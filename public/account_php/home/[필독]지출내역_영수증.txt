@@ -1,0 +1,28 @@
+
+이곳의 파일들은 DB를 연동해서 구축한 PHP웹사이트이다.
+회계를 담당하는 페이지로 사용내역서에 데이타를 입력할수
+있고, 그것을 실시간으로 바로 보여줄수도있다.또한 링크를
+걸어서 그날 사용한 지출내역의 영수증도 사진첨부해서 
+바로 업로드해서 페이지로 확인가능하다.
+이곳 home폴더의 DB접속은 아래와같다.
+
+
+$host = 'localhost';   내부 자체적 DB호스팅 사용중!	
+$username = 'jikji35';
+$password = 'jeonsj84...#';	
+
+
+1. account_input.php (사용내역서 입력)
+2. account_edit.php (사용내역서 편집)
+3. account_view.php (사용내역서 열람)
+4. delete_image.php (이미지 삭제)
+5. images_upload.php (이미지 업로드)
+6. images_view.php (이미지 열람)
+7. images_edit.php (이미지 편집)
+8. update_notice.php
+
+ [[ 추가로 할 예정작업 ]]
+
+- 엑셀파일로 디자인한 작업파일을 구글스프레드시트에서 웹페이지용 파일로 변환해서 만들수도있다.
+
+- 엑셀형 가계부를 PHP로 직접 만들어보기(테이블에서 input태그사용)

@@ -1,0 +1,104 @@
+[[알림]] 관리자 인증절차를 통과해서 페이지 진입하는 코드이므로 삭제하면 안된다.
+
+==>>  직지황악회 진입에 사용내역서의 데이타 입력 및 편집 페이지로 진입할경우
+바로 주소창으로 진입이 불가능하게 차단시켜놓았다.  진입하려면 관리자모드로
+인증절차를 밟아야만 들어갈수있다.
+
+로그인  ==> 사용내역서 입력(account_input.php)
+로그인  ==> 사용내역서 편집(account_edit.php)
+
+
+=========================================================================
+=========================================================================
+
+※ 적용하려면 (해당 페이지; account_input.php , account_edit.php ) 제일상단에 아래와 같이 코드를 반드시 삽입해야한다.
+
+<?php
+// ⭐ 맨 위에 반드시 이 코드가 있어야 합니다!
+require 'php/auth_check.php';
+?>
+
+
+
+=========================================================================
+=========================================================================
+
+※ home/php/auth_check.php - 관리자 인증 체크 공통 파일(아래와 같이 코드를 삽입)
+
+<?php
+
+// 세션 시작 (이미 시작되었는지 확인)
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// 로그인 여부 확인
+if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
+    // 로그인하지 않은 경우
+    $_SESSION['redirect_url'] = $_SERVER['REQUEST_URI']; // 현재 페이지 URL 저장
+    
+    echo "<script>
+        alert('로그인이 필요합니다.');
+        location.href='../member/login_form.php';
+    </script>";
+    exit;
+}
+
+// 관리자 권한 확인 (level 10 이상)
+if (!isset($_SESSION['user_level']) || $_SESSION['user_level'] < 10) {
+    echo "<script>
+        alert('접근 권한이 없습니다. 관리자만 이용 가능합니다.');
+        history.back();
+    </script>";
+    exit;
+}
+
+// 디버깅용 (테스트 후 삭제 가능)
+// echo "<!-- 인증 통과: " . $_SESSION['user_name'] . " (Level: " . $_SESSION['user_level'] . ") -->";
+?>
+
+
+
+=========================================================================
+=========================================================================
+
+※ 관리자모드(level10) 로 데이타베이스(terraone)  테이블(member)에서 지정해 놓았으므로 
+중요한 코드들이 들어있다.  그러므로 이 폴더는 삭제하지 않는다.
+
+DB접속코드가 내컴퓨터로 코드가 설정되어있기때문에 웹호스팅업체에 업로드할경우
+해당 접속코드로 수정해야한다.
+
+ex) //[선택-1] 내컴 자체의 데이터베이스 접속정보
+$servername = "localhost"; // 기본 서버주소. $host로 정의할수도있다.
+$dbuser = "root"; // XAMPP설치후 초기값은 root 이다. $username으로 정의할수도있다.
+$dbpassword = "84325285"; // XAMPP설치후 초기값은 공백('')이다. $password로 정의할수도있다.
+$dbname = "terraone"; // DB접속후 데이타베이스명을 새로만들기 한것이다.
+
+
+//[선택-2] dothome 의 데이터베이스 접속정보
+$servername = "localhost"; 
+$dbuser = "jikji35"; 
+$dbpassword = "jeonsj8....#"; 
+$dbname = "jikji35"; 
+
+
+//[선택-3] infinityfree DB계정 사용!
+   $host = 'sql112.infinityfree.com';
+   $dbname = 'if0_38329280_jikji35';
+   $username = 'if0_38329280';
+   $password = 'Jel10hYSP4LK5D';
+
+
+
+
+
+
+(작업할일 !!)
+
+- 직지황악회 전화연락망도 수정작업할것!(tel_php/tel_input.php ,  el_php/tel_edit.php)
+
+
+
+
+
+ 
