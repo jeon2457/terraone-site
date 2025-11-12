@@ -1,0 +1,22 @@
+
+
+{
+  "name": "terraone-site",
+  "version": "1.0.0",
+  "description": "My Firebase + GitHub Pages project",
+  "scripts": {
+    "sync-pages": "xcopy public\\* . /E /Y /I"
+  },
+  "author": "jeon2457",
+  "license": "MIT"
+}
+
+
+==================================================
+==================================================
+
+이 코드를 만든이유는 깃허브(https://jeon2457.github.io/terraone-site/)에서 만든 웹페이지가 경로(C:\GitHub\terraone-site\public)를 제대로 찾아들어가지 못해서 페이지가 열리지를 않아서 속에 들어있는 모든 데이타를 그대로두고 복사해서 바깥 루트폴더((C:\GitHub\terraone-site)로 붙여넣기해서 이중으로 데이타를 가지고있다.  여기까지는 작동하는데 아무런 문제가 없지만 만약에,
+데이타 수정시 양쪽모두에 데이타를 수정(복사_붙여넣기)를 해야하는 번거러움이 생긴다.
+그래서 간편하게 이 스크립트코드를 만들어서 자동처리하기위해 만든것이다. 
+
+"sync-pages" 스크립트가 public 폴더 → 루트 폴더 동기화 역할
