@@ -1,0 +1,103 @@
+/* GLOBAL STYLES
+
+body {
+  padding: 0;
+  margin: 0;
+  color: #5a5a5a;
+}
+
+
+
+/* Carousel base class */
+.carousel {
+  margin-bottom: 3rem;
+}
+/* Since positioning the image, we need to help out the caption */
+.carousel-caption {
+  bottom: 3rem;
+  z-index: 10;
+}
+
+/* Declare heights because of positioning of img element */
+.carousel-item {
+  height: 32rem;
+}
+
+/* Center align the text within the three columns below the carousel */
+.marketing .col-lg-4 {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+/* rtl:begin:ignore */
+.marketing .col-lg-4 p {
+  margin-right: 0.75rem;
+  margin-left: 0.75rem;
+}
+/* rtl:end:ignore */
+
+.featurette-divider {
+  margin: 5rem 0; /* Space out the Bootstrap <hr> more */
+}
+
+/* Thin out the marketing headings */
+/* rtl:begin:remove */
+.featurette-heading {
+  letter-spacing: -0.05rem;
+}
+
+/* RESPONSIVE CSS
+-------------------------------------------------- */
+
+/* 첫 번째 캐러셀 배경 이미지 스타일 */
+#myCarousel .carousel-item {
+  background-size: cover; /* 배경 이미지가 컨테이너를 꽉 채우도록 */
+  background-position: center; /* 배경 이미지를 중앙에 위치하도록 */
+  background-repeat: no-repeat; /* 배경 이미지 반복 방지 */
+}
+
+/* 800px 이하 화면 크기에서 두 번째 캐러셀 화살표 위치 조정 */
+@media (max-width: 799px) {
+  .carousel-control-prev,
+  .carousel-control-next {
+    top: -70px;
+  }
+  .carousel-caption {
+    top: 123px;
+  }
+
+  .carousel-indicators {
+    position: absolute;
+    bottom: 70px;
+  }
+
+  #carouselExampleAutoplaying .carousel-control-prev,
+  #carouselExampleAutoplaying .carousel-control-next {
+    top: 33%;
+    bottom: auto; /* bottom 속성 초기화 */
+    transform: translateY(-50%);
+  }
+}
+
+/* 480px 이하 화면 크기에서 두 번째 캐러셀 화살표 위치 조정 */
+@media (max-width: 480px) {
+  .carousel-control-prev,
+  .carousel-control-next {
+    top: -290px;
+  }
+
+  .carousel-caption {
+    top: 13px;
+  }
+
+  .carousel-indicators {
+    position: absolute;
+    bottom: 263px;
+  }
+
+  #carouselExampleAutoplaying .carousel-control-prev,
+  #carouselExampleAutoplaying .carousel-control-next {
+    top: 33%;
+    bottom: auto; /* bottom 속성 초기화 */
+    transform: translateY(-50%);
+  }
+}

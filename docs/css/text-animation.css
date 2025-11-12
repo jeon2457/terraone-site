@@ -1,0 +1,96 @@
+/* [필독] : 데이타를 FTP로 전송할때는 반드시 바이너리 형식으로 전송시켜야한다. 안그러면 오류가 발생해서 페이지화면이 제대로 안나온다.  */
+
+.background-image {
+  width: auto;
+  background-image: url('../image/good.jpg');
+  background-size: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  z-index: -10;
+}
+
+svg {
+  font-family: 'Do Hyeon', sans-serif;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+svg text {
+  text-transform: uppercase;
+  animation: stroke 6s infinite alternate;
+  /* 애니메이션 지속 시간 6초로 변경 */
+  stroke-width: 2;
+  stroke: #ff9800;
+  font-size: 180px;
+  letter-spacing: 5px; /* 글자간격 5px로 변경 */
+  transform: scaleX(1.5); /* 가로 크기 확대 */
+  transform-origin: center;
+}
+
+@keyframes stroke {
+  0% {
+    fill: rgba(255, 160, 0, 0);
+    stroke: rgba(255, 152, 0, 1);
+    stroke-dashoffset: 25%;
+    stroke-dasharray: 0 50%;
+    stroke-width: 2;
+  }
+
+  70% {
+    fill: rgba(255, 160, 0, 0);
+    stroke: rgba(255, 152, 0, 1);
+  }
+
+  80% {
+    fill: rgba(255, 160, 0, 0);
+    stroke: rgba(255, 152, 0, 1);
+    stroke-width: 3;
+  }
+
+  100% {
+    fill: rgba(255, 160, 0, 1);
+    stroke: rgba(255, 152, 0, 0);
+    stroke-dashoffset: -25%;
+    stroke-dasharray: 50% 0;
+    stroke-width: 0;
+  }
+
+  100.01% {
+    /* 10초 동안 정지 상태 유지 */
+    fill: rgba(255, 160, 0, 1);
+    stroke: rgba(255, 152, 0, 0);
+    stroke-dashoffset: -25%;
+    stroke-dasharray: 50% 0;
+    stroke-width: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  /* body 에 background linear gradient  가 걸려있으므로 배경을 투명하게 처리한다  */
+  body {
+    background: transparent;
+  }
+
+  .svg-container {
+    height: 700px;
+    /* small해진 뷰포트에 맞게 svg 컨테이너 크기 줄임 */
+  }
+
+  /* 480px 이하에서 배경 이미지 스타일 변경 (예시) */
+  .background-image {
+    position: fixed; /* 기존 fixed 유지  */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh; /* 뷰포트 높이에 꽉 채우도록 설정 */
+    object-fit: cover; /* 이미지가 비율을 유지하며 덮도록 설정 */
+    z-index: -10; /* 다른 컨텐츠 뒤에 위치 */
+    /* 필요한 경우 다른 스타일 추가 */
+  }
+}

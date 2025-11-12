@@ -1,0 +1,201 @@
+/* [필독] : 데이타를 FTP로 전송할때는 반드시 바이너리 형식으로 전송시켜야한다. 안그러면 오류가 발생해서 페이지화면이 제대로 안나온다.  */
+
+@charset "utf-8";
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* body 스크롤바 제거 */
+}
+
+/* SVG 컨테이너 스타일 */
+.svg-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 700px; /* 값을 늘리면 전체 위치가 내려감 (height값을 줄이는게 아니라 늘려줘야한다) */
+}
+
+/* SVG 스타일 유지 */
+svg {
+    width: 100%;
+    max-width: 1320px;
+    height: auto;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+header,
+main,
+footer {
+    padding: 5px;
+}
+
+/* Offcanvas 메뉴 스타일 */
+#offcanvasDarkNavbar {
+    width: 80%;
+}
+
+#offcanvasDarkNavbarLabel {
+    color: rgba(223, 114, 64, 0.897);
+    font-size: 1.5rem;
+}
+
+.navbar-toggler {
+    display: flex;
+    align-items: center;
+    padding-top: 7px;
+    padding-bottom: 5px;
+    margin-top: 3px;
+}
+
+.navbar-toggler-icon {
+    width: 1.84rem;
+    height: 1.84rem;
+    margin-left: -0.54rem;
+    margin-right: -0.54rem;
+    margin-bottom: 0.1rem;
+    line-height: 1;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+
+
+
+/* 직지35황악회 회전속도 조절  */
+.spinner-border.spinner-border-sm {
+  justify-content: center;
+  align-items: center;
+  -webkit-animation: 230s linear infinite spinner-border;
+  animation: 30s linear infinite spinner-border;
+}
+
+/* 직지35황악회 글자 위치조정 */
+.jikji35 {
+    position: absolute;
+    top: 180px;
+    left: 190px;
+    z-index: 1000;
+}
+
+/* 테이블 스타일 */
+.table-bordered {
+    border: 2px dashed black !important;
+}
+
+.table-bordered td,
+.table-bordered th {
+    border: 1px dashed black !important;
+}
+
+/* 기타 스타일 */
+.custom-margin {
+    margin-top: 230px;
+}
+
+.btn-custom-width {
+    width: 100%;
+}
+
+#offcanvasDarkNavbarLabel {
+    color: rgba(223, 114, 64, 0.897);
+    font-size: 1.4em;
+    margin-left: 1.8rem;
+}
+
+.nav-item {  /* Home 버튼 */
+    position: absolute; /* Home 버튼을 절대 위치로 설정 */
+		top: 10px;
+    left: 10px; /* 좌측 여백 조정 */
+}
+
+.number_35 {
+    color: rgb(255, 255, 255);
+    font-size: 20px;
+}
+
+/* 반응형 모바일 사이즈 480px가 최적(중요!) */
+@media (max-width: 480px) {
+
+    body {
+        text-align: center;
+    }
+
+    .svg-container {
+        /* 추가: SVG 컨테이너 스타일 */
+        text-align: center;
+    }
+
+    body {
+        text-align: none;
+        /* 제거: body에는 텍스트 정렬 제거 */
+    }
+
+  /* 직지35황악회 회전속도 조절  */
+  .spinner-border.spinner-border-sm {
+    justify-content: center;
+    align-items: center;
+    -webkit-animation: 230s linear infinite spinner-border;
+    animation: 45s linear infinite spinner-border;
+  }
+  
+    .navbar.navbar-dark.bg-dark.fixed-top {
+        position: absolute;
+    }
+
+    #offcanvasDarkNavbar {
+        width: 100%;
+    }
+
+    .navbar-toggler {
+        display: flex;
+        /* Flexbox 레이아웃 사용 */
+        align-items: center;
+        /* 세로 방향 중앙 정렬 */
+        padding-top: 5px;
+        /* 위쪽 패딩 조정 */
+        padding-bottom: 5px;
+        /* 아래쪽 패딩 조정 */
+        margin-top: -1px;
+        /* 위로 약간 이동 */
+    }
+
+    .navbar-toggler-icon {
+        margin-left: -0.6rem;
+        margin-right: -0.54rem;
+        margin-bottom: 0.04rem;
+    }
+
+    #wrap {
+        padding: 50px 20px 0 15px;
+        height: 100vh;
+    }
+
+    #offcanvasDarkNavbarLabel {
+        font-size: 1.3em;
+        margin-left: 1.5rem;
+    }
+
+    .number_35 {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 670px) {
+    .container {
+        max-width: 670px;
+/*        margin-top: 185px;*/
+        padding: 36px;
+
+        header,
+        main,
+        footer {
+            padding: 3px;
+        }
+    }
+}
+
