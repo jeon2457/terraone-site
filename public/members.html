@@ -1,26 +1,41 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<title>회원 전체</title>
-<script type="module" src="./js/members.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회원 전체 목록</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- 사용자 정의 CSS -->
+  <link rel="stylesheet" href="./css_firebase/members.css">
+
+  <!-- JS 모듈 -->
+  <script type="module" src="./js/members.js" defer></script>
 </head>
 <body>
-<h1>회원 리스트</h1>
-<table border="1" id="membersTable">
-  <thead>
-    <tr>
-      <th>선택</th>
-      <th>ID</th>
-      <th>이름</th>
-      <th>전화</th>
-      <th>주소</th>
-      <th>비고</th>
-      <th>Level</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
-<button id="deleteBtn">선택 삭제</button>
-</body>
-</html>
+  <div class="container mt-5">
+    <h2 class="text-center mb-4">회원 전체 목록</h2>
+
+    <div class="mb-3 text-end">
+      <button id="editSelected" class="btn btn-warning me-2">선택 회원 수정</button>
+      <button id="deleteSelected" class="btn btn-danger">선택 회원 삭제</button>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-striped table-hover" id="membersTable">
+        <thead class="table-dark">
+          <tr>
+            <th><input type="checkbox" id="selectAll"></th>
+            <th>번호</th>
+            <th>아이디</th>
+            <th>이름</th>
+            <th>전화번호</th>
+            <th>주소</th>
+            <th>비고</th>
+            <th>SMS</th>
+            <th>SMS 추가</th>
+            <th>레벨</th>
+          </tr>
+        </thead>

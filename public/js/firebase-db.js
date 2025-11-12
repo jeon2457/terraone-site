@@ -1,57 +1,10 @@
-// firebase-db.js
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
-import { getDatabase, ref, set, get, child }
+// 🔹 firebase-db.js (수정 버전)
+import { app } from "./firebase-config.js";
+import { getDatabase, ref, set, push, get, child, update, remove } 
   from "https://www.gstatic.com/firebasejs/10.6.0/firebase-database.js";
 
-// Firebase 설정 정보 (아까 복사한 부분)
-const firebaseConfig = {
-  apiKey: "AIzaSyAF7AD1d54k21-stmb0Hpg9OMEECvzFHpQ",
-  authDomain: "terraone-d0318.firebaseapp.com",
-  databaseURL: "https://terraone-d0318-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "terraone-d0318",
-  storageBucket: "terraone-d0318.firebasestorage.app",
-  messagingSenderId: "1082807340877",
-  appId: "1:1082807340877:web:6e2b49c04562d800e87104",
-  measurementId: "G-7HMJEV832S"
-};
 
-// Firebase 초기화
-const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-
-// 🔹 테스트용 데이터 쓰기
-set(ref(db, "test/hello"), { message: "안녕하세요" })
-  .then(() => {
-    console.log("✅ 데이터 저장 성공");
-  })
-  .catch((error) => {
-    console.error("❌ 저장 실패:", error);
-  });
-
-// 🔹 데이터 읽기
-get(child(ref(db), "test/hello"))
-  .then((snapshot) => {
-    if (snapshot.exists()) {
-      console.log("📦 데이터:", snapshot.val());
-    } else {
-      console.log("⚠️ 데이터가 없습니다.");
-    }
-  })
-  .catch((error) => {
-    console.error("❌ 읽기 오류:", error);
-  });
-
-
-
-// 1️⃣ firebase-config.js에서 app 가져오기
-import { app } from "./firebase-config.js";
-// 2️⃣ Firebase Database 관련 함수 import
-import { getDatabase, ref, set, push } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-database.js";
-
-
-
-//const db = getDatabase(app);
 const membersRef = ref(db, "terraone/tel");
 
 // ✅ 회원 등록 함수
@@ -70,8 +23,6 @@ export async function getAllMembers() {
     return {};
   }
 }
-
-
 
 // ✅ 회원 수정
 export function updateMember(memberKey, updatedData) {

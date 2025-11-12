@@ -1,21 +1,32 @@
-import { addMember } from "./firebase-db.js";
+// signup.js
+import { addMember } from "./firebase-db.js"; // DB 함수 import
 
-document.getElementById("signupForm").addEventListener("submit", (e) => {
+const form = document.getElementById("signupForm");
+const messageDiv = document.getElementById("message");
+
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const member = {
-    id: document.getElementById("id").value,
-    password: document.getElementById("password").value,
-    name: document.getElementById("name").value,
-    tel: document.getElementById("tel").value,
-    addr: document.getElementById("addr").value,
-    remark: document.getElementById("remark").value,
-    sms: document.getElementById("sms").value,
-    sms_2: document.getElementById("sms_2").value.split(","),
-    level: 1
+    id: document.getElementById("id").value.trim(),
+    password: document.getElementById("password").value.trim(),
+    name: document.getElementById("name").value.trim(),
+    tel: document.getElementById("tel").value.trim(),
+    addr: document.getElementById("addr").value.trim(),
+    remark: document.getElementById("remark").value.trim(),
+    sms: document.getElementById("sms").value.trim(),
+    sms_2: document.getElementById("sms_2").value
+      ? document.getElementById("sms_2").value.split(",").map(s => s.trim())
+      : [],
+    level: parseInt(document.getElementById("level").value, 10)
   };
 
-  addMember(member);
-  alert("회원가입 완료!");
-  e.target.reset();
+  try {
+    await addMember(member); // DB에 추가
+    messageDiv.textContent = "✅ 회원가입 완료!";
+    form.reset();
+  } catch (err) {
+    console.error(err);
+    messageDiv.textContent = "❌ 회원가입 중 오류가 발생했습니다.";
+  }
 });
