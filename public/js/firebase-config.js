@@ -1,11 +1,8 @@
 // 📁 public/js/firebase-config.js
-// Firebase 기본 설정 파일
-
-// Firebase SDK에서 필요한 함수 import
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-analytics.js";
+import { getDatabase, connectDatabaseEmulator } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-database.js";
 
-// Firebase 프로젝트 설정 정보
 const firebaseConfig = {
   apiKey: "AIzaSyAF7AD1d54k21-stmb0Hpg9OMEECvzFHpQ",
   authDomain: "terraone-d0318.firebaseapp.com",
@@ -17,9 +14,14 @@ const firebaseConfig = {
   measurementId: "G-7HMJEV832S"
 };
 
-// Firebase 앱 초기화
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
-// 다른 파일에서 Firebase 앱을 쓸 수 있도록 export
+// 🔥 Emulator 연결 (로컬 테스트용)
+const db = getDatabase(app);
+if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+  connectDatabaseEmulator(db, "localhost", 9000);
+  console.log("🔧 Firebase Emulator에 연결됨");
+}
+
 export { app };

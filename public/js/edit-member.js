@@ -1,5 +1,12 @@
+// edit-member.js
 import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-database.js";
 import { app } from "./firebase-config.js";
+import { requireAdmin } from "./auth.js";
+
+// 🔥 관리자 권한 체크
+if (!requireAdmin()) {
+  // requireAdmin()에서 이미 리다이렉트 처리됨
+}
 
 const db = getDatabase(app);
 
@@ -30,7 +37,7 @@ async function loadMember() {
     remarkInput.value = m.remark || "";
     smsInput.value = m.sms || "";
     sms2Input.value = m.sms_2 || "";
-    levelSelect.value = m.level || "1"; // 기본값 1
+    levelSelect.value = m.level || "1";
   } else {
     messageDiv.textContent = "⚠️ 회원 데이터를 찾을 수 없습니다.";
   }
@@ -53,6 +60,9 @@ form.addEventListener("submit", async (e) => {
   try {
     await update(memberRef, updatedData);
     messageDiv.textContent = "✅ 회원 수정 완료!";
+    setTimeout(() => {
+      window.location.href = "members.html";
+    }, 1500);
   } catch (err) {
     console.error(err);
     messageDiv.textContent = "❌ 수정 실패!";

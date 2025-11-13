@@ -1,3 +1,4 @@
+// login.js
 import { login } from "./firebase-db.js";
 
 const form = document.getElementById("loginForm");
@@ -18,12 +19,21 @@ form.addEventListener("submit", async (e) => {
 
   messageDiv.textContent = "✅ 로그인 성공!";
 
+  // 🔥 세션에 로그인 정보 저장
+  sessionStorage.setItem("loggedInUser", JSON.stringify({
+    key: member.key,
+    id: member.id,
+    name: member.name,
+    level: member.level
+  }));
+
   // level 값에 따라 페이지 이동
   if (member.level === 10) {
     // 관리자 페이지
-    window.location.href = "admin.html";
-  } else {
-    // 일반 회원 페이지
     window.location.href = "members.html";
+  } else {
+    // 일반 회원은 접근 불가
+    alert("❌ 관리자만 접근할 수 있습니다.");
+    sessionStorage.removeItem("loggedInUser"); // 세션 삭제
   }
 });
