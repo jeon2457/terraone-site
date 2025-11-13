@@ -1,0 +1,257 @@
+★★★★★ [[ 필 독: 사용법 ]] ★★★★★
+
+이곳에 있는 코드파일은 jikji35전화연락망을 새로운 방식으로 페이지를 만들기위해 사용되었다.
+구글 firebase(https://console.firebase.google.com/ : 구글계정(jeon2457@gmail.com)에서 Realtime Database 데이타베이스와 연결시키고 깃허브(https://github.com/ 계정: jeon2457@gmail.com - jeon2457(terraone-site)) 로 서로 연결되어있다. 
+
+파일을 편집하고 구글서버로 업데이트 하려면 내컴 탐색기 C:\GitHub\terraone-site에 들어있는데 비주얼스튜디오코드로
+작업을 하고 GitHub Desktop프로그램을 실행하면 변경된것은 여기서 감지한다.  commit처리하고 Push Origin해주면 
+자동으로 깃허브로 데이타 업데이트되고 구글firebase 서버쪽과 웹호스팅 처리가된다.
+
+만약 자동처리가 안된다면 내컴퓨터 프롬프트를 실행하고 해당폴더(C:\GitHub\terraone-site)로 이동해서(명령어 cd C:\GitHub\terraone-site) 프롬프트 명령어: firebase login 으로 로그인 확인하고,  firebase deploy --only hosting 로 실행하면 데이타가 구글서버로 넘겨진다.
+
+
+=============================================================================
+=============================================================================
+
+
+
+
+
+<!--  ☆★☆  terraone-site 폴더구조  ☆★☆
+
+
+C:\GitHub\terraone-site
+│
+├─ .firebase/
+├─ .git/
+├─ .github/
+├─  css/
+├─ image/
+│
+├─ public/
+│   ├─ css/
+│   ├─ css_firebase/
+│   ├─ favicons/
+│   │    
+│   ├─ image/
+│   │    └─ sms-4.png
+│   ├─ images/
+│   ├─ images/
+│   │ 
+│   ├─ js/
+│   │    ├─ auth.js
+│   │    ├─ edit-member.js
+│   │    ├─ firebase-config.js
+│   │    ├─ firebase-db.js
+│   │    ├─ index-firebase.js
+│   │    ├─ login.js
+│   │    ├─ members.js 
+│   │    └─ signup.js
+│   │
+│   ├─ edit-member.html  
+│   ├─ favicon.ico
+│   ├─ firebase.json
+│   ├─ index.html
+│   ├─ login.html
+│   ├─ manifest.json
+│   ├─ members.html
+│   └─ signup.html
+│
+├─ .firebaserc
+├─ .gitattributes
+├─ .gitgnore
+├─ database.rules.json
+├─ favicon.ico
+├─ manifest.json
+├─ package.json
+│
+└─ (기타 파일들)
+
+
+ -->
+
+
+
+
+
+=============================================================================
+=============================================================================
+
+
+
+
+
+메인: https://terraone-d0318.web.app/
+로그인https://terraone-d0318.web.app/login.html
+회원가입https://terraone-d0318.web.app/signup.html
+회원목록https://terraone-d0318.web.app/members.html
+회원수정https://terraone-d0318.web.app/edit-member.html
+
+
+
+
+1.  html 페이지에 스크립트 삽입!
+    ex)  public/index.html에 아래처럼 추가:
+
+	<script type="module" src="js/firebase-db.js"></script>
+
+2. js폴더내에 데이타베이스와 연결되는 스크립트 추가!
+
+    ex) firebase-db.js
+// 1. Firebase App, Database import
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-database.js";
+
+// 2. Firebase 프로젝트 설정 (firebase console에서 확인)
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+// 3. Firebase 초기화
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// 4. 데이터 쓰기 예제
+function writeUserData(userId, name, age) {
+  set(ref(db, 'users/' + userId), {
+    username: name,
+    age: age
+  });
+}
+
+// 예: users/1에 데이터 쓰기
+writeUserData(1, "Jeon", 30);
+
+// 5. 데이터 읽기 예제
+const userRef = ref(db, 'users/1');
+onValue(userRef, (snapshot) => {
+  const data = snapshot.val();
+  console.log("Realtime Database 값:", data);
+});
+
+
+
+=====================================================================
+=====================================================================
+
+1. public/js/firebase-db.js 수정 → 로컬에서 Emulator로 테스트 가능:
+
+firebase emulators:start
+
+
+Hosting: http://127.0.0.1:5000
+
+Database: http://127.0.0.1:4000/database
+
+
+2. 문제가 없으면 Firebase Hosting에 배포:
+
+firebase deploy --only hosting (도스프롬프트에서 실행)
+
+
+===================================================================
+===================================================================
+
+
+프로젝트 이름
+terraone
+프로젝트 ID
+terraone-d0318
+프로젝트 번호
+1082807340877
+앱 닉네임
+terraone
+앱 ID
+1:1082807340877:web:6e2b49c04562d800e87104
+연결된 Firebase 호스팅 사이트
+terraone-d0318
+
+=====================================================================
+npm install firebase
+그런 다음 Firebase를 초기화하여 사용하려는 제품의 SDK를 사용하세요.
+
+
+
+// 📁 public/js/firebase-db.js
+// Firebase 기본 설정 파일
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
+import { getDatabase, ref, set, get, child }
+  from "https://www.gstatic.com/firebasejs/10.6.0/firebase-database.js";
+
+// Firebase 설정 정보 (아까 복사한 부분)
+const firebaseConfig = {
+  apiKey: "AIzaSyAF7AD1d54k21-stmb0Hpg9OMEECvzFHpQ",
+  authDomain: "terraone-d0318.firebaseapp.com",
+  databaseURL: "https://terraone-d0318-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "terraone-d0318",
+  storageBucket: "terraone-d0318.firebasestorage.app",
+  messagingSenderId: "1082807340877",
+  appId: "1:1082807340877:web:6e2b49c04562d800e87104",
+  measurementId: "G-7HMJEV832S"
+};
+
+// Firebase 초기화
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// 🔹 테스트용 데이터 쓰기
+set(ref(db, "test/hello"), { message: "안녕하세요" })
+  .then(() => {
+    console.log("✅ 데이터 저장 성공");
+  })
+  .catch((error) => {
+    console.error("❌ 저장 실패:", error);
+  });
+
+// 🔹 데이터 읽기
+get(child(ref(db), "test/hello"))
+  .then((snapshot) => {
+    if (snapshot.exists()) {
+      console.log("📦 데이터:", snapshot.val());
+    } else {
+      console.log("⚠️ 데이터가 없습니다.");
+    }
+  })
+  .catch((error) => {
+    console.error("❌ 읽기 오류:", error);
+  });
+
+
+
+=====================================================================
+
+
+// 📁 public/js/firebase-config.js
+// Firebase 기본 설정 파일
+
+// Firebase SDK에서 필요한 함수 import
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-analytics.js";
+
+// Firebase 프로젝트 설정 정보
+const firebaseConfig = {
+  apiKey: "AIzaSyAF7AD1d54k21-stmb0Hpg9OMEECvzFHpQ",
+  authDomain: "terraone-d0318.firebaseapp.com",
+  databaseURL: "https://terraone-d0318-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "terraone-d0318",
+  storageBucket: "terraone-d0318.firebasestorage.app",
+  messagingSenderId: "1082807340877",
+  appId: "1:1082807340877:web:6e2b49c04562d800e87104",
+  measurementId: "G-7HMJEV832S"
+};
+
+// Firebase 앱 초기화
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+
+// 다른 파일에서 Firebase 앱을 쓸 수 있도록 export
+export { app };
+
+

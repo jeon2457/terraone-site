@@ -1,11 +1,11 @@
 <!-- 부트스트랩 5.3.3로 제작되었다. css나 js 를 버전에 다른걸 설치하면 작동이 제대로 안될수있으니 주의바람!
 활용방안: 케러셀,오프캔버스,플레이스홀더,스크롤스파이,스피너,토스트,아이콘링크,반응형고정,세로줄,테두리,플렉스,Z-index 등등  
 부트스트랩 link는 <head>에 삽입하고, <script>는 <body>부분의 끝부분에 삽입해야하나 <script> "DOMContentLoaded" 또는 defer를 <head>안에 삽입하면 그 다음부터 스크립트 태그를 <body> 어느 위치에 있어도 정상적으로 작동한다.
-✅ 파비콘 "홈화면 추가" 아이콘 생성이 안되는 원인은 절대경로가 아닌 상대경로(./)를 해야지만 한다. -->
+✅ 파비콘 "홈화면 추가" 아이콘 생성이 안되는 원인은 절대경로가 아닌 상대경로(./)를 해야지만 한다. 
+✅ Firebase Realtime Database와 연동되어 회원 데이터를 동적으로 표시합니다. -->
 
 <!DOCTYPE html>
 <html lang="ko">
-  <!-- 위1번항을 추가하면 떨어지는 크로바이미지 스크립트가 차단됨  -->
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta
@@ -18,19 +18,15 @@
     <!-- 아이폰에서는 전화번호형식 010-1234-5678과 같은 형식이면 자동링크라 바로 전화가 걸린다. 이를 막기위한 메타태그는 -->
     <meta name="format-detection" content="telephone=no" />
 
-    <!-- 스크립트 위치가 어디에와도 상관없게끔하는 코드 ~ <head>태그 안에 삽입한다. -->
-    <!-- 스크립트 DOMContentLoaded", function() 대신에 defer을 사용해도 상관없음! -->
-
     <link rel="stylesheet" href="css/style.css" />
 
     <!-- 부트스트랩 CDN 링크 -->
     <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-    integrity="sha384-YvpCrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-    crossorigin="anonymous"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-YvpCrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
     />
-
 
     <!-- 파비콘 아이콘들 (상대경로(./) 사용 -->
     <link rel="icon" href="./favicon.ico?v=2" />
@@ -200,7 +196,7 @@
                     alt="image"
                   />
                   <span class="custom-span"
-                    >직지초35회 김천지부 동기연락망</span
+                    >직지초35회 김천지부 동기연락망</span
                   >
                   <img
                     src="image/dd.gif"
@@ -233,464 +229,9 @@
               </tr>
             </thead>
 
-            <tbody>
-              <tr>
-                <td class="no_1">1</td>
-                <td class="name_1">
-                  <a href="tel:010-9142-7982"><span>김미영</span></a>
-                </td>
-                <td class="tel_1">
-                  <a href="tel:010-9142-7982"><span>010-9142-7982</span></a>
-                </td>
-                <td class="address_1"><span>김천</span></td>
-                <td class="remark_1"><span>&nbsp;</span></td>
-                <td class="sms_1">
-                  <!-- <a href="sms://010-9142-7982"
-                ><span><img class="max-small" src="image/sms-4.png" /></span></a> -->
-                  <a
-                    href="sms:010-9142-7982"
-                    onclick="sendSMS(event,'010-9142-7982')"
-                    ><span><img class="max-small" src="image/sms-4.png" /></span
-                  ></a>
-                </td>
-              </tr>
-
-              <tr>
-                <td class="no_1">2</td>
-                <td class="name_1">
-                  <a href="tel:010-3371-7107"><span>김병철</span></a>
-                </td>
-                <td class="tel_1">
-                  <a href="tel:010-3371-7107"><span>010-3371-7107</span></a>
-                </td>
-                <td class="address_1">
-                  <!--거주지: 회장,총무가 바뀌면 위치이동및 번호수정 -->
-                  <a
-                    href="sms:010-9142-7982,010-9140-8020,010-8980-3564,010-3588-2322,010-9321-1183,010-9535-4311,010-3535-0111,010-6866-8844,010-6790-3746,010-5281-8008,010-6294-5982,010-6488-2412,010-2760-3519,010-7289-0987,010-9609-1688,010-4538-6724,010-5958-9945,010-2276-6007,010-6623-5695,010-8586-2506"
-                    onclick="sendSMS(event,'010-9142-7982,010-9140-8020,010-8980-3564,010-3588-2322,010-9321-1183,010-9535-4311,010-3535-0111,010-6866-8844,010-6790-3746,010-5281-8008,010-6294-5982,010-6488-2412,010-2760-3519,010-7289-0987,010-9609-1688,010-4538-6724,010-5958-9945,010-2276-6007,010-6623-5695,010-8586-2506')"
-                    ><span>김천</span></a
-                  >
-                </td>
-
-                <td class="remark_1">
-                  <!-- 비고: 회장,총무가 바뀌면 위치이동및 번호수정 -->
-                  <a
-                    href="sms:010-9142-7982,010-9140-8020,010-8980-3564,010-3588-2322,010-9321-1183,010-9535-4311,010-3535-0111,010-6866-8844,010-6790-3746,010-5281-8008,010-6294-5982,010-6488-2412,010-2760-3519,010-7289-0987,010-9609-1688,010-4538-6724,010-5958-9945,010-2276-6007,010-6623-5695,010-8586-2506"
-                    onclick="sendSMS(event,'010-9142-7982,010-9140-8020,010-8980-3564,010-3588-2322,010-9321-1183,010-9535-4311,010-3535-0111,010-6866-8844,010-6790-3746,010-5281-8008,010-6294-5982,010-6488-2412,010-2760-3519,010-7289-0987,010-9609-1688,010-4538-6724,010-5958-9945,010-2276-6007,010-6623-5695,010-8586-2506')"
-                    ><span>총무</span></a
-                  >
-                </td>
-
-                <td class="sms_1">
-                  <!-- <a href="sms://010-3371-7107"
-                ><span><img class="max-small" src="image/sms-4.png" /></span
-              ></a> -->
-                  <a
-                    href="sms:010-3371-7107"
-                    onclick="sendSMS(event,'010-3371-7107')"
-                    ><span><img class="max-small" src="image/sms-4.png" /></span
-                  ></a>
-                </td>
-              </tr>
-              <tr>
-                <td class="no_1">3</td>
-                <td class="name_1">
-                  <a href="tel:010-9140-8020"><span>김상우</span></a>
-                </td>
-                <td class="tel_1">
-                  <a href="tel:010-9140-8020"><span>010-9140-8020</span></a>
-                </td>
-                <td class="address_1"><span>안양</span></td>
-                <td class="remark_1"><span>&nbsp;</span></td>
-                <td class="sms_1">
-                  <!-- <a href="sms://010-9140-8020"
-                ><span><img class="max-small" src="image/sms-4.png" /></span
-              ></a> -->
-                  <a
-                    href="sms:010-9140-8020"
-                    onclick="sendSMS(event,'010-9140-8020')"
-                    ><span><img class="max-small" src="image/sms-4.png" /></span
-                  ></a>
-                </td>
-              </tr>
-              <tr>
-                <td class="no_1">4</td>
-                <td class="name_1">
-                  <a href="tel:010-8980-3564"><span>김상철</span></a>
-                </td>
-                <td class="tel_1">
-                  <a href="tel:010-8980-3564"><span>010-8980-3564</span></a>
-                </td>
-                <td class="address_1"><span>안양</span></td>
-                <td class="remark_1"><span>&nbsp;</span></td>
-                <td class="sms_1">
-                  <!-- <a href="sms://010-8980-3564"
-                ><span><img class="max-small" src="image/sms-4.png" /></span
-              ></a> -->
-                  <a
-                    href="sms:010-8980-3564"
-                    onclick="sendSMS(event,'010-8980-3564')"
-                    ><span><img class="max-small" src="image/sms-4.png" /></span
-                  ></a>
-                </td>
-              </tr>
-              <tr>
-                <td class="no_1">5</td>
-                <td class="name_1">
-                  <a href="tel:010-3588-2322"><span>김이식</span></a>
-                </td>
-                <td class="tel_1">
-                  <a href="tel:010-3588-2322"><span>010-3588-2322</span></a>
-                </td>
-                <td class="address_1"><span>부산</span></td>
-                <td class="remark_1"><span>&nbsp;</span></td>
-                <td class="sms_1">
-                  <!-- <a href="sms://010-3588-2322"
-                ><span><img class="max-small" src="image/sms-4.png" /></span
-              ></a> -->
-                  <a
-                    href="sms:010-3588-2322"
-                    onclick="sendSMS(event,'010-3588-2322')"
-                    ><span><img class="max-small" src="image/sms-4.png" /></span
-                  ></a>
-                </td>
-              </tr>
-
-              <tr>
-                <td class="no_1">6</td>
-                <td class="name_1">
-                  <a href="tel:010-9321-1183"><span>김춘배</span></a>
-                </td>
-                <td class="tel_1">
-                  <a href="tel:010-9321-1183"><span>010-9321-1183</span></a>
-                </td>
-                <td class="address_1"><span>울산</span></td>
-                <td class="remark_1"><span>&nbsp;</span></td>
-                <td class="sms_1">
-                  <!-- <a href="sms://010-9321-1183"
-                ><span><img class="max-small" src="image/sms-4.png" /></span
-              ></a> -->
-                  <a
-                    href="sms:010-9321-1183"
-                    onclick="sendSMS(event,'010-9321-1183')"
-                    ><span><img class="max-small" src="image/sms-4.png" /></span
-                  ></a>
-                </td>
-              </tr>
-              <tr>
-                <td class="no_1">7</td>
-                <td class="name_1">
-                  <a href="tel:010-9535-4311"><span>라찬숙</span></a>
-                </td>
-                <td class="tel_1">
-                  <a href="tel:010-9535-4311"><span>010-9535-4311</span></a>
-                </td>
-                <td class="address_1"><span>여주</span></td>
-                <td class="remark_1"><span>&nbsp;</span></td>
-                <td class="sms_1">
-                  <!--  <a href="sms://010-9535-4311"
-                ><span><img class="max-small" src="image/sms-4.png" /></span
-              ></a>  -->
-                  <a
-                    href="sms:010-9535-4311"
-                    onclick="sendSMS(event,'010-9535-4311')"
-                    ><span><img class="max-small" src="image/sms-4.png" /></span
-                  ></a>
-                </td>
-              </tr>
-              <tr>
-                <td class="no_1">8</td>
-                <td class="name_1">
-                  <a href="tel:010-3535-0111"><span>박건용</span></a>
-                </td>
-                <td class="tel_1">
-                  <a href="tel:010-3535-0111"><span>010-3535-0111</span></a>
-                </td>
-                <td class="address_1"><span>상주</span></td>
-                <td class="remark_1"><span>&nbsp;</span></td>
-                <td class="sms_1">
-                  <!--  <a href="sms://010-3535-0111"
-                ><span><img class="max-small" src="image/sms-4.png" /></span
-              ></a>  -->
-                  <a
-                    href="sms:010-3535-0111"
-                    onclick="sendSMS(event,'010-3535-0111')"
-                    ><span><img class="max-small" src="image/sms-4.png" /></span
-                  ></a>
-                </td>
-              </tr>
-              <tr>
-                <td class="no_1">9</td>
-                <td class="name_1">
-                  <a href="tel:010-6866-8844"><span>박영미</span></a>
-                </td>
-                <td class="tel_1">
-                  <a href="tel:010-6866-8844"><span>010-6866-8844</span></a>
-                </td>
-                <td class="address_1"><span>청주</span></td>
-                <td class="remark_1"><span>&nbsp;</span></td>
-                <td class="sms_1">
-                  <!--  <a href="sms://010-6866-8844"
-                ><span><img class="max-small" src="image/sms-4.png" /></span
-              ></a>  -->
-                  <a
-                    href="sms:010-6866-8844"
-                    onclick="sendSMS(event,'010-6866-8844')"
-                    ><span><img class="max-small" src="image/sms-4.png" /></span
-                  ></a>
-                </td>
-              </tr>
-
-              
-              <tr>
-                <td class="no_1">10</td>
-                <td class="name_1">
-                  <a href="tel:010-5281-8008"><span>백기성</span></a>
-                </td>
-                <td class="tel_1">
-                  <a href="tel:010-5281-8008"><span>010-5281-8008</span></a>
-                </td>
-                <td class="address_1"><span>김천</span></td>
-                <td class="remark_1"><span>&nbsp;</span></td>
-                <td class="sms_1">
-                  <!--  <a href="sms://010-5281-8008"
-                ><span><img class="max-small" src="image/sms-4.png" /></span
-              ></a>  -->
-                  <a
-                    href="sms:010-5281-8008"
-                    onclick="sendSMS(event,'010-5281-8008')"
-                    ><span><img class="max-small" src="image/sms-4.png" /></span
-                  ></a>
-                </td>
-              </tr>
-              <tr>
-                <td class="no_1">11</td>
-                <td class="name_1">
-                  <a href="tel:010-6294-5982"><span>백상숙</span></a>
-                </td>
-                <td class="tel_1">
-                  <a href="tel:010-6294-5982"><span>010-6294-5982</span></a>
-                </td>
-                <td class="address_1"><span>김천</span></td>
-                <td class="remark_1"><span>&nbsp;</span></td>
-                <td class="sms_1">
-                  <!--  <a href="sms://010-6294-5982"
-                ><span><img class="max-small" src="image/sms-4.png" /></span
-              ></a>  -->
-                  <a
-                    href="sms:010-6294-5982"
-                    onclick="sendSMS(event,'010-6294-5982')"
-                    ><span><img class="max-small" src="image/sms-4.png" /></span
-                  ></a>
-                </td>
-              </tr>
-
-              <tr>
-                <td class="no_1">12</td>
-                <td class="name_1">
-                  <a href="tel:010-6488-2412"><span>안 호</span></a>
-                </td>
-                <td class="tel_1">
-                  <a href="tel:010-6488-2412"><span>010-6488-2412</span></a>
-                </td>
-                <td class="address_1">
-                  <!-- 거주지: 회장,총무가 바뀌면 위치이동및 번호수정 -->
-                  <a
-                    href="sms:010-9142-7982,010-3371-7107,010-9140-8020,010-8980-3564,010-3588-2322,010-9321-1183,010-9535-4311,010-3535-0111,010-6866-8844,010-6790-3746,010-5281-8008,010-6294-5982,010-2760-3519,010-7289-0987,010-9609-1688,010-4538-6724,010-5958-9945,010-2276-6007,010-6623-5695,010-8586-2506"
-                    onclick="sendSMS(event,'010-9142-7982,010-3371-7107,010-9140-8020,010-8980-3564,010-3588-2322,010-9321-1183,010-9535-4311,010-3535-0111,010-6866-8844,010-5281-8008,010-6294-5982,010-2760-3519,010-7289-0987,010-9609-1688,010-4538-6724,010-5958-9945,010-2276-6007,010-6623-5695,010-8586-2506')"
-                    ><span>김천</span></a
-                  >
-                </td>
-                <td class="remark_1">
-                  <!-- 비고: 회장,총무가 바뀌면 위치이동및 번호수정 -->
-                  <a
-                    href="sms:010-9142-7982,010-3371-7107,010-9140-8020,010-8980-3564,010-3588-2322,010-9321-1183,010-9535-4311,010-3535-0111,010-6866-8844,010-6790-3746,010-5281-8008,010-6294-5982,010-2760-3519,010-7289-0987,010-9609-1688,010-4538-6724,010-5958-9945,010-2276-6007,010-6623-5695,010-8586-2506"
-                    onclick="sendSMS(event,'010-9142-7982,010-3371-7107,010-9140-8020,010-8980-3564,010-3588-2322,010-9321-1183,010-9535-4311,010-3535-0111,010-6866-8844,010-5281-8008,010-6294-5982,010-2760-3519,010-7289-0987,010-9609-1688,010-4538-6724,010-5958-9945,010-2276-6007,010-6623-5695,010-8586-2506')"
-                    ><span>회장</span></a
-                  >
-                </td>
-                <td class="sms_1">
-                  <!--  <a href="sms://010-6488-2412"
-                ><span><img class="max-small" src="image/sms-4.png" /></span
-              ></a>  -->
-                  <a
-                    href="sms:010-6488-2412"
-                    onclick="sendSMS(event,'010-6488-2412')"
-                    ><span><img class="max-small" src="image/sms-4.png" /></span
-                  ></a>
-                </td>
-              </tr>
-              <tr>
-                <td class="no_1">13</td>
-                <td class="name_1">
-                  <a href="tel:010-2760-3519"><span>유영식</span></a>
-                </td>
-                <td class="tel_1">
-                  <a href="tel:010-2760-3519"><span>010-2760-3519</span></a>
-                </td>
-                <td class="address_1"><span>인천</span></td>
-                <td class="remark_1"><span>&nbsp;</span></td>
-                <td class="sms_1">
-                  <!--  <a href="sms://010-2760-3519"
-                ><span><img class="max-small" src="image/sms-4.png" /></span
-              ></a>  -->
-                  <a
-                    href="sms:010-2760-3519"
-                    onclick="sendSMS(event,'010-2760-3519')"
-                    ><span><img class="max-small" src="image/sms-4.png" /></span
-                  ></a>
-                </td>
-              </tr>
-
-              <tr>
-                <td class="no_1">14</td>
-                <td class="name_1">
-                  <a href="tel:010-7289-0987"><span>전기성</span></a>
-                </td>
-                <td class="tel_1">
-                  <a href="tel:010-7289-0987"><span>010-7289-0987</span></a>
-                </td>
-                <td class="address_1"><span>부산</span></td>
-                <td class="remark_1"><span>&nbsp;</span></td>
-                <td class="sms_1">
-                  <!--  <a href="sms://010-7289-0987"
-									><span><img class="max-small" src="image/sms-4.png" /></span
-								></a>  -->
-                  <a
-                    href="sms:010-7289-0987"
-                    onclick="sendSMS(event,'010-7289-0987')"
-                    ><span><img class="max-small" src="image/sms-4.png" /></span
-                  ></a>
-                </td>
-              </tr>
-              <tr>
-                <td class="no_1">15</td>
-                <td class="name_1">
-                  <a href="tel:010-9609-1688"><span>전상준</span></a>
-                </td>
-                <td class="tel_1">
-                  <a href="tel:010-9609-1688"><span>010-9609-1688</span></a>
-                </td>
-                <td class="address_1"><span>안산</span></td>
-                <td class="remark_1"><span>&nbsp;</span></td>
-                <td class="sms_1">
-                  <!--  <a href="sms://010-9609-1688"
-									><span><img class="max-small" src="image/sms-4.png" /></span
-								></a>  -->
-                  <a
-                    href="sms:010-9609-1688"
-                    onclick="sendSMS(event,'010-9609-1688')"
-                    ><span><img class="max-small" src="image/sms-4.png" /></span
-                  ></a>
-                </td>
-              </tr>
-
-              <tr>
-                <td class="no_1">16</td>
-                <td class="name_1">
-                  <a href="tel:010-4538-6724"><span>전종철</span></a>
-                </td>
-                <td class="tel_1">
-                  <a href="tel:010-4538-6724"><span>010-4538-6724</span></a>
-                </td>
-                <td class="address_1"><span>김천</span></td>
-                <td class="remark_1"><span>&nbsp;</span></td>
-                <td class="sms_1">
-                  <!--  <a href="sms://010-4538-6724"
-									><span><img class="max-small" src="image/sms-4.png" /></span
-								></a>  -->
-                  <a
-                    href="sms:010-4538-6724"
-                    onclick="sendSMS(event,'010-4538-6724')"
-                    ><span><img class="max-small" src="image/sms-4.png" /></span
-                  ></a>
-                </td>
-              </tr>
-              <tr>
-                <td class="no_1">17</td>
-                <td class="name_1">
-                  <a href="tel:010-5958-9945"><span>전창섭</span></a>
-                </td>
-                <td class="tel_1">
-                  <a href="tel:010-5958-9945"><span>010-5958-9945</span></a>
-                </td>
-                <td class="address_1"><span>김천</span></td>
-                <td class="remark_1"><span>&nbsp;</span></td>
-                <td class="sms_1">
-                  <!--  <a href="sms://010-5958-9945"
-									><span><img class="max-small" src="image/sms-4.png" /></span
-								></a>  -->
-                  <a
-                    href="sms:010-5958-9945"
-                    onclick="sendSMS(event,'010-5958-9945')"
-                    ><span><img class="max-small" src="image/sms-4.png" /></span
-                  ></a>
-                </td>
-              </tr>
-              <tr>
-                <td class="no_1">18</td>
-                <td class="name_1">
-                  <a href="tel:010-2276-6007"><span>조병남</span></a>
-                </td>
-                <td class="tel_1">
-                  <a href="tel:010-2276-6007"><span>010-2276-6007</span></a>
-                </td>
-                <td class="address_1"><span>천안</span></td>
-                <td class="remark_1"><span>&nbsp;</span></td>
-                <td class="sms_1">
-                  <!--  <a href="sms://010-2276-6007"
-									><span><img class="max-small" src="image/sms-4.png" /></span
-								></a>  -->
-                  <a
-                    href="sms:010-2276-6007"
-                    onclick="sendSMS(event,'010-2276-6007')"
-                    ><span><img class="max-small" src="image/sms-4.png" /></span
-                  ></a>
-                </td>
-              </tr>
-
-              <tr>
-                <td class="no_1">19</td>
-                <td class="name_1">
-                  <a href="tel:010-6623-5695"><span>최영애</span></a>
-                </td>
-                <td class="tel_1">
-                  <a href="tel:010-6623-5695"><span>010-6623-5695</span></a>
-                </td>
-                <td class="address_1"><span>황간</span></td>
-                <td class="remark_1"><span>&nbsp;</span></td>
-                <td class="sms_1">
-                  <!--  <a href="sms://010-6623-5695"
-									><span><img class="max-small" src="image/sms-4.png" /></span
-								></a>  -->
-                  <a
-                    href="sms:010-6623-5695"
-                    onclick="sendSMS(event,'010-6623-5695')"
-                    ><span><img class="max-small" src="image/sms-4.png" /></span
-                  ></a>
-                </td>
-              </tr>
-              <tr>
-                <td class="no_1">20</td>
-                <td class="name_1">
-                  <a href="tel:010-8586-2506"><span>허남희</span></a>
-                </td>
-                <td class="tel_1">
-                  <a href="tel:010-8586-2506"><span>010-8586-2506</span></a>
-                </td>
-                <td class="address_1"><span>김천</span></td>
-                <td class="remark_1"><span>&nbsp;</span></td>
-                <td class="sms_1">
-                  <!--  <a href="sms://010-8586-2506"
-									><img class="max-small" src="image/sms-4.png"
-								/></a>  -->
-                  <a
-                    href="sms:010-8586-2506"
-                    onclick="sendSMS(event,'010-8586-2506')"
-                    ><span><img class="max-small" src="image/sms-4.png" /></span
-                  ></a>
-                </td>
-              </tr>
+            <tbody id="memberTableBody">
+              <!-- 🔥 Firebase에서 데이터를 불러와 여기에 동적으로 추가됩니다 -->
+              <!-- members.html에서 등록된 회원 데이터가 자동으로 표시됩니다 -->
             </tbody>
 
             <tfoot>
@@ -717,6 +258,9 @@
         </div>
       </div>
     </div>
+
+    <!-- 🔥 Firebase 연동 스크립트 (회원 데이터를 동적으로 불러옵니다) -->
+    <script type="module" src="js/index-firebase.js"></script>
 
     <!-- ✅ Bootstrap JS (번들) -->
     <script

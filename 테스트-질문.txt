@@ -1,0 +1,223 @@
+
+(챗GPT 질문내용)
+
+
+먼저 데이타베이스 테이블을 먼저 만들어줘요.  테이타베이스명은 terraone로 하고싶고,  테이블명은 tel,  그리고 그속 구조는  idx, id`, password, name, tel, addr, remark, sms, sms_2, level 로 만들고싶어요.
+용도를 말하자면 idx는 자동으로 번호가 만들어지는것이고, id,password는 로그인 과정, name는 회원가입에 필요한 이름, tel은 휴대폰전화번호,addr은 주소, remark는 비고란 5글자크기정도, sms는  휴대폰전화번호, sms_2는 휴대폰전화번호가 30명정도 들어갈수있는 사이즈, level은 로그인 회원이 관리자인지, 회원인지를 구분해서 관리자 편집페이지로 진입가는 유무를 검증하기위한겁니다. 기본 페이지인 로그인페이지, 회원가입페이지, 등록된 회원전체를 보여주는페이지, 로그인과정에서 level 10인경우 관리자 진입페이지, 회원전체를 보여주는페이지의 형태에서 추가로 선택적으로 클릭해서(체크박스) 수정, 삭제할수있는페이지를 만들어주면 좋겠네요.
+
+
+이코드는 index.html인데 혹시 css디자인은 손대지말고 원형그대로 보존하고,  DB와 연동되게끔 해줄수있는가요?  members.html에 등록된 회원을 3명을 가져와서 업로드하면되고, edit-member.html에서 수정이나 삭제하면 index.html페이지에서 연동처리하게 하고싶어요. 가능할까요?
+
+
+
+웹서버를 구글firebase와 Realtime Database를 연동해서 사용하고있고 깃허브도 같이 사용중인데,  테스트로 지금 코드를 작성중인데
+입력데이타를 DB에 전송해서 만들어졌다면 내컴퓨터의 어디에 데이타저장되는지를 알려줘. 나의 착각인지 모르겠는데
+분명히 어제 회원등록한 정보로 로그인이 되었는데 오늘 다시 로그인하니 없는 정보라고 나와서 그래요.
+참고로 내컴퓨터 코드위치는 C:\GitHub\terraone-site\public 이랍니다.
+
+
+
+
+
+
+
+<!--  " cd C:\GitHub\terraone-site "    -->
+<!-- 데이타수정후 확인해보려면 도스프롬프트에서 " firebase emulators:start " 실행 -->
+<!-- 브라우저에서 ex)  http://127.0.0.1:5000/login.html    -->
+<!-- 브라우저에서 ex)  http://127.0.0.1:5000/signup.html    -->
+<!-- 브라우저에서 ex)  http://127.0.0.1:5000/members.html    -->
+
+
+
+
+구글 firebase웹페이지와 Realtime Database와 연결되어서 현재 내컴퓨터에서 파일위치는 C:\GitHub\terraone-site\public구조로 만들어져있고, 로그인, 회원가입, 회원멤버 불러오기, 데이타수정,삭제를 하기위해 만들어진 코드이다. 세부적으로는 로그인==> login.html / login.js , 회원가입===> signup.html / signup.js
+회원열람===> members.html / members.js  , 회원편집===> edit-member.html / edit-member.js 와 연결시켜놓았다. 참고로
+js파일은 ./js폴더안에 들어가있고 css코드는 css_firebase폴더에 들어있다. 문제가 되는 지점은 로그인해서 들어가면 회원목록에 데이타를 불러오지를 못해서 그래요.만들어놓은 코드가 총10여개가 되는데 한두개씩 보내줄테니 코드분석을해서 문제점을 찾아주기
+바랍니다.
+
+======================================
+======================================
+
+firebase-congig.js 코드는, 
+// 📁 public/js/firebase-config.js
+// Firebase 기본 설정 파일
+
+// Firebase SDK에서 필요한 함수 import
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-analytics.js";
+
+// Firebase 프로젝트 설정 정보
+const firebaseConfig = {
+  apiKey: "AIzaSyAF7AD1d54k21-stmb0Hpg9OMEECvzFHpQ",
+  authDomain: "terraone-d0318.firebaseapp.com",
+  databaseURL: "https://terraone-d0318-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "terraone-d0318",
+  storageBucket: "terraone-d0318.firebasestorage.app",
+  messagingSenderId: "1082807340877",
+  appId: "1:1082807340877:web:6e2b49c04562d800e87104",
+  measurementId: "G-7HMJEV832S"
+};
+
+// Firebase 앱 초기화
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+
+// 다른 파일에서 Firebase 앱을 쓸 수 있도록 export
+export { app };
+
+이렇게 되어있고,
+
+
+======================================
+======================================
+
+firebase-db.js 코드는,
+// 🔹 firebase-db.js (수정 버전)
+import { app } from "./firebase-config.js";
+import { getDatabase, ref, set, push, get, child, update, remove } 
+  from "https://www.gstatic.com/firebasejs/10.6.0/firebase-database.js";
+
+
+const db = getDatabase(app);
+const membersRef = ref(db, "terraone/tel");
+
+// ✅ 회원 등록 함수
+export function addMember(member) {
+  push(membersRef, member)
+    .then(() => console.log("✅ 새 회원 등록 완료"))
+    .catch(err => console.error("❌ 등록 실패:", err));
+}
+
+// ✅ 전체 회원 가져오기
+export async function getAllMembers() {
+  const snapshot = await get(membersRef);
+  if (snapshot.exists()) {
+    return snapshot.val();
+  } else {
+    return {};
+  }
+}
+
+// ✅ 회원 수정
+export function updateMember(memberKey, updatedData) {
+  const memberRef = ref(db, `terraone/tel/${memberKey}`);
+  update(memberRef, updatedData)
+    .then(() => console.log("✅ 회원 수정 완료"))
+    .catch(err => console.error("❌ 수정 실패:", err));
+}
+
+// ✅ 회원 삭제
+export function deleteMember(memberKey) {
+  const memberRef = ref(db, `terraone/tel/${memberKey}`);
+  remove(memberRef)
+    .then(() => console.log("✅ 회원 삭제 완료"))
+    .catch(err => console.error("❌ 삭제 실패:", err));
+}
+
+// ✅ 로그인 함수
+export async function login(id, password) {
+  const allMembers = await getAllMembers();
+  for (const key in allMembers) {
+    const member = allMembers[key];
+    if (member.id === id && member.password === password) {
+      return { ...member, key };
+    }
+  }
+  return null; // 로그인 실패
+}
+이렇게 되어있다.
+
+
+======================================
+======================================
+
+
+ css 코드(./css_firebase)
+login.css 코드는,
+body {
+  background: linear-gradient(135deg, #6f42c1, #6610f2);
+  min-height: 100vh;
+  font-family: 'Noto Sans KR', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card {
+  border-radius: 1rem;
+}
+
+h2.card-title {
+  font-weight: bold;
+  color: #fff;
+}
+
+#message {
+  font-weight: bold;
+  color: #ffc107;
+}
+
+
+======================================
+======================================
+
+members.css 코드는,
+body {
+  background: linear-gradient(135deg, #6f42c1, #6610f2);
+  min-height: 100vh;
+  color: #fff;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+h2 {
+  font-weight: bold;
+  color: #fff;
+}
+
+.table {
+  background-color: #fff;
+  color: #000;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.table thead.table-dark th {
+  background-color: #343a40;
+  color: #fff;
+}
+
+.btn-warning {
+  margin-right: 5px;
+}
+
+#message {
+  font-weight: bold;
+  color: #ffc107;
+}
+
+
+======================================
+======================================
+
+signup.css 코드는,
+body {
+  background: linear-gradient(135deg, #6f42c1, #6610f2);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card {
+  border-radius: 1rem;
+}
+
+h2.card-title {
+  font-weight: bold;
+  color: #343a40;
+}
+
+#message {
+  font-weight: bold;
+  color: green;
+}

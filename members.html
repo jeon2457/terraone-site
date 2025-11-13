@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회원목록편집</title>
+
+  <!-- 파비콘 아이콘들 (상대경로(./) 사용 -->
+    <link rel="icon" href="./favicon.ico?v=2" />
+
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="36x36"
+      href="./favicons/android-icon-36x36.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="48x48"
+      href="./favicons/android-icon-48x48.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="72x72"
+      href="./favicons/android-icon-72x72.png"
+    />
+
+    <link
+      rel="apple-touch-icon"
+      sizes="32x32"
+      href="./favicons/apple-icon-32x32.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="57x57"
+      href="./favicons/apple-icon-57x57.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="60x60"
+      href="./favicons/apple-icon-60x60.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="72x72"
+      href="./favicons/apple-icon-72x72.png"
+    />
+
+    <!-- 웹사이트 매니페스트 (상대경로(./) 사용  -->
+    <link rel="manifest" href="./manifest.json" />
+
+    <!-- Ms브라우저 설정 파일 (상대경로(./) 사용  -->
+    <meta name="msapplication-config" content="./browserconfig.xml" />
+    <meta name="msapplication-TileColor" content="#ffffff" />
+    <meta name="msapplication-TileImage" content="./ms-icon-144x144.png" />
+    <meta name="theme-color" content="#ffffff" />
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- 사용자 정의 CSS -->
+  <link rel="stylesheet" href="./css_firebase/members.css">
+
+  <!-- JS 모듈 -->
+  <script type="module" src="./js/members.js" defer></script>
+</head>
+<body>
+  <div class="container mt-5">
+    <!-- 🔥 상단 헤더 (로그인 정보 + 로그아웃) -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="mb-0">회원 전체 목록</h2>
+      <div>
+        <span id="userInfo" class="me-3"></span>
+        <button id="logoutBtn" class="btn btn-outline-secondary btn-sm">로그아웃</button>
+      </div>
+    </div>
+
+    <div class="mb-3 text-end">
+      <button id="viewSelected" class="btn btn-warning me-2">회원열람</button>
+      <button id="editSelected" class="btn btn-warning me-2">선택회원 수정</button>
+      <button id="deleteSelected" class="btn btn-danger">선택회원 삭제</button>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-striped table-hover" id="membersTable">
+        <thead class="table-dark">
+          <tr>
+            <th><input type="checkbox" id="selectAll"></th>
+            <th>번호</th>
+            <th>아이디</th>
+            <th>이름</th>
+            <th>전화번호</th>
+            <th>주소</th>
+            <th>비고</th>
+            <th>SMS</th>
+            <th>SMS 추가</th>
+            <th>레벨</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- 여기에 회원 목록이 동적으로 추가됩니다 -->
+        </tbody>
+      </table>
+    </div>
+
+    <div id="message" class="mt-3 text-center"></div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- 🔥 로그아웃 처리 -->
+  <script type="module">
+    import { logout, getCurrentUser } from "./js/auth.js";
+    
+    const logoutBtn = document.getElementById("logoutBtn");
+    const userInfo = document.getElementById("userInfo");
+    
+    const user = getCurrentUser();
+    if (user) {
+      userInfo.textContent = `👋 ${user.name}님 (관리자)`;
+    }
+    
+    logoutBtn.addEventListener("click", () => {
+      if (confirm("로그아웃 하시겠습니까?")) {
+        logout();
+      }
+    });
+  </script>
+</body>
+</html>
