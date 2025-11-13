@@ -5,24 +5,23 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
     ]
   },
   "emulators": {
-    "database": {
-      "port": 9000
-    },
     "hosting": {
       "port": 5000
     },
+    "database": {
+      "port": 9000
+    },
     "ui": {
       "enabled": true
-    },
-    "singleProjectMode": true,
-    "auth": {
-      "port": 9099
     }
-  },
-  "database": {
-    "rules": "database.rules.json"
   }
 }
