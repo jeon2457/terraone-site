@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>이미지 목록 보기</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- 파비콘 아이콘들 (상대경로(./) 사용 -->
+    <link rel="icon" href="./favicon.ico?v=2" />
+
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="36x36"
+      href="./favicons/android-icon-36x36.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="48x48"
+      href="./favicons/android-icon-48x48.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="72x72"
+      href="./favicons/android-icon-72x72.png"
+    />
+
+    <link
+      rel="apple-touch-icon"
+      sizes="32x32"
+      href="./favicons/apple-icon-32x32.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="57x57"
+      href="./favicons/apple-icon-57x57.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="60x60"
+      href="./favicons/apple-icon-60x60.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="72x72"
+      href="./favicons/apple-icon-72x72.png"
+    />
+
+    <!-- 웹사이트 매니페스트 (상대경로(./) 사용  -->
+    <link rel="manifest" href="./manifest.json" />
+
+    <!-- Ms브라우저 설정 파일 (상대경로(./) 사용  -->
+    <meta name="msapplication-config" content="./browserconfig.xml" />
+    <meta name="msapplication-TileColor" content="#ffffff" />
+    <meta name="msapplication-TileImage" content="./ms-icon-144x144.png" />
+    <meta name="theme-color" content="#ffffff" />
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
+
+
+
+  <style>
+    img { width: 300px; border:1px solid #888; }
+    .btn-month { padding:5px 10px; margin:3px; border:1px solid #777; cursor:pointer; }
+    .active { background:#007bff; color:white; }
+  </style>
+</head>
+
+<body>
+  <h2>이미지 목록</h2>
+
+  <div id="monthButtons"></div>
+  <hr>
+
+  <table border="1" width="100%">
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>날짜</th>
+        <th>이미지</th>
+        <th>요약</th>
+        <th>작업</th>
+      </tr>
+    </thead>
+    <tbody id="imageList"></tbody>
+  </table>
+
+  <script type="module">
+    import { db } from "./firebase-config.js";
+    import { ref, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+    const monthButtons = document.getElementById("monthButtons");
+    const imageList = document.getElementById("imageList");
+    let currentMonth = new Date().getMonth() + 1;
+
+    // 월 버튼 생성
+    for (let m = 1; m <= 12; m++) {
+      const btn = document.createElement("button");
+      btn.textContent = m + "월";
+      btn.className = "btn-month" + (m === currentMonth ? " active":"");
+      btn.addEventListener("click", () => loadMonth(m));
+      monthButtons.appendChild(btn);
+    }
+
+    function loadMonth(month) {
+      currentMonth = month;
+      document.querySelectorAll(".btn-month").forEach((b, i) => {
+        b.classList.toggle("active", (i+1) === month);
+      });
+
+      const imagesRef = ref(db, "images");
+      onValue(imagesRef, (snapshot) => {
+        const data = snapshot.val();
+        imageList.innerHTML = "";
+
+        let no = 1;
+
+        for (let key in data) {
+          if (data[key].month != month) continue;
+
+          const row = `
+            <tr>
+              <td>${no++}</td>
+              <td>${data[key].date}</td>
+              <td><img src="${data[key].imageUrl}"></td>
+              <td>${data[key].summary}</td>
+              <td>
+                <a href="${data[key].imageUrl}" download>다운로드</a> |
+                <a href="images_edit.html?id=${key}">수정/삭제</a>
+              </td>
+            </tr>
+          `;
+          imageList.insertAdjacentHTML("beforeend", row);
+        }
+      });
+    }
+
+    loadMonth(currentMonth);
+  </script>
+</body>
+</html>
