@@ -26,6 +26,14 @@ h2 {
   margin-right: 5px;
 }
 
+.btn-Success {
+  margin-right: 3px;
+}
+
+.btn-Primary {
+  margin-right: 3px;
+}
+
 #message {
   font-weight: bold;
   color: #ffc107;

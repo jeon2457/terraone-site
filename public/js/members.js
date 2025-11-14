@@ -144,14 +144,14 @@ window.addEventListener("DOMContentLoaded", () => {
 
 
 
-// 멤버전체목록 페이지(members.html) 회원등록 클릭시 이동
-viewBtn.addEventListener("click", () => {
-  window.location.href = "./signup.html";
+// 멤버전체목록 페이지(members.html) 회원가입 클릭시 이동
+signupBtn.addEventListener("click", () => {
+  window.location.href = "../signup.html";
 });
 
 
 // 멤버전체목록 페이지(members.html) 회원열람 클릭시 이동
 viewBtn.addEventListener("click", () => {
-  window.location.href = "./index.html";
+  window.location.href = "../index.html";
 });
 
