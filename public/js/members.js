@@ -9,6 +9,7 @@ if (!requireAdmin()) {
 
 const tbody = document.querySelector("#membersTable tbody");
 const selectAllCheckbox = document.querySelector("#selectAll");
+const signupBtn = document.querySelector("#signupSelected");
 const viewBtn = document.querySelector("#viewSelected");
 const editBtn = document.querySelector("#editSelected");
 const deleteBtn = document.querySelector("#deleteSelected");
@@ -142,8 +143,15 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 
+
+// 멤버전체목록 페이지(members.html) 회원등록 클릭시 이동
+viewBtn.addEventListener("click", () => {
+  window.location.href = "./signup.html";
+});
+
+
 // 멤버전체목록 페이지(members.html) 회원열람 클릭시 이동
 viewBtn.addEventListener("click", () => {
-  window.location.href = "index.html";
+  window.location.href = "./index.html";
 });
 
