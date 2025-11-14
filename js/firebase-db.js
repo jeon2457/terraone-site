@@ -3,6 +3,8 @@ import { app } from "./firebase-config.js";
 import { getDatabase, ref, set, push, get, child, update, remove } 
   from "https://www.gstatic.com/firebasejs/10.6.0/firebase-database.js";
 
+
+
 const db = getDatabase(app);
 const membersRef = ref(db, "terraone/tel");
 
@@ -57,4 +59,18 @@ export async function updateMember(key, updatedData) {
   return update(memberRef, updatedData)
     .then(() => console.log("✅ 회원 수정 완료"))
     .catch(err => console.error("❌ 수정 실패:", err));
+}
+
+
+
+// 🔹 수입/지출 등록 함수
+export function addTransaction(type, data) {
+  const tableName = type === 'income' ? 'income_table' : 'expense_table';
+  const tableRef = ref(db, tableName);
+  return push(tableRef, {
+    ...data,
+    timestamp: Date.now()
+  })
+    .then(() => console.log(`✅ ${type} 등록 완료`))
+    .catch(err => console.error(`❌ ${type} 등록 실패:`, err));
 }
