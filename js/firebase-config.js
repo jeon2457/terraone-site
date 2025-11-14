@@ -4,6 +4,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-analytics.js";
 import { getDatabase, connectDatabaseEmulator } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-database.js";
+import { getStorage } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-storage.js";
 
 // Firebase 프로젝트 설정 정보
 const firebaseConfig = {
@@ -21,6 +22,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getDatabase(app);
+const storage = getStorage(app);
 
 // 🔥 로컬 환경에서만 에뮬레이터 연결
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
@@ -30,5 +32,5 @@ if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
   console.log("🌐 프로덕션 환경 - 실제 Firebase에 연결합니다.");
 }
 
-// 다른 파일에서 Firebase 앱을 쓸 수 있도록 export
-export { app, db };
+// export
+export { app, db, storage };
