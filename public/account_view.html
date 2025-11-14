@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>사용내역서 보기</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --income-color: #4CAF50;
+      --expense-color: #f44336;
+    }
+    
+    body {
+      background: var(--primary-gradient);
+      min-height: 100vh;
+      padding: 20px;
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .header-card {
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      background: white;
+      padding: 25px;
+      margin-bottom: 20px;
+    }
+    
+    .date-display {
+      text-align: center;
+      color: #667eea;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    
+    .month-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 15px;
+    }
+    
+    .btn-month {
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: 2px solid #e0e0e0;
+      background: white;
+      color: #666;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .btn-month:hover {
+      border-color: #667eea;
+      color: #667eea;
+    }
+    
+    .btn-month.active {
+      background: var(--primary-gradient);
+      color: white;
+      border-color: transparent;
+      transform: scale(1.05);
+    }
+    
+    .alert-info {
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+      border: none;
+      border-radius: 12px;
+      color: #1976d2;
+    }
+    
+    .section-card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      padding: 25px;
+      margin-bottom: 30px;
+    }
+    
+    .section-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 25px;
+      color: #333;
+    }
+    
+    .income-title {
+      color: var(--income-color);
+    }
+    
+    .expense-title {
+      color: var(--expense-color);
+    }
+    
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .custom-table {
+      margin: 0;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .custom-table thead {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .custom-table thead th {
+      padding: 15px;
+      font-weight: 700;
+      border: none;
+      text-align: center;
+    }
+    
+    .custom-table tbody td {
+      padding: 12px;
+      vertical-align: middle;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .custom-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .custom-table tbody tr:hover {
+      background: #f8f9ff;
+    }
+    
+    .amount-column {
+      text-align: right;
+      font-weight: 700;
+      color: #333;
+    }
+    
+    .summary-row {
+      background: linear-gradient(135deg, #f8f9ff 0%, #e8eaf6 100%);
+      font-weight: 700;
+    }
+    
+    .summary-label-income {
+      background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+      color: var(--income-color);
+      font-weight: 700;
+      text-align: center;
+    }
+    
+    .summary-label-expense {
+      background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+      color: var(--expense-color);
+      font-weight: 700;
+      text-align: center;
+    }
+    
+    .summary-value {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #667eea;
+      text-align: center;
+    }
+    
+    .balance-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 20px;
+      padding: 30px;
+      color: white;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      margin-bottom: 20px;
+    }
+    
+    .balance-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+      opacity: 0.9;
+    }
+    
+    .balance-amount {
+      font-size: 2.5rem;
+      font-weight: 900;
+      margin: 0;
+    }
+    
+    .balance-positive {
+      color: #4CAF50;
+      text-shadow: 0 2px 10px rgba(76, 175, 80, 0.3);
+    }
+    
+    .balance-negative {
+      color: #f44336;
+      text-shadow: 0 2px 10px rgba(244, 67, 54, 0.3);
+    }
+    
+    .nav-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .btn-nav {
+      flex: 1;
+      padding: 15px;
+      border-radius: 12px;
+      border: none;
+      background: white;
+      color: #667eea;
+      font-weight: 700;
+      text-decoration: none;
+      text-align: center;
+      transition: all 0.3s;
+      border: 2px solid white;
+    }
+    
+    .btn-nav:hover {
+      background: transparent;
+      color: white;
+      border-color: white;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+    }
+    
+    @media (max-width: 768px) {
+      .month-buttons {
+        gap: 5px;
+      }
+      
+      .btn-month {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+      }
+      
+      .balance-amount {
+        font-size: 1.8rem;
+      }
+      
+      .section-title {
+        font-size: 1.4rem;
+      }
+      
+      .custom-table {
+        font-size: 0.85rem;
+      }
+      
+      .custom-table thead th,
+      .custom-table tbody td {
+        padding: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header-card">
+      <div class="date-display" id="dateDisplay">로딩 중...</div>
+      
+      <div class="month-buttons" id="monthButtons">
+        <!-- 월 버튼이 동적으로 생성됩니다 -->
+      </div>
+      
+      <div class="alert alert-info text-center" role="alert">
+        💡 합계가 제대로 보이지 않으면 월 버튼을 눌러주세요!
+      </div>
+    </div>
+    
+    <!-- 수입 테이블 -->
+    <div class="section-card">
+      <h3 class="section-title income-title">📈 수입 목록</h3>
+      <div class="table-wrapper">
+        <table class="table custom-table">
+          <thead>
+            <tr>
+              <th style="width: 8%">No</th>
+              <th style="width: 15%">일자</th>
+              <th style="width: 35%">항목</th>
+              <th style="width: 27%">비고</th>
+              <th style="width: 15%">금액</th>
+            </tr>
+          </thead>
+          <tbody id="incomeTableBody">
+            <tr>
+              <td colspan="5" class="loading">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2 mb-0">로딩 중...</p>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="summary-row">
+              <td colspan="2" class="summary-label-income">월수입 합계</td>
+              <td colspan="3" class="summary-value" id="monthlyIncomeTotal">0원</td>
+            </tr>
+            <tr class="summary-row">
+              <td colspan="2" class="summary-label-income">년수입 합계</td>
+              <td colspan="3" class="summary-value" id="yearIncomeTotal">0원</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+    
+    <!-- 지출 테이블 -->
+    <div class="section-card">
+      <h3 class="section-title expense-title">📉 지출 목록</h3>
+      <div class="table-wrapper">
+        <table class="table custom-table">
+          <thead>
+            <tr>
+              <th style="width: 8%">No</th>
+              <th style="width: 15%">일자</th>
+              <th style="width: 35%">항목</th>
+              <th style="width: 27%">비고</th>
+              <th style="width: 15%">금액</th>
+            </tr>
+          </thead>
+          <tbody id="expenseTableBody">
+            <tr>
+              <td colspan="5" class="loading">
+                <div class="spinner-border text-danger" role="status"></div>
+                <p class="mt-2 mb-0">로딩 중...</p>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="summary-row">
+              <td colspan="2" class="summary-label-expense">월지출 합계</td>
+              <td colspan="3" class="summary-value" id="monthlyExpenseTotal">0원</td>
+            </tr>
+            <tr class="summary-row">
+              <td colspan="2" class="summary-label-expense">년지출 합계</td>
+              <td colspan="3" class="summary-value" id="yearExpenseTotal">0원</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+    
+    <!-- 총잔액 -->
+    <div class="balance-card">
+      <h3 class="balance-title">💰 총잔액</h3>
+      <h2 class="balance-amount" id="totalBalance">0원</h2>
+      
+      <div class="nav-buttons mt-4">
+        <a href="account_input.html" class="btn-nav">➕ 입력하기</a>
+        <a href="account_edit.html" class="btn-nav">✏️ 편집하기</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+    // Firebase 설정
+    const firebaseConfig = {
+        apiKey: "AIzaSyAF7AD1d54k21-stmb0Hpg9OMEECvzFHpQ",
+        authDomain: "terraone-d0318.firebaseapp.com",
+        databaseURL: "https://terraone-d0318-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "terraone-d0318",
+        storageBucket: "terraone-d0318.appspot.com",   // ← 이 값만 다시 확인!
+        messagingSenderId: "1082807340877",
+        appId: "1:1082807340877:web:6e2b49c04562d800e87104",
+        measurementId: "G-7HMJEV832S"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    // 전역 변수
+    let currentMonth = new Date().getMonth() + 1;
+    const currentYear = new Date().getFullYear();
+    let allIncomeData = [];
+    let allExpenseData = [];
+
+    // 날짜 표시
+    function updateDateDisplay() {
+      const now = new Date();
+      const formatted = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      document.getElementById('dateDisplay').innerHTML = `📅 오늘의 날짜: ${formatted}`;
+    }
+
+    // 월 버튼 생성
+    function createMonthButtons() {
+      const buttonsContainer = document.getElementById('monthButtons');
+      let html = '';
+      
+      for (let month = 1; month <= 12; month++) {
+        const activeClass = month === currentMonth ? 'active' : '';
+        html += `<button class="btn-month ${activeClass}" onclick="selectMonth(${month})">${month}월</button>`;
+      }
+      
+      buttonsContainer.innerHTML = html;
+    }
+
+    // 월 선택
+    window.selectMonth = function(month) {
+      currentMonth = month;
+      createMonthButtons();
+      updateDisplay();
+    };
+
+    // 데이터 로드
+    function loadData() {
+      const incomeRef = ref(database, 'income_table');
+      const expenseRef = ref(database, 'expense_table');
+
+      onValue(incomeRef, (snapshot) => {
+        const data = snapshot.val();
+        allIncomeData = data ? Object.entries(data).map(([id, item]) => ({
+          id,
+          ...item
+        })) : [];
+        updateDisplay();
+      });
+
+      onValue(expenseRef, (snapshot) => {
+        const data = snapshot.val();
+        allExpenseData = data ? Object.entries(data).map(([id, item]) => ({
+          id,
+          ...item
+        })) : [];
+        updateDisplay();
+      });
+    }
+
+    // 화면 업데이트
+    function updateDisplay() {
+      displayIncomeTable();
+      displayExpenseTable();
+      calculateTotals();
+    }
+
+    // 수입 테이블 표시
+    function displayIncomeTable() {
+      const tbody = document.getElementById('incomeTableBody');
+      
+      const filteredData = allIncomeData.filter(item => {
+        const itemDate = new Date(item.date);
+        return itemDate.getFullYear() === currentYear && 
+               (itemDate.getMonth() + 1) === currentMonth;
+      }).sort((a, b) => new Date(a.date) - new Date(b.date));
+      
+      if (filteredData.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="empty-state">
+              <p>이번 달 수입 내역이 없습니다.</p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      tbody.innerHTML = filteredData.map((item, index) => `
+        <tr>
+          <td style="text-align: center">${index + 1}</td>
+          <td style="text-align: center">${item.date}</td>
+          <td>${item.category}</td>
+          <td>${item.description || '-'}</td>
+          <td class="amount-column">${Number(item.amount).toLocaleString()}원</td>
+        </tr>
+      `).join('');
+    }
+
+    // 지출 테이블 표시
+    function displayExpenseTable() {
+      const tbody = document.getElementById('expenseTableBody');
+      
+      const filteredData = allExpenseData.filter(item => {
+        const itemDate = new Date(item.date);
+        return itemDate.getFullYear() === currentYear && 
+               (itemDate.getMonth() + 1) === currentMonth;
+      }).sort((a, b) => new Date(a.date) - new Date(b.date));
+      
+      if (filteredData.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="empty-state">
+              <p>이번 달 지출 내역이 없습니다.</p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      tbody.innerHTML = filteredData.map((item, index) => `
+        <tr>
+          <td style="text-align: center">${index + 1}</td>
+          <td style="text-align: center">${item.date}</td>
+          <td>${item.category}</td>
+          <td>${item.description || '-'}</td>
+          <td class="amount-column">${Number(item.amount).toLocaleString()}원</td>
+        </tr>
+      `).join('');
+    }
+
+    // 합계 계산
+    function calculateTotals() {
+      // 월별 합계
+      let monthlyIncome = 0;
+      let monthlyExpense = 0;
+      
+      allIncomeData.forEach(item => {
+        const itemDate = new Date(item.date);
+        if (itemDate.getFullYear() === currentYear && 
+            (itemDate.getMonth() + 1) === currentMonth) {
+          monthlyIncome += Number(item.amount);
+        }
+      });
+      
+      allExpenseData.forEach(item => {
+        const itemDate = new Date(item.date);
+        if (itemDate.getFullYear() === currentYear && 
+            (itemDate.getMonth() + 1) === currentMonth) {
+          monthlyExpense += Number(item.amount);
+        }
+      });
+      
+      // 년 합계 (선택한 월까지)
+      let yearIncome = 0;
+      let yearExpense = 0;
+      
+      allIncomeData.forEach(item => {
+        const itemDate = new Date(item.date);
+        if (itemDate.getFullYear() === currentYear && 
+            (itemDate.getMonth() + 1) <= currentMonth) {
+          yearIncome += Number(item.amount);
+        }
+      });
+      
+      allExpenseData.forEach(item => {
+        const itemDate = new Date(item.date);
+        if (itemDate.getFullYear() === currentYear && 
+            (itemDate.getMonth() + 1) <= currentMonth) {
+          yearExpense += Number(item.amount);
+        }
+      });
+      
+      // 총잔액
+      const balance = yearIncome - yearExpense;
+      
+      // 화면에 표시
+      document.getElementById('monthlyIncomeTotal').textContent = 
+        monthlyIncome.toLocaleString() + '원';
+      document.getElementById('yearIncomeTotal').textContent = 
+        yearIncome.toLocaleString() + '원';
+      document.getElementById('monthlyExpenseTotal').textContent = 
+        monthlyExpense.toLocaleString() + '원';
+      document.getElementById('yearExpenseTotal').textContent = 
+        yearExpense.toLocaleString() + '원';
+      
+      const balanceElement = document.getElementById('totalBalance');
+      balanceElement.textContent = balance.toLocaleString() + '원';
+      
+      if (balance >= 0) {
+        balanceElement.className = 'balance-amount balance-positive';
+      } else {
+        balanceElement.className = 'balance-amount balance-negative';
+      }
+    }
+
+    // 초기화
+    updateDateDisplay();
+    createMonthButtons();
+    loadData();
+  </script>
+</body>
+</html>

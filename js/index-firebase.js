@@ -64,6 +64,7 @@ async function renderMembers() {
       // 🔥 회장이나 총무인 경우 특별 처리
       const isPresident = member.remark === "회장";
       const isTreasurer = member.remark === "총무";
+      const isSpecialRole = isPresident || isTreasurer;
 
       // 기존 index.html의 클래스명 그대로 사용
       tr.innerHTML = `
@@ -76,16 +77,19 @@ async function renderMembers() {
         </td>
 
         <td class="address_1">
-          <span>${member.addr || ""}</span>
+          ${
+            isSpecialRole
+              ? `<a href="sms:${allPhoneNumbers}" onclick="sendSMS(event, '${allPhoneNumbers}'); return false;">
+                   <span>${member.address_1 || "&nbsp;"}</span>
+                 </a>`
+              : `<span>${member.address_1 || "&nbsp;"}</span>`
+          }
         </td>
 
-        <!-- (아래코드) <span>${member.remark || "&nbsp;"}</span> 는
-             전화 연락망페이지에 나타나는 거주지의 회장/총무 글자부분에
-             전화번호를 링크지정 되어있다. -->
         <td class="remark_1">
           ${
-            isPresident || isTreasurer
-              ? `<a href="sms:${allPhoneNumbers}" onclick="sendSMS(event,'${allPhoneNumbers}')">
+            isSpecialRole
+              ? `<a href="sms:${allPhoneNumbers}" onclick="sendSMS(event, '${allPhoneNumbers}'); return false;">
                    <span>${member.remark || "&nbsp;"}</span>
                  </a>`
               : `<span>${member.remark || "&nbsp;"}</span>`
@@ -93,7 +97,7 @@ async function renderMembers() {
         </td>
 
         <td class="sms_1">
-          <a href="sms:${member.tel || ""}" onclick="sendSMS(event,'${member.tel || ""}')">
+          <a href="sms:${member.tel || ""}" onclick="sendSMS(event, '${member.tel || ""}'); return false;">
             <span><img class="max-small" src="image/sms-4.png" /></span>
           </a>
         </td>
