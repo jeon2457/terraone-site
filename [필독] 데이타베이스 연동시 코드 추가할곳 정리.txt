@@ -50,7 +50,7 @@ C:\GitHub\terraone-site
 │   ├─ image/
 │   │    └─ sms-4.png
 │   ├─ images/
-│   ├─ images/
+│   │
 │   │ 
 │   ├─ js/
 │   │    ├─ auth.js
@@ -69,11 +69,18 @@ C:\GitHub\terraone-site
 │   ├─ login.html
 │   ├─ manifest.json
 │   ├─ members.html
+│   ├─ account_edit.html
+│   ├─ account_input.html
+│   ├─ account_view.html
+│   ├─ images_edit.html
+│   ├─ images_upload.html
+│   ├─ images_view.html
 │   └─ signup.html
 │
 ├─ .firebaserc
 ├─ .gitattributes
 ├─ .gitgnore
+├─ cors.json
 ├─ database.rules.json
 ├─ favicon.ico
 ├─ manifest.json
