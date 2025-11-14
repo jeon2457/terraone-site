@@ -1,6 +1,8 @@
 <!-- 부트스트랩 5.3.3로 제작되었다. css나 js 를 버전에 다른걸 설치하면 작동이 제대로 안될수있으니 주의바람!
 활용방안: 케러셀,오프캔버스,플레이스홀더,스크롤스파이,스피너,토스트,아이콘링크,반응형고정,세로줄,테두리,플렉스,Z-index 등등  
-부트스트랩 link는 <head>에 삽입하고, <script>는 <body>부분의 끝부분에 삽입해야하나 <script> "DOMContentLoaded" 또는 defer를 <head>안에 삽입하면 그 다음부터 스크립트 태그를 <body> 어느 위치에 있어도 정상적으로 작동한다.
+부트스트랩 link는 <head>에 삽입하고, <script>는 <body>부분의 끝부분에 삽입해야하나 <script> "DOMContentLoaded" 
+또는 defer를 <head>안에 삽입하면 그 다음부터 스크립트 태그를 <body> 어느 위치에 있어도 정상적으로 작동한다.
+
 ✅ 파비콘 "홈화면 추가" 아이콘 생성이 안되는 원인은 절대경로가 아닌 상대경로(./)를 해야지만 한다. 
 ✅ Firebase Realtime Database와 연동되어 회원 데이터를 동적으로 표시합니다. -->
 
@@ -272,3 +274,60 @@
     <script src="./js/swipe.js" defer></script>
   </body>
 </html>
+
+
+
+
+
+<!--  ☆★☆  terraone-site 폴더구조  ☆★☆
+
+
+C:\GitHub\terraone-site
+│
+├─ .firebase/
+├─ .git/
+├─ .github/
+├─  css/
+├─ image/
+│
+├─ public/
+│   ├─ css/
+│   ├─ css_firebase/
+│   ├─ favicons/
+│   │    
+│   ├─ image/
+│   │    └─ sms-4.png
+│   ├─ images/
+│   ├─ images/
+│   │ 
+│   ├─ js/
+│   │    ├─ auth.js
+│   │    ├─ edit-member.js
+│   │    ├─ firebase-config.js
+│   │    ├─ firebase-db.js
+│   │    ├─ index-firebase.js
+│   │    ├─ login.js
+│   │    ├─ members.js 
+│   │    └─ signup.js
+│   │
+│   ├─ edit-member.html  
+│   ├─ favicon.ico
+│   ├─ firebase.json
+│   ├─ index.html
+│   ├─ login.html
+│   ├─ manifest.json
+│   ├─ members.html
+│   └─ signup.html
+│
+├─ .firebaserc
+├─ .gitattributes
+├─ .gitgnore
+├─ database.rules.json
+├─ favicon.ico
+├─ manifest.json
+├─ package.json
+│
+└─ (기타 파일들)
+
+
+ -->

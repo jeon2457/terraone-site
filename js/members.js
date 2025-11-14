@@ -42,7 +42,7 @@ async function renderMembers() {
     }
 
     // 레벨 숫자를 문자열로 매핑
-    const levelText = { 1: "회원", 2: "회원+", 10: "관리자" };
+    const levelText = { 1: "임시회원", 2: "회원+", 10: "관리자" };
 
     tbody.innerHTML = ""; // 기존 내용 지우기
     let idx = 1;
