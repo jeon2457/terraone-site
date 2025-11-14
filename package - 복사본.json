@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "My Firebase + GitHub Pages project",
   "scripts": {
-    "build": "echo 'No build step, just using public folder'",
     "sync-pages": "xcopy public\\* . /E /Y /I"
   },
   "author": "jeon2457",

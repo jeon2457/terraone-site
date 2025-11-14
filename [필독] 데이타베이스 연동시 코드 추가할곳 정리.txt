@@ -10,6 +10,29 @@
 만약 자동처리가 안된다면 내컴퓨터 프롬프트를 실행하고 해당폴더(C:\GitHub\terraone-site)로 이동해서(명령어 cd C:\GitHub\terraone-site) 프롬프트 명령어: firebase login 으로 로그인 확인하고,  firebase deploy --only hosting 로 실행하면 데이타가 구글서버로 넘겨진다.
 
 
+
+=============================================================================
+
+🚀 GitHub에서 해야 할 작업(깃허브와 연동이 안될경우 해야할것!)
+Firebase 토큰 발급
+
+로컬에서 firebase login:ci 실행 → 토큰 발급
+
+이 토큰을 GitHub 저장소의 Secrets에 등록 (FIREBASE_TOKEN 같은 이름으로)
+
+GitHub Actions 워크플로우 작성
+
+.github/workflows/firebase-hosting.yml 파일 생성
+
+main 브랜치에 push될 때 Firebase Hosting으로 자동 배포되도록 설정
+
+Actions 탭에서 확인
+
+저장소의 Actions 탭에서 워크플로우가 정상적으로 실행되는지 확인
+
+성공하면 Firebase Hosting에 자동 배포 완료
+
+
 =============================================================================
 =============================================================================
 

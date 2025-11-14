@@ -13,6 +13,80 @@
 firebase login 으로 로그인 확인하고, 
 firebase deploy --only hosting 로 실행하면 데이타가 구글서버로 넘겨진다.
 
+=============================================================================
+
+🚀 GitHub에서 해야 할 작업(깃허브와 연동이 안될경우 해야할것!)
+Firebase 토큰 발급
+
+로컬에서 firebase login:ci 실행 → 토큰 발급
+
+1. Firebase 토큰 등록
+방금 firebase login:ci 실행 후 터미널에 긴 문자열 토큰이 출력되었을 겁니다.
+
+이 토큰을 복사해두세요.
+
+깃허브 저장소(terraone-site)에서:
+
+Settings → Secrets and variables → Actions → New repository secret으로 이동
+
+이름은 FIREBASE_TOKEN으로 지정
+
+값에 방금 복사한 토큰 붙여넣기 → 저장
+
+
+2. GitHub Actions 워크플로우 파일 생성
+저장소 루트에 .github/workflows/firebase-hosting.yml 파일을 새로 만듭니다.
+
+예시 설정:
+name: Deploy to Firebase Hosting
+
+on:
+  push:
+    branches:
+      - main   # main 브랜치에 push될 때 실행
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
+
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_TOKEN }}"
+          channelId: live
+          projectId: terraone-d0318   # Firebase 프로젝트 ID로 교체
+
+
+3. Actions 실행 확인
+저장소에서 Actions 탭으로 들어가면, 방금 만든 워크플로우가 보입니다.
+
+main 브랜치에 push하면 자동으로 Firebase Hosting에 배포됩니다.
+
+성공하면 Firebase Hosting에서 사이트가 업데이트됩니다.
+
+✅ 요약
+
+Firebase 토큰을 GitHub Secrets에 등록
+
+.github/workflows에 배포용 YAML 작성
+
+Actions 탭에서 실행 확인
+
 
 =============================================================================
 =============================================================================
