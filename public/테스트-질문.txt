@@ -16,7 +16,7 @@
 참고로 내컴퓨터 코드위치는 C:\GitHub\terraone-site\public 이랍니다.
 
 
-
+웹페이지를 깃허브와 구글firebase, Realtime Database 2곳에서 활용하고있는데,  데이터를 어느위치를 기준으로 가져오는가요? 구글firebase, Realtime Database은 예를들어서 C:\GitHub\terraone-site 폴더가 아닌 C:\GitHub\terraone-site\public 폴더안에서 가져온다는거 같은데 맞는가요?  그리고 깃허브는 https://github.com/jeon2457/terraone-site 주소라면 \public 폴더안이 아니라 루트상에 있는 index.html 파일을 가져오는게 맞는가요?
 
 
 
