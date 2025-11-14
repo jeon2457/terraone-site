@@ -75,13 +75,22 @@ async function renderMembers() {
           <a href="tel:${member.tel || ""}"><span>${member.tel || ""}</span></a>
         </td>
 
-        <td class="address_1">
-          <span>${member.addr || ""}</span>
-        </td>
+
 
         <!-- (아래코드) <span>${member.remark || "&nbsp;"}</span> 는
              전화 연락망페이지에 나타나는 거주지의 회장/총무 글자부분에
              전화번호를 링크지정 되어있다. -->
+
+        <td class="address_1">
+          ${
+            isPresident || isTreasurer
+              ? `<a href="sms:${allPhoneNumbers}" onclick="sendSMS(event,'${allPhoneNumbers}')">
+                   <span>${member.address_1 || "&nbsp;"}</span>
+                 </a>`
+              : `<span>${member.address_1 || "&nbsp;"}</span>`
+          }
+        </td>
+
         <td class="remark_1">
           ${
             isPresident || isTreasurer
