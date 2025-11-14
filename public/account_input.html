@@ -87,8 +87,8 @@
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getDatabase, ref, push, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-    import { firebaseConfig } from './js/firebase-config.js';
-    import { addTransaction } from './js/firebase-db.js';
+    import { firebaseConfig } from '../js/firebase-config.js';
+    import { addTransaction } from '../js/firebase-db.js';
 
     // Firebase 초기화
     const app = initializeApp(firebaseConfig);
@@ -96,10 +96,6 @@
 
     // 전역 변수
     let currentType = 'income';
-
-    // 🔽 이 코드를 추가해 보세요
-    console.log('버튼 이벤트 리스너 등록 시도');
-
     document.querySelector('[data-type="income"]').addEventListener('click', () => selectType('income'));
     document.querySelector('[data-type="expense"]').addEventListener('click', () => selectType('expense'));
 
