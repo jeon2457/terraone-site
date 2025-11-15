@@ -2,333 +2,1188 @@
 (챗GPT 질문내용)
 https://claude.ai/chat/
 
-구글 firebase, Realtime Database를 사용할수있게 코드를 3개 만들었어요. 
-파일은 account_input.html 사용내역서 입력페이지, account_edit.html 사용내역서 편집페이지,  account_view.html 사용내역서 페이지로 만들었어요. 실행해보면 아래와같이 개발자도구 네트워크에서 이렇게 표시가 됩니다.
-.lp?start=t&ser=30427453&cb=18&v=5&p=YOUR_APP_ID	(failed)net::ERR_BLOCKED_BY_ORB	script	WebSocketConnection.ts:47	0.0 kB	315 ms
 
-(account_input.html 코드)
+1. account_view.html (구글 firebase / Realtime Database 연동됨) 코드를 먼저보여준다.
+2. account_view.php 코드를 보여준다.
+3. php 코드를 적용해서 만들건데 페이지에 보여주는걸 가로형으로 되어있어서 불편한거같아요.  
+account_view.html 과 동일한 세로 구조의 틀과 디자인색상으로 
+화면에 출력하게 만든 PHP코드를 만들어줘요.  
+
+4. account_edit.php
+5. account_input.php
+
+
+
+
+===========================================================================
+===========================================================================
+
+
+[[ auth_check.php 코드 ]]
+
+<?php
+
+// auth_check.php - 관리자 인증 체크 공통 파일
+
+// 세션 시작 (이미 시작되었는지 확인)
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// 로그인 여부 확인
+if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
+    // 로그인하지 않은 경우
+    $_SESSION['redirect_url'] = $_SERVER['REQUEST_URI']; // 현재 페이지 URL 저장
+    
+    echo "<script>
+        alert('로그인이 필요합니다.');
+        location.href='../member/login_form.php';
+    </script>";
+    exit;
+}
+
+// 관리자 권한 확인 (level 10 이상)
+if (!isset($_SESSION['user_level']) || $_SESSION['user_level'] < 10) {
+    echo "<script>
+        alert('접근 권한이 없습니다. 관리자만 이용 가능합니다.');
+        history.back();
+    </script>";
+    exit;
+}
+
+// 디버깅용 (테스트 후 삭제 가능)
+// echo "<!-- 인증 통과: " . $_SESSION['user_name'] . " (Level: " . $_SESSION['user_level'] . ") -->";
+?>
+
+
+
+
+===========================================================================
+===========================================================================
+
+
+[[ db-connect.php 코드 ]]
+
+
+<?php
+
+//[선택-1] dothome(닷홈) DB계정 사용!
+ $host = 'localhost';
+ $dbname = 'jikji35';
+ $username = 'jikji35';
+ $password = 'jeonsj84325285#'; 
+
+ //[선택-3] 내컴 자체의 데이터베이스 접속정보
+//  $host = 'localhost';
+//  $dbname = 'terraone';
+//  $username = 'root';
+//  $password = '84325285';
+
+ //[선택] infinityfree DB계정 사용!
+  //$host = 'sql112.infinityfree.com';
+  //$dbname = 'if0_38329280_jikji35';
+  //$username = 'if0_38329280';
+  //$password = 'Jel10hYSP4LK5D';
+
+
+//[선택-2] ivyro(아이비로) DB계정 사용!
+// $host = 'localhost';
+// $dbname = 'jikji35';
+// $username = 'jikji35';
+// $password = 'jeon2457#'; 
+
+
+
+
+
+
+try {
+    $db = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("데이터베이스 연결 실패: " . $e->getMessage());
+}
+
+
+?>
+
+
+
+===========================================================================
+===========================================================================
+
+
+
+[[ member.php 코드 ]]
+
+<?php
+
+// 이곳은 DB 테이블 member를 사용한다.
+// 바인딩(binding); SQL 구문과 파라미터(parameter) 값을 연결하는 것
+// 파라미터(parameter); 함수나 메소드 등에서 입력받는 값을 의미합니다. 
+
+
+
+// (아래) "Member" 클래스 정의! 여러함수들을 이 속에 포함시켰다.
+// 클래스명은 대문자로 시작한다.
+ 
+class Member {  // 데이터베이스 연결을 담당
+  // 멤버 변수, 프로퍼티
+  private $conn; // private; 외부에서 다이렉트로 접근이 불가!
+
+  // 생성자(첫번째 무조건 호출되는 함수)
+  // public; 외부에서 접근이 가능하다.
+  public function __construct($db) {  //PDO 인스턴스를 받는다($db)
+    $this->conn = $db;
+  }
+  // 위의 멤버 클래스는 데이터베이스 연결을 담당하는 클래스입니다. $conn은 private 변수로 선언되어 있으며, 생성자를 통해 $db라는 PDO 인스턴스를 받아 $conn에 할당합니다. 이후 $conn 변수를 사용하여 데이터베이스에 쿼리를 실행하는 등의 작업을 수행합니다. 이렇게 멤버 변수($conn)와 생성자($db)를 활용하여 데이터베이스 연결 코드를 캡슐화함으로써, 코드의 가독성과 유지보수성을 향상시킬 수 있습니다.
+  // $db 객체를 Member 클래스 생성자의 매개변수로 전달받아서 $conn 멤버 변수에 할당합니다. $conn 멤버 변수는 이후에 Member 클래스에서 데이터베이스 연결을 사용하는 모든 함수에서 사용됩니다. 이렇게 하는 이유는 객체를 생성할 때마다 데이터베이스 연결을 매번 새로 만드는 것보다는 한 번만 만들어놓고 공유하여 사용하는 것이 효율적이기 때문입니다.
+
+
+
+  // [[ 아이디 중복체크 ]]
+  // id_exists(); 아이디 중복체크 ~ 멤버 함수, 메소드
+  // 테이블명:  member
+
+  public function id_exists($id) {
+        try {
+            $sql = "SELECT COUNT(*) FROM member WHERE id = :id";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_STR);
+            $stmt->execute();
+            $count = $stmt->fetchColumn();
+            
+            return $count > 0; // true: 존재함, false: 존재하지 않음
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+
+
+
+
+
+
+
+
+  // [[ 이메일 형식 유효성검사 테스트 ]]   ==> @ 삽입 유무확인!
+  // email_format_check()는 이메일을 검증해주는 메서드이다.
+  // 함수명은 "email_format_check"이고, 입력값으로 이메일 주소를 받습니다.
+  public function email_format_check($email) {
+        return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+    }
+
+  // (예) $email = 'ddd' 로 입력한다면 ; // 결과값: bool(false) 검증실패!
+  // (예) $email = 'ddd@naver.com' 로 입력한다면 ; // 결과값: string(11) "ddd@naver.com" 검증통과!
+
+
+
+
+  // [[ 이메일 중복체크 ]]
+  public function email_exists($email) {
+        try {
+            $sql = "SELECT COUNT(*) FROM member WHERE email = :email";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+            $stmt->execute();
+            $count = $stmt->fetchColumn();
+            
+            return $count > 0; // true: 존재함, false: 존재하지 않음
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+
+
+
+  // [[ 회원정보 가입입력 - 암호화로 만듬! ]]
+  // PDO를 이용한 데이터베이스 입력(insert) 작업을 수행하는 함수!
+ 
+
+  // 패스워드(password) 단방향 암호화 사용!
+  // 똑같은 비밀번호를 사용해도 코드값이 다르다!
+   public function input($arr) { //배열로 처리
+        try {
+            // 비밀번호 해싱
+            $hashedPassword = password_hash($arr['password'], PASSWORD_DEFAULT);
+            
+            $sql = "INSERT INTO member (id, name, password, tel, email, zipcode, addr1, addr2, photo, create_at, ip, level) 
+                    VALUES (:id, :name, :password, :tel, :email, :zipcode, :addr1, :addr2, :photo, NOW(), :ip, 1)";
+            
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':id', $arr['id'], PDO::PARAM_STR);
+            $stmt->bindParam(':name', $arr['name'], PDO::PARAM_STR);
+            $stmt->bindParam(':password', $hashedPassword, PDO::PARAM_STR);
+            $stmt->bindParam(':tel', $arr['tel'], PDO::PARAM_STR);
+            $stmt->bindParam(':email', $arr['email'], PDO::PARAM_STR);
+            $stmt->bindParam(':zipcode', $arr['zipcode'], PDO::PARAM_STR);
+            $stmt->bindParam(':addr1', $arr['addr1'], PDO::PARAM_STR);
+            $stmt->bindParam(':addr2', $arr['addr2'], PDO::PARAM_STR);
+            $stmt->bindParam(':photo', $arr['photo'], PDO::PARAM_STR);
+            
+            $ip = $_SERVER['REMOTE_ADDR'];
+            $stmt->bindParam(':ip', $ip, PDO::PARAM_STR);
+            
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            echo "오류: " . $e->getMessage();
+            return false;
+        }
+    }
+
+
+
+
+
+
+  // 로그인 가입확인($id, $pw로 인자를 2개 받는형식으로 사용!)
+  public function login($id, $pw) {
+    // password_verify($password, $new_password)
+
+    // 로그인 암호화로 회원정보 비교검증을 하는데 암호화된것이라 아이디 필드를 불러와 id를 서로 비교한다
+    $sql = "SELECT password FROM member WHERE id=:id"; //(코드풀이)~ id 필드의 값이 :id 변수와 일치하는 데이터를 가져오겠다는 의미(앞쪽에 있는 id는 DB 필드명)
+
+    $stmt = $this->conn->prepare($sql);
+    $stmt->bindParam(':id', $id); // 패스워드는 암호화처리된 상태라 불러올수가 없고, 입력한 아이디와 같은 아이디인지를 확인한다 
+   
+    $stmt->execute();
+
+    if ($stmt->rowCount()) { // id가 존재한다면
+      $row = $stmt->fetch();
+
+      // password_verify PHP 함수는 암호화된 패스워드를 검증하는 역할을 합니다.
+      if (password_verify($pw, $row['password'])) { //입력한 패스워드($pw) 인자와, DB패스워드(password) 인자를 서로 비교
+        $sql = "UPDATE member SET login_dt=NOW() WHERE id=:id" ;
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':id', $id); 
+        $stmt->execute();
+
+      return true; //일치! 로그인성공, ../pg/login_process.png로 넘어간다
+      
+      } else {
+        return false; //불일치! 로그인실패
+      }
+
+    } else {
+      return false;
+    }
+
+    //return $stmt->rowCount() ? true : false; // 값이 1이면 true, 0이면 false
+
+  }
+
+
+
+  public function logout() {
+    session_start();
+    session_destroy(); //로그아웃 시키기
+
+    die('<script>self.location.href="../index.php";</script>');
+  }
+
+
+
+  public function getInfoFormIdx($idx) {
+    $sql = "SELECT * FROM member WHERE idx=:idx";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->bindParam(":idx", $idx);
+    $stmt->setFetchMode(PDO::FETCH_ASSOC); //중복 재처리! 예) Array([idx] => 11 [id] => terraone     [name] => 홍길동 [password] => 0$OMpmptiI7QWOHnOGQhh0IuimkNTeL1xS9mfW1cKKujgwuJc9CcL/a [tel] => 010-2544-6666 [email] => rraone@naver.com  [zipcode] => 15292 [addr1] => 경기 안산시 상록구 성포동 591-1 (성포동, 경일초등학교)       [addr2] => 12  [photo] => terraone.png       [create_at] => 2023-05-13 22:35:56        [login_dt] => 2023-05-15 10:02:33 [ip] => ::1)
+    
+    $stmt->execute();
+    return $stmt->fetch();
+  }
+
+
+
+
+  public function getInfo($id) {
+    $sql = "SELECT * FROM member WHERE id=:id";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->bindParam(":id", $id);
+    $stmt->setFetchMode(PDO::FETCH_ASSOC); //중복 재처리! 예) Array([idx] => 11 [id] => terraone     [name] => 홍길동 [password] => 0$OMpmptiI7QWOHnOGQhh0IuimkNTeL1xS9mfW1cKKujgwuJc9CcL/a [tel] => 010-2544-6666 [email] => rraone@naver.com  [zipcode] => 15292 [addr1] => 경기 안산시 상록구 성포동 591-1 (성포동, 경일초등학교)       [addr2] => 12  [photo] => terraone.png       [create_at] => 2023-05-13 22:35:56        [login_dt] => 2023-05-15 10:02:33 [ip] => ::1)
+    
+    $stmt->execute();
+    return $stmt->fetch();
+  }
+
+
+
+  // 회원정보 수정
+  public function edit($marr) {
+    $sql = "UPDATE member SET name=:name, tel=:tel, email=:email, zipcode=:zipcode, addr1=:addr1, addr2=:addr2, photo=:photo ";
+    $params = [
+      ':name' => $marr['name'],
+      ':tel' => $marr['tel'],
+      ':email' => $marr['email'],
+      ':zipcode' => $marr['zipcode'],
+      ':addr1' => $marr['addr1'],
+      ':addr2' => $marr['addr2'],
+      ':photo' => $marr['photo']
+    ];
+
+    if($marr['password'] != '') {
+      // 패스워드(password) 단방향 암호화 사용!
+      $new_hash_password = password_hash($marr['password'], PASSWORD_DEFAULT);  // 암호화!
+      $params[':password'] = $new_hash_password;
+
+      $sql .= ", password=:password";
+    }
+
+
+
+    if($_SESSION['ses_level'] == 10 && isset($marr['idx']) && $marr['idx'] != '') {
+      $params[':level'] = $marr['level']; //레벨변경
+      $params[':idx'] = $marr['idx']; //판단
+      $sql .= ", level=:level";
+      $sql .= " WHERE idx=:idx";
+
+    } else {
+      $params[':id'] = $marr['id']; //일반회원이라서 id값이 필요
+      $sql .= " WHERE id=:id";  // [중요!]: " WHERE 절 앞에 반드시 공백 추가! "(공백) WHE... 그렇지않으면 패스워드 변경시에 에러가 난다.
+    }
+
+
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute($params);
+
+  }
+
+
+
+
+    // 회원목록 관리(게시판)
+    // 번호, 아이디, 이름, 이메일, 등록일시 꼭 필요한것만 가져온다.
+    // 아래 쿼리문에서 date출력을 할수도있다. (방법-2) $sql = "SELECT idx, id, name, email, DATE_FORMAT(create_at,'%Y-%m-%d %H:%i') AS create_at FROM member ORDER BY idx DESC";   ====> 2023-03-15 15:58
+
+
+    public function list($page, $limit, $paramArr) { //DESC; 데이타 역순으로 정렬
+      $start = ($page - 1) * $limit; // 1페이지라면 0,5/ 2페이지라면 5,5/ 3페이지라면 10,5/15,5...
+
+      $where = "";
+      if($paramArr['sn'] != '' && $paramArr['sf'] != '' ) {
+        switch($paramArr['sn']) {
+          case 1 : $sn_str = 'name'; break;
+          case 2 : $sn_str = 'id'; break;
+          case 3 : $sn_str = 'email'; break;
+        }
+
+        $where = " WHERE ". $sn_str."=:sf "; //띄워쓰기 주의!
+      }
+
+      $sql = "SELECT idx, id, name, email, DATE_FORMAT(create_at, '%Y-%m-%d %H:%i') AS create_at FROM member ". $where ." ORDER BY idx DESC LIMIT ".$start.",". $limit;  //1페이지면 0,5,  2페이지면 5,5 /10, 5/ 10, 5..
+    // DATE_FORMAT(create_at, '%Y-%m-%d %H:%i')는 날짜에서 마지막 "초"를 생략하기위함!
+    // ORDER BY idx DESC LIMIT는 출력물을 내림차순(최신게시물이 제일위로 가게끔 하기위함!)
+     
+      $stmt = $this->conn->prepare($sql);
+
+      if($where != '') {
+        $stmt->bindParam(':sf', $paramArr['sf']);
+      }
+
+      $stmt->setFetchMode(PDO::FETCH_ASSOC); //중복 재처리! , ASSOC는 필드명만 가져온다.
+      $stmt->execute();
+      return $stmt->fetchAll(); //모두 가져온다() , fetch()는 한개만 가져온다.
+    }
+
+
+
+
+    // 게시판목록 갯수구하기
+    public function total($paramArr) {
+
+      $where = "";
+      if($paramArr['sn'] != '' && $paramArr['sf'] != '' ) {
+        switch($paramArr['sn']) {
+          case 1 : $sn_str = 'name'; break;
+          case 2 : $sn_str = 'id'; break;
+          case 3 : $sn_str = 'email'; break;
+        }
+
+        $where = " WHERE ". $sn_str."=:sf "; // "(공백처리)WHERE" => 띄워쓰기 주의!
+      }
+
+
+      $sql = "SELECT COUNT(*) cnt FROM member ". $where;  // "member(공백처리)" => 띄워쓰기 주의!
+      // echo $sql; // 테스트 확인해볼것!
+      // exit;
+
+      $stmt = $this->conn->prepare($sql);
+
+      if($where != '') {
+        $stmt->bindParam(':sf', $paramArr['sf']);
+      }
+
+      $stmt->setFetchMode(PDO::FETCH_ASSOC); //중복 재처리! , ASSOC는 필드명만 가져온다.
+      $stmt->execute();
+      $row = $stmt->fetch(); 
+      return $row['cnt'];  // row에 cnt값을 던져준다
+
+    }
+
+
+
+    // 회원목록 관리(데이타를 엑셀에 저장하기위한 작업)
+
+    public function getAllData() { 
+
+      $sql = "SELECT * FROM member  ORDER BY idx ASC";  
+      $stmt = $this->conn->prepare($sql);
+      $stmt->setFetchMode(PDO::FETCH_ASSOC); //중복 재처리! , ASSOC는 필드명만 가져온다.
+      $stmt->execute();
+      return $stmt->fetchAll(); //모두 가져온다()
+    }
+
+
+
+    
+
+
+    // 회원삭제
+
+    public function member_del($idx) {
+      // (삭제방법-1)
+      // $sql = "delete from member where idx=". $idx;
+
+      // (삭제방법-2)
+      $sql = "DELETE FROM member WHERE idx=:idx";  // 테이블명; member
+      $stmt = $this->conn->prepare($sql);
+      $stmt->bindParam(':idx', $idx);
+      $stmt->execute();
+
+    }
+
+
+
+
+
+    // 프로필 이미지 업로드==> public; 외부접근 가능!
+    public function profile_upload($id, $new_photo, $old_photo) {
+        if ($new_photo['name'] != '') {
+            $tmparr = explode('.', $new_photo['name']);
+            $ext = end($tmparr);
+            $photo = $id . '.' . $ext;
+            
+            // 기존 파일 삭제
+            if ($old_photo != '' && file_exists("../data/profile/" . $old_photo)) {
+                unlink("../data/profile/" . $old_photo);
+            }
+            
+            // 새 파일 업로드
+            copy($new_photo['tmp_name'], "../data/profile/" . $photo);
+            
+            return $photo;
+        }
+        
+        return $old_photo;
+    }
+
+
+
+
+} // Member Class 끝부분
+
+
+
+
+
+
+
+
+
+===========================================================================
+
+
+[[ account_view.php 코드 ]]
+
+<!-- ✅ 페이지 그대로의 주소를 입력하면 에러가 나므로 반드시 ?month=숫자(현재의 달)을 같이 입력해야한다. (예)http://localhost/home/account_view.php?month=5  현재5월달이라면 ===>  ?month=5 추가입력!   상단 월단위의 버튼을 눌러줘도 복구된다. -->
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>사용내역서 입력</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    :root {
-      --primary-color: #4CAF50;
-      --secondary-color: #f44336;
-      --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    body {
-      background: var(--bg-gradient);
-      min-height: 100vh;
-      padding: 20px;
-      font-family: 'Noto Sans KR', sans-serif;
-    }
-    
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-    }
-    
-    .card {
-      border-radius: 20px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-      border: none;
-      overflow: hidden;
-    }
-    
-    .card-header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 25px;
-      text-align: center;
-      border: none;
-    }
-    
-    .card-header h2 {
-      margin: 0;
-      font-weight: 700;
-      font-size: 1.8rem;
-    }
-    
-    .card-body {
-      padding: 30px;
-      background: white;
-    }
-    
-    .form-label {
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 8px;
-    }
-    
-    .form-control, .form-select {
-      border-radius: 10px;
-      border: 2px solid #e0e0e0;
-      padding: 12px;
-      transition: all 0.3s;
-    }
-    
-    .form-control:focus, .form-select:focus {
-      border-color: #667eea;
-      box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-    }
-    
-    .btn-group-custom {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-    
-    .btn-type {
-      flex: 1;
-      padding: 15px;
-      border-radius: 12px;
-      border: 2px solid #e0e0e0;
-      background: white;
-      cursor: pointer;
-      transition: all 0.3s;
-      font-weight: 600;
-      font-size: 1.1rem;
-    }
-    
-    .btn-type.active-income {
-      background: var(--primary-color);
-      color: white;
-      border-color: var(--primary-color);
-      transform: scale(1.05);
-    }
-    
-    .btn-type.active-expense {
-      background: var(--secondary-color);
-      color: white;
-      border-color: var(--secondary-color);
-      transform: scale(1.05);
-    }
-    
-    .btn-submit {
-      width: 100%;
-      padding: 15px;
-      border-radius: 12px;
-      font-size: 1.2rem;
-      font-weight: 700;
-      border: none;
-      color: white;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      transition: all 0.3s;
-      margin-top: 20px;
-    }
-    
-    .btn-submit:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-    }
-    
-    .nav-buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-    }
-    
-    .nav-buttons a {
-      flex: 1;
-      text-decoration: none;
-    }
-    
-    .btn-nav {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: 2px solid #667eea;
-      background: white;
-      color: #667eea;
-      font-weight: 600;
-      transition: all 0.3s;
-    }
-    
-    .btn-nav:hover {
-      background: #667eea;
-      color: white;
-    }
-    
-    .alert {
-      border-radius: 12px;
-      border: none;
-      margin-top: 20px;
-    }
-    
-    @media (max-width: 576px) {
-      .card-body {
-        padding: 20px;
-      }
-      
-      .btn-type {
-        font-size: 1rem;
-        padding: 12px;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="card">
-      <div class="card-header">
-        <h2>💰 사용내역서 입력</h2>
-      </div>
-      <div class="card-body">
-        <form id="transactionForm">
-          <div class="btn-group-custom">
-            <button type="button" class="btn-type active-income" data-type="income" onclick="selectType('income')">
-              📈 수입
-            </button>
-            <button type="button" class="btn-type" data-type="expense" onclick="selectType('expense')">
-              📉 지출
-            </button>
-          </div>
-          
-          <div class="mb-3">
-            <label for="date" class="form-label">일자</label>
-            <input type="date" class="form-control" id="date" required>
-          </div>
-          
-          <div class="mb-3">
-            <label for="category" class="form-label">항목</label>
-            <input type="text" class="form-control" id="category" placeholder="예: 월급, 식비, 교통비" required>
-          </div>
-          
-          <div class="mb-3">
-            <label for="description" class="form-label">비고</label>
-            <input type="text" class="form-control" id="description" placeholder="상세 설명을 입력하세요">
-          </div>
-          
-          <div class="mb-3">
-            <label for="amount" class="form-label">금액 (원)</label>
-            <input type="number" class="form-control" id="amount" placeholder="0" required>
-          </div>
-          
-          <button type="submit" class="btn-submit">등록하기</button>
-        </form>
-        
-        <div id="alertMessage"></div>
-        
-        <div class="nav-buttons">
-          <a href="account_view.html"><button class="btn-nav">📊 내역보기</button></a>
-          <a href="account_edit.html"><button class="btn-nav">✏️ 편집하기</button></a>
-        </div>
-      </div>
-    </div>
-  </div>
+  <meta name="description" content="J.S.J" />
+  <title>사용내역서보기</title>
+  <link rel="stylesheet" href="css/account_view.css" />
+  <link rel="manifest" href="manifest.json">
+  <meta name="msapplication-config" content="/browserconfig.xml">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="theme-color" content="#ffffff">
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Bootstrap CSS (5.3.3) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   
-  <!-- Firebase SDK -->
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    import { getDatabase, ref, push, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+  <!-- 파비콘 아이콘들 -->
+  <link rel="icon" href="/favicon.ico?v=2" />
 
-    // Firebase 설정 (여기에 본인의 Firebase 설정을 입력하세요)
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT_ID.appspot.com",
-      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
+  <link rel="icon" type="image/png" sizes="36x36" href="/favicons/android-icon-36x36.png" />
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicons/android-icon-48x48.png" />
+  <link rel="icon" type="image/png" sizes="72x72" href="/favicons/android-icon-72x72.png" />
 
-    // Firebase 초기화
-    const app = initializeApp(firebaseConfig);
-    const database = getDatabase(app);
+  <link rel="apple-touch-icon" sizes="32x32" href="/favicons/apple-icon-32x32.png">
+  <link rel="apple-touch-icon" sizes="57x57" href="/favicons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/favicons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/favicons/apple-icon-72x72.png">
+  
 
-    // 전역 변수
-    let currentType = 'income';
+</head>
 
-    // 타입 선택 함수
-    window.selectType = function(type) {
-      currentType = type;
-      const incomeBtn = document.querySelector('[data-type="income"]');
-      const expenseBtn = document.querySelector('[data-type="expense"]');
-      
-      if (type === 'income') {
-        incomeBtn.classList.add('active-income');
-        incomeBtn.classList.remove('active-expense');
-        expenseBtn.classList.remove('active-income', 'active-expense');
-      } else {
-        expenseBtn.classList.add('active-expense');
-        expenseBtn.classList.remove('active-income');
-        incomeBtn.classList.remove('active-income', 'active-expense');
-      }
-    };
+<body>
 
-    // 오늘 날짜 설정
-    document.getElementById('date').valueAsDate = new Date();
+<?php
+  
+  
+require 'php/db-connect.php'; // DB 접속 정보 불러오기(방법-1)
+//include 'php/db-connect.php'; // DB 접속 정보 불러오기(방법-2)  
+  
 
-    // 폼 제출 처리
-    document.getElementById('transactionForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      
-      const date = document.getElementById('date').value;
-      const category = document.getElementById('category').value;
-      const description = document.getElementById('description').value;
-      const amount = parseFloat(document.getElementById('amount').value);
-      
-      if (!date || !category || !amount) {
-        showAlert('모든 필수 항목을 입력해주세요.', 'danger');
-        return;
-      }
-      
-      try {
-        const tableName = currentType === 'income' ? 'income_table' : 'expense_table';
-        const tableRef = ref(database, tableName);
-        
-        await push(tableRef, {
-          date: date,
-          category: category,
-          description: description,
-          amount: amount,
-          timestamp: serverTimestamp()
-        });
-        
-        showAlert('✅ 등록되었습니다!', 'success');
-        
-        // 폼 초기화
-        document.getElementById('category').value = '';
-        document.getElementById('description').value = '';
-        document.getElementById('amount').value = '';
-        document.getElementById('date').valueAsDate = new Date();
-        
-      } catch (error) {
-        console.error('Error:', error);
-        showAlert('❌ 등록 중 오류가 발생했습니다.', 'danger');
-      }
+
+$pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
+
+// 오늘의 날짜 출력
+$today = date('Y/m/d H:i');
+echo "<div style='margin-top: 30px'>오늘의 날짜: $today</div>";
+  
+
+// 월 선택 버튼 생성
+// <div>에 id="month-buttons" 추가.(히스토리 차단목적;되돌아가기 없앰)
+// <a> 태그에 data-month='$month' 추가.(히스토리 차단목적;되돌아가기 없앰)
+  
+$months = range(1, 12);
+$currentMonth = isset($_GET['month']) ? intval($_GET['month']) : date('n');
+echo "<div style='margin-top: 20px' id='month-buttons'>";
+foreach ($months as $month) {
+  $activeClass = ($month == $currentMonth) ? 'active' : '';
+  echo "<a class='btn $activeClass' href='?month=$month' data-month='$month'>$month 월</a>";
+}
+echo "</div>";
+echo "<div class='notice'> [알림] 현재 합계부분이 제대로 보이지않으면 위 월단위의 버튼을 누르세요! </div>";
+
+// 현재 연도 가져오기
+$currentYear = date('Y');
+
+// 선택한 월까지의 수입/지출 데이터 조회
+$stmt = $pdo->prepare("SELECT date, amount FROM income_table WHERE YEAR(date) = ? AND MONTH(date) <= ? ORDER BY date DESC");
+$stmt->execute([$currentYear, $currentMonth]);
+$incomeTransactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$stmt = $pdo->prepare("SELECT date, amount FROM expense_table WHERE YEAR(date) = ? AND MONTH(date) <= ? ORDER BY date DESC");
+$stmt->execute([$currentYear, $currentMonth]);
+$expenseTransactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// 월별 합계 계산
+$monthlyIncomeTotals = array_fill(1, 12, 0);
+$monthlyExpenseTotals = array_fill(1, 12, 0);
+
+foreach ($incomeTransactions as $transaction) {
+  $month = (int)date('n', strtotime($transaction['date']));
+  $monthlyIncomeTotals[$month] += $transaction['amount'];
+}
+
+foreach ($expenseTransactions as $transaction) {
+  $month = (int)date('n', strtotime($transaction['date']));
+  $monthlyExpenseTotals[$month] += $transaction['amount'];
+}
+
+// 선택한 월의 월수입/월지출 합계
+$selectedMonthIncomeTotal = $monthlyIncomeTotals[$currentMonth];
+$selectedMonthExpenseTotal = $monthlyExpenseTotals[$currentMonth];
+
+// 년수입/년지출 합계
+$yearIncomeTotal = 0;
+$yearExpenseTotal = 0;
+for ($i = 1; $i <= $currentMonth; $i++) {
+  $yearIncomeTotal += $monthlyIncomeTotals[$i];
+  $yearExpenseTotal += $monthlyExpenseTotals[$i];
+}
+
+// 총잔액 계산
+$balance = $yearIncomeTotal - $yearExpenseTotal;
+
+// 표시용 데이터 (선택한 달, 일자 오름차순 정렬)
+$stmt = $pdo->prepare("SELECT * FROM income_table WHERE MONTH(date) = ? AND YEAR(date) = ? ORDER BY date ASC");
+$stmt->execute([$currentMonth, $currentYear]);
+$incomeTransactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$stmt = $pdo->prepare("SELECT * FROM expense_table WHERE MONTH(date) = ? AND YEAR(date) = ? ORDER BY date ASC");
+$stmt->execute([$currentMonth, $currentYear]);
+$expenseTransactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// 수정/삭제 처리 (기존 유지)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit'])) {
+  $editID = $_POST['edit'];
+  $id = $_POST['id'];
+  $date = $_POST['date'];
+  $type = $_POST['type'];
+  $category = $_POST['category'];
+  $description = $_POST['description'];
+  $amount = $_POST['amount'];
+
+  if ($type === '수입') {
+    $table = 'income_table';
+  } elseif ($type === '지출') {
+    $table = 'expense_table';
+  }
+
+  if ($editID === $id) {
+    ?>
+    <form method="POST" action="account_book.php">
+      <input type="hidden" name="id" value="<?php echo $id; ?>">
+      <input type="hidden" name="type" value="<?php echo $type; ?>">
+      <div class="form-group">
+        <label for="edit-date">일자:</label>
+        <input type="date" class="form-control" id="edit-date" name="date" value="<?php echo $date; ?>" required>
+      </div>
+      <div class="form-group">
+        <label for="edit-category">항목:</label>
+        <input type="text" class="form-control" id="edit-category" name="category" value="<?php echo $category; ?>" required>
+      </div>
+      <div class="form-group">
+        <label for="edit-description">비고:</label>
+        <input type="text" class="form-control" id="edit-description" name="description" value="<?php echo $description; ?>" required>
+      </div>
+      <div class="form-group">
+        <label for="edit-amount">금액:</label>
+        <input type="number" class="form-control" id="edit-amount" name="amount" value="<?php echo $amount; ?>" required>
+      </div>
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary" name="save">저장</button>
+        <button type="button" class="btn btn-secondary" onclick="location.href='account_edit.php'">취소</button>
+      </div>
+    </form>
+    <?php
+    exit;
+  }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete'])) {
+  $deleteID = $_POST['delete'];
+  $id = $_POST['id'];
+  $type = $_POST['type'];
+
+  if ($type === '수입') {
+    $table = 'income_table';
+  } else if ($type === '지출') {
+    $table = 'expense_table';
+  }
+
+  $stmt = $pdo->prepare("DELETE FROM $table WHERE id = ?");
+  $stmt->execute([$id]);
+
+  header("Location: account_edit.php");
+  exit;
+}
+?>
+
+<!-- 수입 목록 -->
+<h3 style="width: 100%; text-align: center; color:darkgrey; margin-top: 30px">[수입 목록]</h3>
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th style="width: 5%; text-align: center;">no</th>
+      <th style="width: 10%; text-align: center;">일자</th>
+      <th style="width: 45%; text-align: center;">항목</th>
+      <th style="width: 30%; text-align: center;">비고</th>
+      <th style="width: 10%; text-align: center;">금액</th>
+    </tr>
+  </thead>
+  <tbody>
+    <?php 
+    $incomeCounter = 1;
+    foreach ($incomeTransactions as $transaction): ?>
+      <tr>
+        <td style="text-align: center;"><?php echo $incomeCounter++; ?></td>
+        <td style="text-align: center;"><?php echo $transaction['date']; ?></td>
+        <td><?php echo $transaction['category']; ?></td>
+        <td><?php echo $transaction['description']; ?></td>
+        <td class="amount-column"><?php echo number_format($transaction['amount']); ?>원</td>
+      </tr>
+    <?php endforeach; ?>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="2" class="summary-label-income">월수입 합계:</td>
+      <td colspan="2" class="summary-value"><?php echo number_format($selectedMonthIncomeTotal); ?>원</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td colspan="2" class="summary-label-income">년수입 합계:</td>
+      <td colspan="2" class="summary-value"><?php echo number_format($yearIncomeTotal); ?>원</td>
+      <td></td>
+    </tr>
+  </tfoot>
+</table>
+
+<!-- 지출 목록 -->
+<h3 style="width: 100%; text-align: center; color:darkgrey; margin-top: 30px">[지출 목록]</h3>
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th style="width: 5%; text-align: center;">no</th>
+      <th style="width: 10%; text-align: center;">일자</th>
+      <th style="width: 45%; text-align: center;">항목</th>
+      <th style="width: 30%; text-align: center;">비고</th>
+      <th style="width: 10%; text-align: center;">금액</th>
+    </tr>
+  </thead>
+  <tbody>
+    <?php 
+    $expenseCounter = 1;
+    foreach ($expenseTransactions as $transaction): ?>
+      <tr>
+        <td style="text-align: center;"><?php echo $expenseCounter++; ?></td>
+        <td style="text-align: center;"><?php echo $transaction['date']; ?></td>
+        <td><?php echo $transaction['category']; ?></td>
+        <td><?php echo $transaction['description']; ?></td>
+        <td class="amount-column"><?php echo number_format($transaction['amount']); ?>원</td>
+      </tr>
+    <?php endforeach; ?>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="2" class="summary-label-expense">월지출 합계:</td>
+      <td colspan="2" class="summary-value"><?php echo number_format($selectedMonthExpenseTotal); ?>원</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td colspan="2" class="summary-label-expense">년지출 합계:</td>
+      <td colspan="2" class="summary-value"><?php echo number_format($yearExpenseTotal); ?>원</td>
+      <td></td>
+    </tr>
+  </tfoot>
+</table>
+
+<!-- 총잔액 -->
+<div>
+  <h3 class="total_balance">총잔액:<span> <?php echo number_format($balance); ?>원</span></h3>
+  <a class="account_image" href="./images_view.php">
+    <button type="button" class="btn btn-success">영수증 사진보기</button>
+  </a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+
+<!-- ✅ 여러 "월"을 페이지보기를 했다가 완전히 사이트를 닫고자할때 거쳐온 달들을 다시 돌아가는것을 생략하고 빨리 빠져 나가고자할때 이 스크립트를 활용! 138,141라인도 일부 코드를 추가함.
+JavaScript로 클릭 이벤트를 가로채고, history.replaceState()로 히스토리를 대체   -->
+<script>
+  document.querySelectorAll('#month-buttons a').forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.preventDefault(); // 기본 링크 동작 차단
+      const month = this.getAttribute('data-month');
+      // URL을 변경하되 히스토리를 대체
+      window.history.replaceState({}, document.title, `?month=${month}`);
+      // 페이지 새로고침
+      window.location.href = `?month=${month}`;
     });
+  });
+</script>
 
-    function showAlert(message, type) {
-      const alertDiv = document.getElementById('alertMessage');
-      alertDiv.innerHTML = `
-        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-          ${message}
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-      `;
-      
-      setTimeout(() => {
-        alertDiv.innerHTML = '';
-      }, 3000);
-    }
-  </script>
+
+<!-- 채널톡 상담 소스 -->
+<script>
+  (function(){var w=window;if(w.ChannelIO){return w.console.error("ChannelIO script included twice.");}var ch=function(){ch.c(arguments);};ch.q=[];ch.c=function(args){ch.q.push(args);};w.ChannelIO=ch;function l(){if(w.ChannelIOInitialized){return;}w.ChannelIOInitialized=true;var s=document.createElement("script");s.type="text/javascript";s.async=true;s.src="https://cdn.channel.io/plugin/ch-plugin-web.js";var x=document.getElementsByTagName("script")[0];if(x.parentNode){x.parentNode.insertBefore(s,x);}}if(document.readyState==="complete"){l();}else{w.addEventListener("DOMContentLoaded",l);w.addEventListener("load",l);}})();
+  
+  ChannelIO('boot', {
+    "pluginKey": "8a8da17f-40dc-4f7b-87c4-718e23824191"
+  });
+</script>
 </body>
 </html>
 
-js코드를 안만들어서 그런가요?  지금 사용중인 연결 js코드가 있는데 보여줄께요.
 
 
 
 
+===========================================================================
+===========================================================================
+
+
+[[ account_edit.php 코드 ]]
+
+<!-- ✅ 파일그래로의 주소를 입력하면 에러가 나므로 반드시 ?month=숫자(현재의 달)을 같이 입력해야한다. (예) http://localhost/account_input/account_edit.php?month=5  현재5월달이라면 ===>  ?month=5 추가입력!   상단 월단위의 버튼을 눌러줘도 복구된다. -->
+
+
+<?php require 'php/auth_check.php'; ?>
+
+
+<!-- ⭐ 관리자 인증 — 로그인 + 레벨10 확인 -->
+ <?php
+require 'php/auth_check.php';
+?>
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="J.S.J" />
+    <title>사용내역서편집</title>
+    <link rel="stylesheet" href="css/account_edit.css" />
+    <link rel="manifest" href="manifest.json">
+    <meta name="msapplication-config" content="/browserconfig.xml">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="theme-color" content="#ffffff">
+    
+
+    <!-- Bootstrap CSS (5.3.3) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+
+    <!-- 파비콘 아이콘들 -->
+    <link rel="icon" href="/favicon.ico?v=2" />
+
+    <link rel="icon" type="image/png" sizes="36x36" href="/favicons/android-icon-36x36.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicons/android-icon-48x48.png" />
+    <link rel="icon" type="image/png" sizes="72x72" href="/favicons/android-icon-72x72.png" />
+
+    <link rel="apple-touch-icon" sizes="32x32" href="/favicons/apple-icon-32x32.png">
+    <link rel="apple-touch-icon" sizes="57x57" href="/favicons/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/favicons/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/favicons/apple-icon-72x72.png">
+
+</head>
+<body>
+
+<?php
+ob_start(); // 출력 버퍼링 시작(오류 메세지 방지차원!)
+
+
+require 'php/db-connect.php'; // DB 접속 정보 불러오기(방법-1)
+//include 'php/db-connect.php'; // DB 접속 정보 불러오기(방법-2)  
+  
+
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("데이터베이스 접속 오류: " . $e->getMessage());
+}
+
+// 현재 연도와 월 설정
+$currentYear = date('Y');
+$currentMonth = isset($_GET['month']) ? intval($_GET['month']) : date('n');
+
+// 수정 버튼 클릭 처리
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit'])) {
+    $editID = $_POST['edit'];
+    $id = $_POST['id'];
+    $date = $_POST['date'];
+    $type = $_POST['type'];
+    $category = $_POST['category'];
+    $description = $_POST['description'];
+    $amount = $_POST['amount'];
+
+    if ($type === '수입') {
+        $table = 'income_table';
+    } elseif ($type === '지출') {
+        $table = 'expense_table';
+    }
+
+    if ($editID === $id) {
+        ob_end_clean(); // 이전 출력 버퍼 지우기
+        ?> 
+        <div class="edit-form-container">
+            <form method="POST" action="" class="edit-form">
+                <input type="hidden" name="id" value="<?php echo $id; ?>">
+                <input type="hidden" name="type" value="<?php echo $type; ?>">
+                <div class="form-group">
+                    <label for="edit-date">일자:</label>
+                    <input type="date" class="form-control" id="edit-date" name="date" value="<?php echo $date; ?>" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-category">항목:</label>
+                    <input type="text" class="form-control" id="edit-category" name="category" value="<?php echo $category; ?>" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-description">비고:</label>
+                    <input type="text" class="form-control" id="edit-description" name="description" value="<?php echo $description; ?>" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-amount">금액:</label>
+                    <input type="number" class="form-control" id="edit-amount" name="amount" value="<?php echo $amount; ?>" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit" name="update" class="btn btn-primary">업데이트</button>
+                    <button type="button" class="btn btn-secondary" onclick="location.href='account_edit.php?month=<?php echo $currentMonth; ?>'">취소</button>
+                </div>
+            </form>
+        </div>
+        
+
+    <?php
+    exit;
+    }
+}
+
+// 업데이트 처리
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
+    $id = $_POST['id'];
+    $date = $_POST['date'];
+    $type = $_POST['type'];
+    $category = $_POST['category'];
+    $description = $_POST['description'];
+    $amount = $_POST['amount'];
+
+    if ($type === '수입') {
+        $table = 'income_table';
+    } elseif ($type === '지출') {
+        $table = 'expense_table';
+    }
+
+    $stmt = $pdo->prepare("UPDATE $table SET date = ?, category = ?, description = ?, amount = ? WHERE id = ?");
+    $stmt->execute([$date, $category, $description, $amount, $id]);
+
+    ob_end_clean();
+    header("Location: account_edit.php?month=$currentMonth");
+    exit;
+}
+
+// 삭제 처리
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete'])) {
+    $id = $_POST['id'];
+    $type = $_POST['type'];
+
+    if ($type === '수입') {
+        $table = 'income_table';
+    } else if ($type === '지출') {
+        $table = 'expense_table';
+    }
+
+    $stmt = $pdo->prepare("DELETE FROM $table WHERE id = ?");
+    $stmt->execute([$id]);
+
+    ob_end_clean();
+    header("Location: account_edit.php?month=$currentMonth");
+    exit;
+}
+
+// 데이터 조회
+$stmt = $pdo->prepare("SELECT date, amount FROM income_table WHERE YEAR(date) = ? AND MONTH(date) <= ? ORDER BY date DESC");
+$stmt->execute([$currentYear, $currentMonth]);
+$incomeTransactionsTotal = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$stmt = $pdo->prepare("SELECT date, amount FROM expense_table WHERE YEAR(date) = ? AND MONTH(date) <= ? ORDER BY date DESC");
+$stmt->execute([$currentYear, $currentMonth]);
+$expenseTransactionsTotal = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$monthlyIncomeTotals = array_fill(1, 12, 0);
+$monthlyExpenseTotals = array_fill(1, 12, 0);
+
+foreach ($incomeTransactionsTotal as $transaction) {
+    $month = (int)date('n', strtotime($transaction['date']));
+    $monthlyIncomeTotals[$month] += $transaction['amount'];
+}
+
+foreach ($expenseTransactionsTotal as $transaction) {
+    $month = (int)date('n', strtotime($transaction['date']));
+    $monthlyExpenseTotals[$month] += $transaction['amount'];
+}
+
+$selectedMonthIncomeTotal = $monthlyIncomeTotals[$currentMonth];
+$selectedMonthExpenseTotal = $monthlyExpenseTotals[$currentMonth];
+
+$yearIncomeTotal = 0;
+$yearExpenseTotal = 0;
+for ($i = 1; $i <= $currentMonth; $i++) {
+    $yearIncomeTotal += $monthlyIncomeTotals[$i];
+    $yearExpenseTotal += $monthlyExpenseTotals[$i];
+}
+
+$balance = $yearIncomeTotal - $yearExpenseTotal;
+
+$stmt = $pdo->prepare("SELECT * FROM income_table WHERE MONTH(date) = ? AND YEAR(date) = ? ORDER BY date ASC");
+$stmt->execute([$currentMonth, $currentYear]);
+$incomeTransactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$stmt = $pdo->prepare("SELECT * FROM expense_table WHERE MONTH(date) = ? AND YEAR(date) = ? ORDER BY date ASC");
+$stmt->execute([$currentMonth, $currentYear]);
+$expenseTransactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
+
+
+  
+    <div class="container">
+        <section>
+            <?php
+            $today = date('Y/m/d H:i');
+            echo "<div style='margin-top: 30px'>오늘의 날짜: $today</div>";
+
+            $months = range(1, 12);
+            echo "<div style='margin-top: 20px'>";
+            foreach ($months as $month) {
+                $activeClass = ($month == $currentMonth) ? 'active' : '';
+                echo "<a class='btn $activeClass' href='?month=$month'>$month 월</a>";
+            }
+            echo "</div>";
+            echo "<div class='notice'> [알림] 수정/삭제 후 페이지가 새로고침됩니다! </div>";
+            ?>
+
+            <!-- 수입 목록 -->
+            <h3 style="width: 100%; text-align: center; color:darkgrey; margin-top: 30px">[수입 목록]</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>NO</th>
+                        <th>일자</th>
+                        <th>항목</th>
+                        <th>비고</th>
+                        <th>금액</th>
+                        <th>관리</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php 
+                    $incomeCounter = 1;
+                    foreach ($incomeTransactions as $transaction): ?>
+                        <tr>
+                            <td><?php echo $incomeCounter++; ?></td>
+                            <td><?php echo $transaction['date']; ?></td>
+                            <td><?php echo $transaction['category']; ?></td>
+                            <td><?php echo $transaction['description']; ?></td>
+                            <td class="amount-column"><?php echo number_format($transaction['amount']); ?>원</td>
+                            <td>
+                                <form method="POST">
+                                    <input type="hidden" name="id" value="<?php echo $transaction['id']; ?>">
+                                    <input type="hidden" name="date" value="<?php echo $transaction['date']; ?>">
+                                    <input type="hidden" name="type" value="수입">
+                                    <input type="hidden" name="category" value="<?php echo $transaction['category']; ?>">
+                                    <input type="hidden" name="description" value="<?php echo $transaction['description']; ?>">
+                                    <input type="hidden" name="amount" value="<?php echo $transaction['amount']; ?>">
+                                    <div class="btn_edit_delete">
+                                        <button type="submit" name="edit" value="<?php echo $transaction['id']; ?>" class="btn btn-primary">수정</button>
+                                        <button type="submit" name="delete" value="<?php echo $transaction['id']; ?>" class="btn btn-danger">삭제</button>
+                                    </div>
+                                </form>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2" class="summary-label-income">월수입 합계:</td>
+                        <td colspan="2" class="summary-value"><?php echo number_format($selectedMonthIncomeTotal); ?>원</td>
+                        <td colspan="2"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="summary-label-income">년수입 합계:</td>
+                        <td colspan="2" class="summary-value"><?php echo number_format($yearIncomeTotal); ?>원</td>
+                        <td colspan="2"></td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <!-- 지출 목록 -->
+            <h3 style="width: 100%; text-align: center; color:darkgrey; margin-top: 30px">[지출 목록]</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>NO</th>
+                        <th>일자</th>
+                        <th>항목</th>
+                        <th>비고</th>
+                        <th>금액</th>
+                        <th>관리</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php 
+                    $expenseCounter = 1;
+                    foreach ($expenseTransactions as $transaction): ?>
+                        <tr>
+                            <td><?php echo $expenseCounter++; ?></td>
+                            <td><?php echo $transaction['date']; ?></td>
+                            <td><?php echo $transaction['category']; ?></td>
+                            <td><?php echo $transaction['description']; ?></td>
+                            <td class="amount-column"><?php echo number_format($transaction['amount']); ?>원</td>
+                            <td>
+                                <form method="POST">
+                                    <input type="hidden" name="id" value="<?php echo $transaction['id']; ?>">
+                                    <input type="hidden" name="date" value="<?php echo $transaction['date']; ?>">
+                                    <input type="hidden" name="type" value="지출">
+                                    <input type="hidden" name="category" value="<?php echo $transaction['category']; ?>">
+                                    <input type="hidden" name="description" value="<?php echo $transaction['description']; ?>">
+                                    <input type="hidden" name="amount" value="<?php echo $transaction['amount']; ?>">
+                                    <div class="btn_edit_delete">
+                                        <button type="submit" name="edit" value="<?php echo $transaction['id']; ?>" class="btn btn-primary">수정</button>
+                                        <button type="submit" name="delete" value="<?php echo $transaction['id']; ?>" class="btn btn-danger">삭제</button>
+                                    </div>
+                                </form>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2" class="summary-label-expense">월지출 합계:</td>
+                        <td colspan="2" class="summary-value"><?php echo number_format($selectedMonthExpenseTotal); ?>원</td>
+                        <td colspan="2"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="summary-label-expense">년지출 합계:</td>
+                        <td colspan="2" class="summary-value"><?php echo number_format($yearExpenseTotal); ?>원</td>
+                        <td colspan="2"></td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <!-- 총잔액 -->
+            <div class="jikji_footer">
+                <h3 class="total_balance">총잔액:<span> <?php echo number_format($balance); ?>원</span></h3>
+                <a class="account_image" href="./images_upload.php"><button type="button" class="btn btn-success">영수증 입력하기</button></a>
+                <button id="copyButton">회원열람용 사이트복사</button>
+            </div>
+
+            <script>
+                function copyAddress() {
+                    var address = "http://jikji35.dothome.co.kr/home/account_view.php?month=해당월을 숫자로입력 하시오";
+                    var tempTextArea = document.createElement("textarea");
+                    tempTextArea.value = address;
+                    document.body.appendChild(tempTextArea);
+                    tempTextArea.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(tempTextArea);
+                    alert("주소가 복사되었습니다.");
+                }
+                var copyButton = document.getElementById("copyButton");
+                copyButton.addEventListener("click", copyAddress);
+            </script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+           
+        </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>
+
+<?php
+ob_end_flush(); // 출력 버퍼링 종료 및 출력
+?>
+
+
+
+
+
+==========================================================================
+==========================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+구글 firebase, Realtime Database를 사용할수있게 코드를 3개 만들었어요. 
+파일은 account_input.html 사용내역서 입력페이지, account_edit.html 사용내역서 편집페이지,  account_view.html 사용내역서 페이지로 만들었어요. 
 
 
 
