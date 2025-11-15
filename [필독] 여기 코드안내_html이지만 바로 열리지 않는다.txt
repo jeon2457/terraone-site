@@ -1,0 +1,29 @@
+
+[[ 중요! ]] 여기 이 속에있는 코드들은 일반 HTML이 아니라 구글 firebase / Realtime Database
+와 연동되서 돌아가는 시스템이므로 html 코드 이지만 바로 열리지 않는다.
+구글서버로 접속되어 DB에서 데이타를 받아와서 페이지에 뿌려지는 방식이다. (PHP코드와 유사)
+
+
+
+
+==================================================================
+==================================================================
+
+📋 구글 firebase / Realtime Database 전체 페이지 목록	
+	
+      페이지	                        URL
+회원연락망 메인	https://terraone-d0318.web.app/
+관리자 로그인	https://terraone-d0318.web.app/login.html
+관리자 회원가입	https://terraone-d0318.web.app/signup.html
+관리자 회원목록	https://terraone-d0318.web.app/members.html
+관리자 회원편집	https://terraone-d0318.web.app/edit-member.html
+	
+관리자 사용내역서 입력	https://terraone-d0318.web.app/account_input.html
+관리자 사용내역서 편집	https://terraone-d0318.web.app/account_edit.html
+사용내역서 보기	                https://terraone-d0318.web.app/account_view.html
+	
+	
+관리자 영수증 입력	https://terraone-d0318.web.app/images_upload.html
+관리자 영수증 편집	https://terraone-d0318.web.app/images_edit.html
+영수증 보기	        https://terraone-d0318.web.app/images_view.html
+	

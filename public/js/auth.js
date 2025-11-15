@@ -28,12 +28,18 @@ export function logout() {
 // ✅ 관리자 페이지 접근 체크 (관리자가 아니면 로그인 페이지로 이동)
 export function requireAdmin() {
   if (!isLoggedIn()) {
+    // 🔥 현재 페이지 URL 저장
+    sessionStorage.setItem("redirectAfterLogin", window.location.pathname + window.location.search);
+    
     alert("❌ 로그인이 필요합니다.");
     window.location.href = "login.html";
     return false;
   }
   
   if (!isAdmin()) {
+    // 🔥 현재 페이지 URL 저장
+    sessionStorage.setItem("redirectAfterLogin", window.location.pathname + window.location.search);
+    
     alert("❌ 관리자만 접근할 수 있습니다.");
     window.location.href = "login.html";
     return false;

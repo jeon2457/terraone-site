@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>이미지 업로드</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #667eea;
+      --secondary-color: #764ba2;
+      --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    body {
+      background: var(--bg-gradient);
+      min-height: 100vh;
+      padding: 20px;
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .card {
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      border: none;
+      overflow: hidden;
+    }
+    
+    .card-header {
+      background: var(--bg-gradient);
+      color: white;
+      padding: 25px;
+      text-align: center;
+      border: none;
+    }
+    
+    .card-header h2 {
+      margin: 0;
+      font-weight: 700;
+      font-size: 1.8rem;
+    }
+    
+    .card-body {
+      padding: 30px;
+      background: white;
+    }
+    
+    .form-label {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+    
+    .form-control, .form-select {
+      border-radius: 10px;
+      border: 2px solid #e0e0e0;
+      padding: 12px;
+      transition: all 0.3s;
+    }
+    
+    .form-control:focus, .form-select:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    /* 이미지 업로드 영역 */
+    .image-upload-area {
+      border: 3px dashed #e0e0e0;
+      border-radius: 15px;
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: #f8f9ff;
+      margin-bottom: 20px;
+    }
+    
+    .image-upload-area:hover {
+      border-color: var(--primary-color);
+      background: #f0f2ff;
+    }
+    
+    .image-upload-area.dragover {
+      border-color: var(--primary-color);
+      background: var(--primary-color);
+      color: white;
+    }
+    
+    .upload-icon {
+      font-size: 3rem;
+      margin-bottom: 10px;
+      color: var(--primary-color);
+    }
+    
+    .image-preview {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 10px;
+      margin-top: 15px;
+      display: none;
+    }
+    
+    .image-preview.show {
+      display: block;
+    }
+    
+    .btn-submit {
+      width: 100%;
+      padding: 15px;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      border: none;
+      color: white;
+      background: var(--bg-gradient);
+      transition: all 0.3s;
+      margin-top: 20px;
+    }
+    
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-submit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .nav-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    .nav-buttons a {
+      flex: 1;
+      text-decoration: none;
+    }
+    
+    .btn-nav {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 2px solid var(--primary-color);
+      background: white;
+      color: var(--primary-color);
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    .btn-nav:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+    
+    .alert {
+      border-radius: 12px;
+      border: none;
+      margin-top: 20px;
+    }
+    
+    .upload-progress {
+      display: none;
+      margin-top: 15px;
+    }
+    
+    .progress {
+      height: 25px;
+      border-radius: 10px;
+    }
+    
+    .progress-bar {
+      background: var(--bg-gradient);
+      font-weight: 600;
+    }
+    
+    @media (max-width: 576px) {
+      .card-body {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <h2>📤 이미지 업로드</h2>
+      </div>
+      <div class="card-body">
+        <form id="imageUploadForm">
+          <div class="mb-3">
+            <label for="date" class="form-label">일자</label>
+            <input type="date" class="form-control" id="date" required>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">이미지 선택</label>
+            <div class="image-upload-area" id="uploadArea">
+              <div class="upload-icon">📷</div>
+              <p><strong>클릭하거나 이미지를 드래그하세요</strong></p>
+              <p class="text-muted">JPG, PNG, GIF 지원 (최대 5MB)</p>
+              <input type="file" 
+                     id="imageFile" 
+                     accept="image/*" 
+                     style="display: none;" 
+                     required>
+            </div>
+            <img id="imagePreview" class="image-preview" alt="미리보기">
+            
+            <!-- 업로드 진행률 -->
+            <div class="upload-progress" id="uploadProgress">
+              <div class="progress">
+                <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%">0%</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <label for="summary" class="form-label">요약 (선택)</label>
+            <textarea class="form-control" 
+                      id="summary" 
+                      rows="3" 
+                      placeholder="이미지에 대한 간단한 설명을 입력하세요"></textarea>
+          </div>
+          
+          <button type="submit" class="btn-submit" id="submitBtn">업로드하기</button>
+        </form>
+        
+        <div id="alertMessage"></div>
+        
+        <div class="nav-buttons">
+          <a href="images_view.html"><button class="btn-nav">📊 목록보기</button></a>
+          <a href="images_edit.html"><button class="btn-nav">✏️ 편집하기</button></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script type="module">
+    import { requireAdmin } from "./js/auth.js";
+    // 관리자 권한 체크
+    if (!requireAdmin()) {
+      // auth.js에서 자동으로 login.html로 리다이렉트
+    }
+    
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getDatabase, ref, push, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+    import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+
+    // Firebase 설정
+    const firebaseConfig = {
+        apiKey: "AIzaSyAF7AD1d54k21-stmb0Hpg9OMEECvzFHpQ",
+        authDomain: "terraone-d0318.firebaseapp.com",
+        databaseURL: "https://terraone-d0318-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "terraone-d0318",
+        storageBucket: "terraone-d0318.firebasestorage.app",
+        messagingSenderId: "1082807340877",
+        appId: "1:1082807340877:web:6e2b49c04562d800e87104",
+        measurementId: "G-7HMJEV832S"
+    };
+
+    // Firebase 초기화
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    const storage = getStorage(app);
+
+    let selectedFile = null;
+
+    // 오늘 날짜 설정
+    document.getElementById('date').valueAsDate = new Date();
+
+    // 업로드 영역 클릭 이벤트
+    document.getElementById('uploadArea').addEventListener('click', function() {
+      document.getElementById('imageFile').click();
+    });
+
+    // 파일 선택 이벤트
+    document.getElementById('imageFile').addEventListener('change', function(e) {
+      handleFileSelect(e.target.files[0]);
+    });
+
+    // 드래그 앤 드롭 이벤트
+    const uploadArea = document.getElementById('uploadArea');
+    
+    uploadArea.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+    
+    uploadArea.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+    });
+    
+    uploadArea.addEventListener('drop', function(e) {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleFileSelect(files[0]);
+      }
+    });
+
+    // 파일 선택 처리
+    function handleFileSelect(file) {
+      console.log('파일 선택됨:', file.name);
+      
+      // 파일 타입 체크
+      if (!file.type.startsWith('image/')) {
+        showAlert('❌ 이미지 파일만 업로드 가능합니다.', 'danger');
+        return;
+      }
+      
+      // 파일 크기 체크 (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        showAlert('❌ 파일 크기는 5MB 이하여야 합니다.', 'danger');
+        return;
+      }
+      
+      selectedFile = file;
+      
+      // 미리보기 표시
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const preview = document.getElementById('imagePreview');
+        preview.src = e.target.result;
+        preview.classList.add('show');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // 알림 메시지 표시
+    function showAlert(message, type) {
+      const alertDiv = document.getElementById('alertMessage');
+      alertDiv.innerHTML = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+          ${message}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      `;
+      
+      setTimeout(() => {
+        alertDiv.innerHTML = '';
+      }, 5000);
+    }
+
+    // 폼 제출 처리
+    document.getElementById('imageUploadForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const date = document.getElementById('date').value;
+      const summary = document.getElementById('summary').value;
+      
+      if (!date) {
+        showAlert('날짜를 선택해주세요.', 'danger');
+        return;
+      }
+      
+      if (!selectedFile) {
+        showAlert('이미지를 선택해주세요.', 'danger');
+        return;
+      }
+      
+      // 버튼 비활성화
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = '업로드 중...';
+      
+      // 진행률 표시
+      const progressDiv = document.getElementById('uploadProgress');
+      const progressBar = document.getElementById('progressBar');
+      progressDiv.style.display = 'block';
+      
+      try {
+        // 파일명 생성 (날짜_타임스탬프)
+        const timestamp = Date.now();
+        const fileName = `images/${date}_${timestamp}_${selectedFile.name}`;
+        
+        // Storage에 업로드
+        const imageRef = storageRef(storage, fileName);
+        const uploadTask = uploadBytesResumable(imageRef, selectedFile);
+        
+        uploadTask.on('state_changed',
+          (snapshot) => {
+            // 업로드 진행률
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            progressBar.style.width = progress + '%';
+            progressBar.textContent = Math.round(progress) + '%';
+            console.log('업로드 진행률:', progress + '%');
+          },
+          (error) => {
+            // 업로드 실패
+            console.error('업로드 실패:', error);
+            showAlert('❌ 업로드 중 오류가 발생했습니다: ' + error.message, 'danger');
+            submitBtn.disabled = false;
+            submitBtn.textContent = '업로드하기';
+            progressDiv.style.display = 'none';
+          },
+          async () => {
+            // 업로드 성공
+            try {
+              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+              console.log('이미지 URL:', downloadURL);
+              
+              // Database에 정보 저장
+              const imagesRef = ref(database, 'images_table');
+              await push(imagesRef, {
+                date: date,
+                summary: summary,
+                imageUrl: downloadURL,
+                fileName: selectedFile.name,
+                timestamp: serverTimestamp()
+              });
+              
+              console.log('데이터베이스 저장 완료!');
+              showAlert('✅ 업로드되었습니다!', 'success');
+              
+              // 폼 초기화
+              document.getElementById('summary').value = '';
+              document.getElementById('imageFile').value = '';
+              document.getElementById('imagePreview').classList.remove('show');
+              document.getElementById('date').valueAsDate = new Date();
+              selectedFile = null;
+              
+              // 버튼 복구
+              submitBtn.disabled = false;
+              submitBtn.textContent = '업로드하기';
+              progressDiv.style.display = 'none';
+              progressBar.style.width = '0%';
+              progressBar.textContent = '0%';
+              
+            } catch (error) {
+              console.error('데이터베이스 저장 실패:', error);
+              showAlert('❌ 데이터 저장 중 오류가 발생했습니다.', 'danger');
+              submitBtn.disabled = false;
+              submitBtn.textContent = '업로드하기';
+            }
+          }
+        );
+        
+      } catch (error) {
+        console.error('오류:', error);
+        showAlert('❌ 업로드 중 오류가 발생했습니다: ' + error.message, 'danger');
+        submitBtn.disabled = false;
+        submitBtn.textContent = '업로드하기';
+        progressDiv.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

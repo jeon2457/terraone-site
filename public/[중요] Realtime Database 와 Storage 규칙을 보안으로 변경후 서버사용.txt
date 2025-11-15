@@ -1,0 +1,57 @@
+[중요] Realtime Database 와 Storage 규칙을 보안으로 변경후 서버사용!!
+
+
+
+
+(Realtime Database)
+
+공개전환일 경우(테스트중일때...) ===>
+
+{
+  "rules": {
+    ".read": true,
+    ".write": true
+  }
+}
+
+
+보안전환일 경우(실제 운영중일때도 코드가 복잡해지므로 그냥 공개용과 같은코드 적용함!) ===>
+
+{
+  "rules": {
+    ".read": true,
+    ".write": true
+  }
+}
+
+
+
+==========================================================
+==========================================================
+
+(Storage)
+
+공개전환일 경우(테스트중일때...) ===>
+
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read: if true;
+      allow write: if true;
+    }
+  }
+}
+
+
+보안전환일 경우(실제 운영중일때...) ===>
+
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read: if true;  // 누구나 읽기 가능 (이미지 보기용)
+      allow write: if request.auth != null;  // 로그인한 사용자만 쓰기
+    }
+  }
+}

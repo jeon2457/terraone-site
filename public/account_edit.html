@@ -295,6 +295,12 @@
   
   <!-- Firebase SDK -->
   <script type="module">
+    import { requireAdmin } from "./js/auth.js";
+    // 관리자 권한 체크
+    if (!requireAdmin()) {
+      // auth.js에서 자동으로 login.html로 리다이렉트
+    }
+
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getDatabase, ref, onValue, update, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 

@@ -173,10 +173,10 @@
         <form id="transactionForm">
           <div class="btn-group-custom">
             <button type="button" class="btn-type active-income" data-type="income" onclick="selectType('income')">
-              📈 수입(test)
+              📈 수입
             </button>
             <button type="button" class="btn-type" data-type="expense" onclick="selectType('expense')">
-              📉 지출(test)
+              📉 지출
             </button>
           </div>
           
@@ -215,106 +215,74 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   
-  <!-- Firebase SDK -->
   <script type="module">
+    import { requireAdmin } from "./js/auth.js";
+    // 관리자 권한 체크
+    if (!requireAdmin()) {
+      // auth.js에서 자동으로 login.html로 리다이렉트
+    }
+
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getDatabase, ref, push, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
-        
-    import { addTransaction } from './js/firebase-db.js'; // 추가
-
-    // 기존 Firebase 초기화 코드 유지
-  
-    import { getDatabase } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-    import { firebaseConfig } from './js/firebase-config.js'; // firebaseConfig 분리 시
-
-  
-    // 전역 변수
-    let currentType = 'income';
-
-    // 타입 선택 함수는 그대로 유지
-
-    // 폼 제출 처리
-    document.getElementById('transactionForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-
-      const date = document.getElementById('date').value;
-      const category = document.getElementById('category').value;
-      const description = document.getElementById('description').value;
-      const amount = parseFloat(document.getElementById('amount').value);
-
-      if (!date || !category || !amount) {
-        showAlert('모든 필수 항목을 입력해주세요.', 'danger');
-        return;
-      }
-
-      try {
-        await addTransaction(currentType, {
-          date,
-          category,
-          description,
-          amount
-        });
-
-        showAlert('✅ 등록되었습니다!', 'success');
-
-        // 폼 초기화
-        document.getElementById('category').value = '';
-        document.getElementById('description').value = '';
-        document.getElementById('amount').value = '';
-        document.getElementById('date').valueAsDate = new Date();
-
-      } catch (error) {
-        console.error('Error:', error);
-        showAlert('❌ 등록 중 오류가 발생했습니다.', 'danger');
-      }
-    });
-    
-    
-    
-
-    
-        // Firebase 설정
-    {% comment %} const firebaseConfig = {
+    // Firebase 설정
+    const firebaseConfig = {
         apiKey: "AIzaSyAF7AD1d54k21-stmb0Hpg9OMEECvzFHpQ",
         authDomain: "terraone-d0318.firebaseapp.com",
         databaseURL: "https://terraone-d0318-default-rtdb.asia-southeast1.firebasedatabase.app",
         projectId: "terraone-d0318",
-        storageBucket: "terraone-d0318.appspot.com",   // ← 이 값만 다시 확인!
+        storageBucket: "terraone-d0318.firebasestorage.app",
         messagingSenderId: "1082807340877",
         appId: "1:1082807340877:web:6e2b49c04562d800e87104",
         measurementId: "G-7HMJEV832S"
-    }; {% endcomment %}
+    };
 
     // Firebase 초기화
-    {% comment %} const app = initializeApp(firebaseConfig);
-    const database = getDatabase(app); {% endcomment %}
-
-
-
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
 
     // 전역 변수
     let currentType = 'income';
 
-    // 타입 선택 함수
+    // 타입 선택 함수 (전역으로 등록)
     window.selectType = function(type) {
+      console.log('selectType 호출됨:', type); // 디버깅용
       currentType = type;
+      
       const incomeBtn = document.querySelector('[data-type="income"]');
       const expenseBtn = document.querySelector('[data-type="expense"]');
       
+      // 모든 active 클래스 제거
+      incomeBtn.classList.remove('active-income', 'active-expense');
+      expenseBtn.classList.remove('active-income', 'active-expense');
+      
+      // 선택된 타입에 맞는 클래스 추가
       if (type === 'income') {
         incomeBtn.classList.add('active-income');
-        incomeBtn.classList.remove('active-expense');
-        expenseBtn.classList.remove('active-income', 'active-expense');
+        console.log('수입 버튼 활성화 - 초록색'); // 디버깅용
       } else {
         expenseBtn.classList.add('active-expense');
-        expenseBtn.classList.remove('active-income');
-        incomeBtn.classList.remove('active-income', 'active-expense');
+        console.log('지출 버튼 활성화 - 빨간색'); // 디버깅용
       }
     };
 
     // 오늘 날짜 설정
     document.getElementById('date').valueAsDate = new Date();
+
+    // 알림 메시지 표시 함수
+    function showAlert(message, type) {
+      const alertDiv = document.getElementById('alertMessage');
+      alertDiv.innerHTML = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+          ${message}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      `;
+      
+      setTimeout(() => {
+        alertDiv.innerHTML = '';
+      }, 3000);
+    }
 
     // 폼 제출 처리
     document.getElementById('transactionForm').addEventListener('submit', async function(e) {
@@ -334,6 +302,8 @@
         const tableName = currentType === 'income' ? 'income_table' : 'expense_table';
         const tableRef = ref(database, tableName);
         
+        console.log('데이터 전송 시도:', { tableName, date, category, amount }); // 디버깅용
+        
         await push(tableRef, {
           date: date,
           category: category,
@@ -342,6 +312,7 @@
           timestamp: serverTimestamp()
         });
         
+        console.log('데이터 전송 성공!'); // 디버깅용
         showAlert('✅ 등록되었습니다!', 'success');
         
         // 폼 초기화
@@ -351,24 +322,10 @@
         document.getElementById('date').valueAsDate = new Date();
         
       } catch (error) {
-        console.error('Error:', error);
-        showAlert('❌ 등록 중 오류가 발생했습니다.', 'danger');
+        console.error('Firebase 오류:', error);
+        showAlert('❌ 등록 중 오류가 발생했습니다: ' + error.message, 'danger');
       }
     });
-
-    function showAlert(message, type) {
-      const alertDiv = document.getElementById('alertMessage');
-      alertDiv.innerHTML = `
-        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-          ${message}
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-      `;
-      
-      setTimeout(() => {
-        alertDiv.innerHTML = '';
-      }, 3000);
-    }
   </script>
 </body>
 </html>

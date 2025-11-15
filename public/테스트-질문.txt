@@ -1,5 +1,67 @@
+[[ 브라우저 캐시 삭제 ]]
+Ctrl + Shift + R (강력 새로고침)
+
 
 (챗GPT 질문내용)
+members.html
+이 코드를 잘봐둬요.  관리자(level 10)가 아니면 차단시키고, login.html /login.js 페이지로 자동으로 돌아가게 하고 있어요. 부탁할게 뭐냐면  account_input.html , account_edit.html ,  images_input , images_edit.html ,  account_input.html 이 코드들은 검증없이 바로 진입하고있는데 마찬가지로 검증없이는 차단시키고,  login.html에서 로그인 페이지로 이동시켜서 검증을 통과하면 해당페이지가 열리게 만드는 코드를 다시 수정부탁해요. 
+
+
+
+images_input.html를 https://terraone-d0318.web.app/images_view.html 페이지에서 이미지입력하고 업로드하면 콘솔창에서 아래와 같이 에러메시지가 계속 반복됩니다.
+
+Access to XMLHttpRequest at 'https://firebasestorage.googleapis.com/v0/b/terraone-d0318.firebasestorage.app/o?name=images%2F2025-11-15_1763167359330_apple-icon.png' from origin 'https://terraone-d0318.web.app' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: It does not have HTTP ok status.
+
+connection.ts:88  POST https://firebasestorage.googleapis.com/v0/b/terraone-d0318.firebasestorage.app/o?name=images%2F2025-11-15_1763167359330_apple-icon.png net::ERR_FAILED
+
+====> [결과] 구글 firebase에서 나의 프로젝트 storage규칙을 제대로 지정해줘야한다.(서버 접근방식)
+
+
+그런데 문제가 발생했어요!
+그전에 만들어놓았던 login.html , signup.html , members.html , edit-member.html 코드가있는데 이곳은 접근을 막아놓아서 관리자모드(level=10)로 로그인 검증을 거쳐야 페이지진입(members.html, edit-member.html)이 되는데 지금 실행해보니 index.html(아무나 보기가능)페이지가 기본틀은 보여지는데 그동안 20여명의 데이타를 불러와야하는데 하나도 가져오질 못한다.  이건 storage규칙하고 상관이 있는건가요?
+
+
+
+ 회원정보 데이타를 못불러오는 지금 확인해보면 {
+
+  "rules": {
+
+    ".read": true,
+
+    ".write": true
+
+  }
+
+}
+
+이렇게 공개로 풀려져있는거 같은걸요. 아래와같은 곳은 확인해보면 모두 데이타를 불러와요.
+
+
+
+관리자 사용내역서 입력	https://terraone-d0318.web.app/account_input.html
+
+관리자 사용내역서 편집	https://terraone-d0318.web.app/account_edit.html
+
+사용내역서 보기			https://terraone-d0318.web.app/account_view.html
+
+	
+
+관리자 영수증 입력	https://terraone-d0318.web.app/images_input.html
+
+관리자 영수증 편집	https://terraone-d0318.web.app/images_edit.html
+
+영수증 보기		https://terraone-d0318.web.app/images_view.html
+
+
+
+===>>>  데이타 못불러옴!
+
+회원연락망 메인	https://terraone-d0318.web.app/index.html
+
+관리자 회원목록	https://terraone-d0318.web.app/members.html
+
+
+
 
 
 먼저 데이타베이스 테이블을 먼저 만들어줘요.  테이타베이스명은 terraone로 하고싶고,  테이블명은 tel,  그리고 그속 구조는  idx, id`, password, name, tel, addr, remark, sms, sms_2, level 로 만들고싶어요.
@@ -18,7 +80,9 @@
 
 웹페이지를 깃허브와 구글firebase, Realtime Database 2곳에서 활용하고있는데,  데이터를 어느위치를 기준으로 가져오는가요? 구글firebase, Realtime Database은 예를들어서 C:\GitHub\terraone-site 폴더가 아닌 C:\GitHub\terraone-site\public 폴더안에서 가져온다는거 같은데 맞는가요?  그리고 깃허브는 https://github.com/jeon2457/terraone-site 주소라면 \public 폴더안이 아니라 루트상에 있는 index.html 파일을 가져오는게 맞는가요?
 
-
+덕분에 보내준코드는 정상적으로 작동하고있네요. 고마워요!
+이제 다른걸 만들려고해요. https://terraone-d0318.web.app/account_view.html 를 확인해줘요.
+작업할건 images_view.html 코드로 상단에  1월부터 시작해서 12월까지 버튼식으로 만들어져있고 오늘날짜를 기준으로 지금이 11월달이니깐 active로 11월달에 바탕색상이 바뀌어져있고,  아래 본문에는 테이블형태로 번호,날짜,이미지, 요약,다운로드 를 만들어서 코드를 부탁해요.  좀전에 우리가 작업했던 account_input.html 참고해서 같은 코드 전송방식으로 이미지입력창도 만들어주고요. 파일명은 images_input.html, 편집페이지는 images_edit.html
 
 
 <!--  " cd C:\GitHub\terraone-site "    -->

@@ -1,12 +1,11 @@
 // 🔹 firebase-db.js (완전 버전)
 import { app } from "./firebase-config.js";
 import { getDatabase, ref, set, push, get, child, update, remove } 
-  from "https://www.gstatic.com/firebasejs/10.6.0/firebase-database.js";
-
-
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";  // 10.6.0 → 10.7.1
 
 const db = getDatabase(app);
 const membersRef = ref(db, "terraone/tel");
+
 
 // ✅ 회원 등록 함수
 export function addMember(member) {

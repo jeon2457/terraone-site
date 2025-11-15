@@ -1,20 +1,18 @@
 // 📁 public/js/firebase-config.js
 // Firebase 기본 설정 파일
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-analytics.js";
-import { getDatabase, connectDatabaseEmulator } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-database.js";
-import { getStorage } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-storage.js";
-
-
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+import { getDatabase, connectDatabaseEmulator } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getStorage } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 // Firebase 프로젝트 설정 정보
-export const firebaseConfig = { // 👈 여기에 'export' 키워드를 추가했습니다.
+const firebaseConfig = {  // ← export 제거!
     apiKey: "AIzaSyAF7AD1d54k21-stmb0Hpg9OMEECvzFHpQ",
     authDomain: "terraone-d0318.firebaseapp.com",
     databaseURL: "https://terraone-d0318-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId: "terraone-d0318",
-    storageBucket: "terraone-d0318.firebasestorage.app",
+    storageBucket: "terraone-d0318.appspot.com",
     messagingSenderId: "1082807340877",
     appId: "1:1082807340877:web:6e2b49c04562d800e87104",
     measurementId: "G-7HMJEV832S"
@@ -34,5 +32,5 @@ if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
     console.log("🌐 프로덕션 환경 - 실제 Firebase에 연결합니다.");
 }
 
-// export
-export { app, db, storage, firebaseConfig }; // firebaseConfig도 명시적으로 export합니다.
+// export (한 번만!)
+export { app, db, storage, firebaseConfig };
