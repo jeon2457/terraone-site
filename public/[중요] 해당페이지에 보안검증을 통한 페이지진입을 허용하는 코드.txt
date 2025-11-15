@@ -1,0 +1,173 @@
+
+해당 페이지를 검증절차를 위한 코드를 삽입하면
+페이지 진입시 "로그인이 필요합니다" 라는 안내창이 뜬다.
+
+
+보안검증 코드는,
+해당페이지(예: members_input.html , account_input.html , account_edit.html , images_input.html , images_edit.html)
+<script> 안에 추가삽입해준다.
+
+=======================================================================
+
+import { requireAdmin } from "./js/auth.js";
+    // 관리자 권한 체크
+    if (!requireAdmin()) {
+      // auth.js에서 자동으로 login.html로 리다이렉트
+    }
+
+=======================================================================
+
+// 📁 public/js/login.js
+
+import { login } from "./firebase-db.js";
+
+const form = document.getElementById("loginForm");
+const messageDiv = document.getElementById("message");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const id = document.getElementById("id").value;
+  const password = document.getElementById("password").value;
+
+  const member = await login(id, password);
+
+  if (!member) {
+    messageDiv.textContent = "❌ 아이디 또는 비밀번호가 잘못되었습니다.";
+    return;
+  }
+
+  messageDiv.textContent = "✅ 로그인 성공!";
+
+  // 🔥 세션에 로그인 정보 저장
+  sessionStorage.setItem("loggedInUser", JSON.stringify({
+    key: member.key,
+    id: member.id,
+    name: member.name,
+    level: member.level
+  }));
+
+  // level 값에 따라 페이지 이동
+  if (member.level === 10) {
+    // 🔥 원래 가려던 페이지가 있으면 그곳으로, 없으면 members.html로
+    const redirectUrl = sessionStorage.getItem("redirectAfterLogin");
+    
+    if (redirectUrl) {
+      sessionStorage.removeItem("redirectAfterLogin"); // 사용 후 삭제
+      window.location.href = redirectUrl;
+    } else {
+      // 직접 login.html에 접근한 경우
+      window.location.href = "members.html";
+    }
+  } else {
+    // 일반 회원은 접근 불가
+    alert("❌ 관리자만 접근할 수 있습니다.");
+    sessionStorage.removeItem("loggedInUser"); // 세션 삭제
+  }
+});
+
+
+=======================================================================
+
+[학습]
+
+## 🎯 작동 시나리오
+
+### 시나리오 1: account_input.html 접근
+```
+1. account_input.html 접근 (비로그인)
+2. requireAdmin() 실행
+3. sessionStorage에 "account_input.html" 저장
+4. login.html로 리다이렉트
+5. 로그인 성공
+6. 저장된 "account_input.html"로 이동 ✅
+```
+
+### 시나리오 2: 직접 login.html 접근
+```
+1. login.html 직접 접근
+2. redirectAfterLogin 없음
+3. 로그인 성공
+4. members.html로 이동 (기본값) ✅
+```
+
+### 시나리오 3: images_edit.html 접근
+```
+1. images_edit.html 접근 (비로그인)
+2. requireAdmin() 실행
+3. sessionStorage에 "images_edit.html" 저장
+4. login.html로 리다이렉트
+5. 로그인 성공
+6. 저장된 "images_edit.html"로 이동 ✅
+
+
+=======================================================================
+
+
+// 📁 public/js/auth.js
+// 권한 체크 공통 모듈
+
+// ✅ 로그인 여부 확인
+export function isLoggedIn() {
+  const user = sessionStorage.getItem("loggedInUser");
+  return user !== null;
+}
+
+// ✅ 현재 로그인한 사용자 정보 가져오기
+export function getCurrentUser() {
+  const user = sessionStorage.getItem("loggedInUser");
+  return user ? JSON.parse(user) : null;
+}
+
+// ✅ 관리자 권한 확인 (level 10)
+export function isAdmin() {
+  const user = getCurrentUser();
+  return user && user.level === 10;
+}
+
+// ✅ 로그아웃
+export function logout() {
+  sessionStorage.removeItem("loggedInUser");
+  window.location.href = "login.html";
+}
+
+// ✅ 관리자 페이지 접근 체크 (관리자가 아니면 로그인 페이지로 이동)
+export function requireAdmin() {
+  if (!isLoggedIn()) {
+    // 🔥 현재 페이지 URL 저장 (로그인 후 돌아오기 위해)
+    sessionStorage.setItem("redirectAfterLogin", window.location.pathname + window.location.search);
+    
+    alert("❌ 로그인이 필요합니다.");
+    window.location.href = "login.html";
+    return false;
+  }
+  
+  if (!isAdmin()) {
+    // 🔥 현재 페이지 URL 저장
+    sessionStorage.setItem("redirectAfterLogin", window.location.pathname + window.location.search);
+    
+    alert("❌ 관리자만 접근할 수 있습니다.");
+    window.location.href = "login.html";
+    return false;
+  }
+  
+  return true;
+}
+
+// ✅ 로그인 페이지 접근 체크 (이미 로그인했으면 members.html로 이동)
+export function requireGuest() {
+  if (isLoggedIn() && isAdmin()) {
+    window.location.href = "members.html";
+    return false;
+  }
+  return true;
+}
+
+=======================================================================
+
+
+
+
+
+
+

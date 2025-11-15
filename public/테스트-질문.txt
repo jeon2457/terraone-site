@@ -34,32 +34,6 @@ connection.ts:88  POST https://firebasestorage.googleapis.com/v0/b/terraone-d031
 
 }
 
-이렇게 공개로 풀려져있는거 같은걸요. 아래와같은 곳은 확인해보면 모두 데이타를 불러와요.
-
-
-
-관리자 사용내역서 입력	https://terraone-d0318.web.app/account_input.html
-
-관리자 사용내역서 편집	https://terraone-d0318.web.app/account_edit.html
-
-사용내역서 보기			https://terraone-d0318.web.app/account_view.html
-
-	
-
-관리자 영수증 입력	https://terraone-d0318.web.app/images_input.html
-
-관리자 영수증 편집	https://terraone-d0318.web.app/images_edit.html
-
-영수증 보기		https://terraone-d0318.web.app/images_view.html
-
-
-
-===>>>  데이타 못불러옴!
-
-회원연락망 메인	https://terraone-d0318.web.app/index.html
-
-관리자 회원목록	https://terraone-d0318.web.app/members.html
-
 
 
 
