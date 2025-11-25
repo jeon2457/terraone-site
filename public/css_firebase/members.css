@@ -38,3 +38,11 @@ h2 {
   font-weight: bold;
   color: #ffc107;
 }
+
+ @media (max-width: 768px) {
+    .btn-area-responsive {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px; /* 버튼 간 간격 */
+    }
+  }

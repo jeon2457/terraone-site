@@ -6,12 +6,11 @@
       "**/.*",
       "**/node_modules/**"
     ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ]
+
+  "rewrites": [
+    { "source": "/admin_firebase.html", "destination": "/admin_firebase.html" },
+    { "source": "**", "destination": "/index.html" }
+  ]
   },
   "emulators": {
     "hosting": {

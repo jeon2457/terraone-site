@@ -77,8 +77,10 @@
       </div>
     </div>
 
-    <div class="mb-3 text-end">
+    <div class="mb-3 text-end btn-area-responsive">
+      <!-- ✅ 새로 추가된 회원관리 버튼 -->
       <button id="signupSelected" class="btn btn-success me-2">회원가입</button>
+      <button id="adminManage" class="btn btn-dark me-2">회계/영수증</button>
       <button id="viewSelected" class="btn btn-primary me-2">회원열람</button>
       <button id="editSelected" class="btn btn-warning me-2">선택회원 수정</button>
       <button id="deleteSelected" class="btn btn-danger">선택회원 삭제</button>
@@ -130,5 +132,13 @@
       }
     });
   </script>
+
+  <script>
+    // 🔥 회원관리 버튼 클릭 → admin_firebase.html 이동
+    document.getElementById("adminManage").addEventListener("click", () => {
+      window.location.href = "admin_firebase.html";
+    });
+  </script>
+
 </body>
 </html>

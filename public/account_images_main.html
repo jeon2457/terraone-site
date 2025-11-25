@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회원 회계관리</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea, #764ba2);
+      --secondary-gradient: linear-gradient(135deg, #f6d365, #fda085);
+      --dark-bg: #2c2f33;
+    }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: var(--dark-bg);
+      color: #f0f0f0;
+      min-height: 100vh;
+    }
+
+    .page-header {
+      background: linear-gradient(135deg, #3d5e40ff 0%, #04472fff 100%);
+      color: #f88e47ff;
+      padding: 30px 20px;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      text-align: center;
+      margin-top: 40px;
+      margin-bottom: 40px;
+    }
+
+    .btn-card {
+      background: #3a3d42;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+      padding: 25px 15px;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .btn-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+    }
+
+    .btn-card .btn {
+      width: 100%;
+      font-weight: 700;
+      padding: 15px 0;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary-gradient {
+      background: var(--primary-gradient);
+      color: #fff;
+      border: none;
+    }
+
+    .btn-primary-gradient:hover {
+      opacity: 0.9;
+    }
+
+    .btn-secondary-gradient {
+      background: var(--secondary-gradient);
+      color: #fff;
+      border: none;
+    }
+
+    .btn-secondary-gradient:hover {
+      opacity: 0.9;
+    }
+
+    .btn-back {
+      display: block;
+      width: 200px;
+      margin: 50px auto 20px auto;
+      padding: 12px 20px;
+      border-radius: 12px;
+      background: #667eea;
+      color: #fff;
+      font-weight: 700;
+      text-align: center;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-back:hover {
+      background: #556cd6;
+      text-decoration: none;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container mt-5">
+
+  <!-- Firebase 관리자 표시 -->
+  <div class="text-end mb-3" id="adminInfo" style="font-size:15px; color:#ccc;">
+    관리자 확인중...
+  </div>
+
+  <div class="page-header">
+    <h1>회원 회계관리</h1>
+  </div>
+
+  <div class="row g-4">
+    
+    <div class="col-lg-4 col-md-6">
+      <div class="btn-card">
+        <button class="btn btn-primary-gradient" onclick="location.href='account_input.html'">
+          거래명세서 입력
+        </button>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <div class="btn-card">
+        <button class="btn btn-primary-gradient" onclick="location.href='account_edit.html'">
+          거래명세서 편집
+        </button>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <div class="btn-card">
+        <button class="btn btn-primary-gradient" onclick="location.href='account_view.html'">
+          거래명세서 보기
+        </button>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <div class="btn-card">
+        <button class="btn btn-secondary-gradient" onclick="location.href='images_input.html'">
+          영수증사진 업로드
+        </button>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <div class="btn-card">
+        <button class="btn btn-secondary-gradient" onclick="location.href='images_edit.html'">
+          영수증사진 편집
+        </button>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <div class="btn-card">
+        <button class="btn btn-secondary-gradient" onclick="location.href='images_view.html'">
+          영수증사진 보기
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 되돌아가기 Firebase 페이지 -->
+  <a href="admin_firebase.html" class="btn-back">← 되돌아가기</a>
+
+</div>
+
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } 
+    from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAF7AD1d54k21-stmb0Hpg9OMEECvzFHpQ",
+    authDomain: "terraone-d0318.firebaseapp.com",
+    databaseURL: "https://terraone-d0318-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "terraone-d0318",
+    storageBucket: "terraone-d0318.firebasestorage.app",
+    messagingSenderId: "1082807340877",
+    appId: "1:1082807340877:web:6e2b49c04562d800e87104",
+    measurementId: "G-7HMJEV832S"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // 🔹 로그인 확인 (진입차단 포함 X → 로그인 안되어도 페이지 열림)
+  onAuthStateChanged(auth, (user) => {
+    const info = document.getElementById("adminInfo");
+    if (user) {
+      info.innerHTML = `👤 관리자: <strong>${user.email}</strong>`;
+    } else {
+      info.innerHTML = `👤 관리자: 로그인 필요`;
+      // 로그인 안되어도 페이지 진입 가능 → 차단 없음
+    }
+  });
+</script>
+
+</body>
+</html>
