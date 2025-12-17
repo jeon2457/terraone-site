@@ -9,100 +9,11 @@
 자동으로 깃허브로 데이타 업데이트되고 구글firebase 서버쪽과 웹호스팅 처리가된다.
 
 (작업-2)
+내컴퓨터 프롬프트를 실행하고 해당폴더로 이동해서(명령어 cd C:\GitHub\terraone-site) 
 도스 프롬프트 명령어: 
-내컴퓨터 C:\GitHub\terraone-site 에 원본 파일이 들어있고, 데이타 코드를 수정할때는, 반드시 도스에서 경로를
-c:\user> cd C:\GitHub\terraone-site 폴더로 이동한 후에 
-C:\GitHub\terraone-site>   firebase login   로 로그인이 된것을 확인을하고,
-C:\GitHub\terraone-site>   firebase deploy --only hosting   으로 구글서버로 업데이트선택)
-C:\GitHub\terraone-site>  firebase deploy  로 실행하면 전체코드를 업데이트한다.(선택)
-
-=============================================================================
-
-코드수정없이 데이타베이스(DB) 데이타를 입력/수정/삭제 할경우는 해당 html파일을 실행하면된다.
-
-📋 구글 firebase / Realtime Database 전체 페이지 목록	
-	
-페이지	URL
-회원연락망 메인	https://terraone-d0318.web.app/
-관리자 로그인	https://terraone-d0318.web.app/login.html
-관리자 회원가입	https://terraone-d0318.web.app/signup.html
-관리자 회원목록	https://terraone-d0318.web.app/members.html
-관리자 회원편집	https://terraone-d0318.web.app/edit-member.html
-	
-관리자 사용내역서 입력	https://terraone-d0318.web.app/account_input.html
-관리자 사용내역서 편집	https://terraone-d0318.web.app/account_edit.html
-사용내역서 보기	https://terraone-d0318.web.app/account_view.html
-	
-	
-관리자 영수증 입력	https://terraone-d0318.web.app/images_input.html
-관리자 영수증 편집	https://terraone-d0318.web.app/images_edit.html
-영수증 보기	https://terraone-d0318.web.app/images_view.html
-	
-
-
-=============================================================================
-
-
-<!--  ☆★☆  terraone-site 폴더구조  ☆★☆
-
-
-C:\GitHub\terraone-site
-│
-├─ .firebase/
-├─ .git/
-├─ .github/
-├─  css/
-├─ image/
-│
-├─ public/
-│   ├─ css/
-│   ├─ css_firebase/
-│   ├─ favicons/
-│   │    
-│   ├─ image/
-│   │    └─ sms-4.png
-│   ├─ images/
-│   │
-│   │ 
-│   ├─ js/
-│   │    ├─ auth.js
-│   │    ├─ edit-member.js
-│   │    ├─ firebase-config.js
-│   │    ├─ firebase-db.js
-│   │    ├─ index-firebase.js
-│   │    ├─ login.js
-│   │    ├─ members.js 
-│   │    └─ signup.js
-│   │
-│   ├─ edit-member.html  
-│   ├─ favicon.ico
-│   ├─ firebase.json
-│   ├─ index.html
-│   ├─ login.html
-│   ├─ manifest.json
-│   ├─ members.html
-│   ├─ account_edit.html
-│   ├─ account_input.html
-│   ├─ account_view.html
-│   ├─ images_edit.html
-│   ├─ images_upload.html
-│   ├─ images_view.html
-│   └─ signup.html
-│
-├─ .firebaserc
-├─ .gitattributes
-├─ .gitgnore
-├─ cors.json
-├─ database.rules.json
-├─ favicon.ico
-├─ manifest.json
-├─ package.json
-│
-└─ (기타 파일들)
-
-
- -->
-
+firebase login 으로 로그인 확인하고, 
+firebase deploy --only hosting 로 실행하면 데이타가 구글서버로 넘겨진다.(선택)
+firebase deploy  로 실행하면 전체코드를 업데이트한다.(선택)
 
 
 
@@ -186,11 +97,24 @@ Actions 탭에서 실행 확인
 =============================================================================
 
 
-메인: https://terraone-d0318.web.app/
-로그인https://terraone-d0318.web.app/login.html
-회원가입https://terraone-d0318.web.app/signup.html
-회원목록https://terraone-d0318.web.app/members.html
-회원수정https://terraone-d0318.web.app/edit-member.html
+📋 구글 firebase / Realtime Database 전체 페이지 목록	
+	
+페이지	URL
+회원연락망 메인	https://terraone-d0318.web.app/
+관리자 로그인	https://terraone-d0318.web.app/login.html
+관리자 회원가입	https://terraone-d0318.web.app/signup.html
+관리자 회원목록	https://terraone-d0318.web.app/members.html
+관리자 회원편집	https://terraone-d0318.web.app/edit-member.html
+	
+관리자 사용내역서 입력	https://terraone-d0318.web.app/account_input.html
+관리자 사용내역서 편집	https://terraone-d0318.web.app/account_edit.html
+사용내역서 보기	https://terraone-d0318.web.app/account_view.html
+	
+	
+관리자 영수증 입력	https://terraone-d0318.web.app/images_input.html
+관리자 영수증 편집	https://terraone-d0318.web.app/images_edit.html
+영수증 보기	https://terraone-d0318.web.app/images_view.html
+	
 
 
 =====================================================================

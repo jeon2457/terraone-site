@@ -1,0 +1,128 @@
+[중요] Realtime Database 와 Storage 규칙을 보안으로 변경후 서버사용!!
+
+
+
+
+(Realtime Database)
+
+공개전환일 경우(테스트중일때...) ===>
+
+{
+  "rules": {
+    ".read": true,
+    ".write": true
+  }
+}
+
+
+보안전환일 경우(실제 운영중일때도 코드가 복잡해지므로 그냥 공개용과 같은코드 적용함!) ===>
+
+{
+  "rules": {
+    ".read": true,
+    ".write": true
+  }
+}
+
+
+
+==========================================================
+==========================================================
+
+(Storage)
+
+공개전환일 경우(테스트중일때...) ===>
+
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read: if true;
+      allow write: if true;
+    }
+  }
+}
+
+
+보안전환일 경우(실제 운영중일때...) ===>
+
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read: if true;  // 누구나 읽기 가능 (이미지 보기용)
+      allow write: if request.auth != null;  // 로그인한 사용자만 쓰기
+    }
+  }
+}
+
+
+==========================================================
+==========================================================
+
+
+
+
+
+📊 오늘 완성한 시스템 총정리
+✅ 완료된 기능들
+1️⃣ 회원 관리 시스템
+
+✅ index.html - 회원 연락망 (누구나 접근)
+✅ members.html - 회원 목록 관리 (관리자만)
+✅ login.html - 로그인
+✅ signup.html - 회원가입
+
+2️⃣ 사용내역서 시스템
+
+✅ account_view.html - 수입/지출 보기 (누구나 접근)
+✅ account_input.html - 입력 (관리자만) 🔒
+✅ account_edit.html - 편집 (관리자만) 🔒
+
+3️⃣ 이미지/영수증 시스템
+
+✅ images_view.html - 이미지 보기 (누구나 접근)
+✅ images_input.html - 업로드 (관리자만) 🔒
+✅ images_edit.html - 편집/삭제 (관리자만) 🔒
+
+4️⃣ 보안 기능
+
+✅ 관리자 권한 체크 (level 10)
+✅ 로그인 후 원래 페이지로 복귀
+✅ Firebase 연동 완료
+✅ Storage CORS 설정 완료
+
+
+🛡️ 보안 상태
+항목현재 상태권장페이지 접근 제어✅ 완료-Firebase Database Rules🟡 개발 모드운영 시 강화Firebase Storage Rules🟡 개방운영 시 강화비밀번호 암호화❌ 평문 저장추후 bcrypt 적용
+
+🚀 다음 단계 제안
+선택 1: 기능 추가
+
+📊 통계/차트 (월별 수입/지출 그래프)
+📱 모바일 앱 버전 (PWA)
+🔔 알림 기능
+📧 이메일 발송
+
+선택 2: 보안 강화
+
+🔐 Firebase Authentication 전환
+🔒 비밀번호 암호화
+🛡️ Firebase Rules 강화
+📝 감사 로그 (누가 언제 수정했는지)
+
+선택 3: UI/UX 개선
+
+🎨 디자인 통일
+📱 반응형 개선
+⚡ 로딩 속도 최적화
+🌙 다크 모드
+
+
+
+
+
+
+
+
+

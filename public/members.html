@@ -3,59 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>회원목록편집</title>
+  <title>목록편집</title>
 
-  <!-- 파비콘 아이콘들 (상대경로(./) 사용 -->
-    <link rel="icon" href="./favicon.ico?v=2" />
+  <!-- 파비콘 -->
+  <link rel="icon" href="./favicons/favicon.png?v=2" />
+  <link rel="icon" type="image/png" sizes="36x36" href="./favicons/android-icon-36x36.png" />
+  <link rel="icon" type="image/png" sizes="48x48" href="./favicons/android-icon-48x48.png" />
+  <link rel="icon" type="image/png" sizes="72x72" href="./favicons/android-icon-72x72.png" />
+  <link rel="apple-touch-icon" sizes="32x32" href="./favicons/apple-icon-32x32.png">
+  <link rel="apple-touch-icon" sizes="57x57" href="./favicons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="./favicons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="./favicons/apple-icon-72x72.png">
 
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="36x36"
-      href="./favicons/android-icon-36x36.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="48x48"
-      href="./favicons/android-icon-48x48.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="72x72"
-      href="./favicons/android-icon-72x72.png"
-    />
 
-    <link
-      rel="apple-touch-icon"
-      sizes="32x32"
-      href="./favicons/apple-icon-32x32.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="57x57"
-      href="./favicons/apple-icon-57x57.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="60x60"
-      href="./favicons/apple-icon-60x60.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="72x72"
-      href="./favicons/apple-icon-72x72.png"
-    />
+  <!-- 웹사이트 매니페스트 -->
+  <link rel="manifest" href="./manifest.json" />
 
-    <!-- 웹사이트 매니페스트 (상대경로(./) 사용  -->
-    <link rel="manifest" href="./manifest.json" />
-
-    <!-- Ms브라우저 설정 파일 (상대경로(./) 사용  -->
-    <meta name="msapplication-config" content="./browserconfig.xml" />
-    <meta name="msapplication-TileColor" content="#ffffff" />
-    <meta name="msapplication-TileImage" content="./ms-icon-144x144.png" />
-    <meta name="theme-color" content="#ffffff" />
+  <!-- Ms브라우저 설정 파일 -->
+  <meta name="msapplication-config" content="./browserconfig.xml" />
+  <meta name="msapplication-TileColor" content="#ffffff" />
+  <meta name="msapplication-TileImage" content="./ms-icon-144x144.png" />
+  <meta name="theme-color" content="#ffffff" />
 
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -65,20 +33,84 @@
 
   <!-- JS 모듈 -->
   <script type="module" src="./js/members.js" defer></script>
+
+  <style>
+    #logoutBtn{
+      color: white;
+    }
+
+    /* 기존 버튼 스타일 */
+    .btn-back {
+      display: block;
+      width: 200px;
+      margin: 25px auto 20px auto;
+      padding: 12px 20px;
+      border-radius: 12px;
+      background: #667eea;
+      color: #fff;
+      font-weight: 700;
+      text-align: center;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-back:hover {
+      background: #556cd6;
+      text-decoration: none;
+      color: #fff;
+    }
+
+    /* ✅ [추가] 위로 이동 버튼 스타일 */
+    #btnScrollToTop {
+      display: none;
+      position: fixed;
+      bottom: 5px;   /* 요청하신 위치 유지 */
+      right: 10px;   /* 요청하신 위치 유지 */
+      z-index: 999;
+      border: none;
+      outline: none;
+      background-color: #667eea;
+      color: white;
+      cursor: pointer;
+      
+      /* 🔥 중앙 정렬을 위한 수정 부분 🔥 */
+      padding: 0;          /* 여백 제거 (중요) */
+      width: 40px;
+      height: 40px;
+      line-height: 40px;   /* 높이와 똑같이 설정하면 세로 중앙 정렬됨 */
+      text-align: center;  /* 가로 중앙 정렬 */
+      /* --------------------------- */
+
+      border-radius: 50%;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: background-color 0.3s, transform 0.3s;
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    #btnScrollToTop:hover {
+      background-color: #556cd6;
+      transform: translateY(-5px);
+    }
+
+    
+  </style>
+
 </head>
 <body>
   <div class="container mt-5">
     <!-- 🔥 상단 헤더 (로그인 정보 + 로그아웃) -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-center align-items-center mb-4">
       <h2 class="mb-0">회원 전체 목록</h2>
-      <div>
-        <span id="userInfo" class="me-3"></span>
-        <button id="logoutBtn" class="btn btn-outline-secondary btn-sm">로그아웃</button>
-      </div>
     </div>
 
-    <div class="mb-3 text-end btn-area-responsive">
-      <!-- ✅ 새로 추가된 회원관리 버튼 -->
+      <span id="userInfo" class="me-3"></span>
+      <button id="logoutBtn" class="btn btn-outline-secondary btn-sm">로그아웃</button>
+  </div>
+   
+
+    <div class="mb-3 mt-3 text-end btn-area-responsive">
+      <!-- ✅ 회원관리 버튼들 -->
       <button id="signupSelected" class="btn btn-success me-2">회원가입</button>
       <button id="adminManage" class="btn btn-dark me-2">회계/영수증</button>
       <button id="viewSelected" class="btn btn-primary me-2">회원열람</button>
@@ -109,6 +141,10 @@
     </div>
 
     <div id="message" class="mt-3 text-center"></div>
+
+    <!-- ✅ [추가] 위로 이동 버튼 (화살표 아이콘) -->
+    <button id="btnScrollToTop" title="맨 위로 이동">⬆</button>
+
   </div>
 
   <!-- Bootstrap JS -->
@@ -138,6 +174,49 @@
     document.getElementById("adminManage").addEventListener("click", () => {
       window.location.href = "admin_firebase.html";
     });
+
+    // ==========================================
+    // ✅ [추가] 위로 이동 스크립트 (1.5초 애니메이션)
+    // ==========================================
+    
+    const btnScrollToTop = document.getElementById("btnScrollToTop");
+
+    // 1. 스크롤 위치에 따라 버튼 표시/숨김
+    window.onscroll = function() {
+      if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+        btnScrollToTop.style.display = "block";
+      } else {
+        btnScrollToTop.style.display = "none";
+      }
+    };
+
+    // 2. 버튼 클릭 시 부드럽게 위로 이동 (1500ms)
+    btnScrollToTop.addEventListener("click", function() {
+      scrollToTop(1500); // 1.5초
+    });
+
+    // 3. 커스텀 스크롤 애니메이션 함수
+    function scrollToTop(duration) {
+      const start = window.scrollY;
+      const startTime = performance.now();
+
+      function scroll(currentTime) {
+        const timeElapsed = currentTime - startTime;
+        const progress = Math.min(timeElapsed / duration, 1); // 0 ~ 1 사이 값
+
+        // 이징 함수 (Easing Function) - 부드러운 감속 효과 (Ease Out Quart)
+        // 처음에 빠르다가 끝에 천천히 멈춤
+        const ease = 1 - Math.pow(1 - progress, 4);
+
+        window.scrollTo(0, start * (1 - ease));
+
+        if (timeElapsed < duration) {
+          requestAnimationFrame(scroll);
+        }
+      }
+
+      requestAnimationFrame(scroll);
+    }
   </script>
 
 </body>

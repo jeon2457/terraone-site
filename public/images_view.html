@@ -3,7 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>이미지 보기</title>
+  <title>이미지보기</title>
+  
+  <!-- 파비콘 -->
+  <link rel="icon" href="./favicons/favicon.png?v=2" />
+  <link rel="icon" type="image/png" sizes="36x36" href="./favicons/android-icon-36x36.png" />
+  <link rel="icon" type="image/png" sizes="48x48" href="./favicons/android-icon-48x48.png" />
+  <link rel="icon" type="image/png" sizes="72x72" href="./favicons/android-icon-72x72.png" />
+  <link rel="apple-touch-icon" sizes="32x32" href="./favicons/apple-icon-32x32.png">
+  <link rel="apple-touch-icon" sizes="57x57" href="./favicons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="./favicons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="./favicons/apple-icon-72x72.png">
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     :root {
@@ -231,8 +242,41 @@
       font-weight: bold;
       cursor: pointer;
     }
+
+
+    .btn-back {
+      display: block;
+      width: 200px;
+      margin: 30px auto 20px auto;
+      padding: 12px 20px;
+      border-radius: 12px;
+      background: #667eea;
+      color: #fff;
+      font-weight: 700;
+      text-align: center;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-back:hover {
+      background: #556cd6;
+      text-decoration: none;
+      color: #fff;
+    }
+
+ 
     
     @media (max-width: 768px) {
+      .container {
+        max-width: 100%;     /* ⬅ 옆으로 확장 */
+        margin-top: 35px;      /* ⬇ 아래로 내리기 */
+        margin-left: 1px;
+        margin-right: 1px;
+        padding-left: 1px;
+        padding-right: 1px;
+      }
+
+
       .month-buttons {
         grid-template-columns: repeat(3, 1fr);
       }
@@ -245,9 +289,60 @@
       .summary-text {
         max-width: 100px;
       }
+
+      table, thead, tbody, tr, td, th {
+        display: block;
+        width: 100%;
+      }
+
+      thead {
+        display: none; /* 테이블 헤더 숨김 */
+      }
+
+      tbody tr {
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 15px;
+        background: #fff;
+      }
+
+      td {
+        border: none;
+        padding: 8px 0;
+        text-align: left;
+      }
+
+      /* 날짜 */
+      td:nth-child(2) {
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+
+      /* 이미지 */
+      td:nth-child(3) img {
+        width: 100%;
+        height: auto;
+        max-height: 200px;
+        margin-bottom: 8px;
+      }
+
+      /* 🔥 요약 + 다운로드 아래로 */
+      td:nth-child(4),
+      td:nth-child(5) {
+        margin-top: 8px;
+      }
+
+      /* 다운로드 버튼 전체폭 */
+      .btn-download {
+        width: 100%;
+        text-align: center;
+      }
     }
+
   </style>
 </head>
+
 <body>
   <div class="container">
     <div class="card">
@@ -255,6 +350,7 @@
         <h2>🖼️ 이미지 보기</h2>
       </div>
       <div class="card-body">
+
         <!-- 월 선택 버튼 -->
         <div class="month-buttons">
           <button class="btn-month" data-month="1" onclick="selectMonth(1)">1월</button>
@@ -270,119 +366,98 @@
           <button class="btn-month" data-month="11" onclick="selectMonth(11)">11월</button>
           <button class="btn-month" data-month="12" onclick="selectMonth(12)">12월</button>
         </div>
-        
+
         <!-- 테이블 -->
         <div class="table-container">
           <table>
             <thead>
               <tr>
-                <th style="width: 60px;">No</th>
-                <th style="width: 120px;">날짜</th>
-                <th style="width: 100px;">이미지</th>
+                <th style="width:60px;">No</th>
+                <th style="width:120px;">날짜</th>
+                <th style="width:90px;">시간</th>
+                <th style="width:100px;">이미지</th>
                 <th>요약</th>
-                <th style="width: 100px;">다운로드</th>
+                <th style="width:120px;">다운로드</th>
               </tr>
             </thead>
             <tbody id="imageTableBody">
               <tr>
-                <td colspan="5" class="loading">로딩 중...</td>
+                <td colspan="6" class="loading">로딩 중...</td>
               </tr>
             </tbody>
           </table>
         </div>
-        
-        <!-- 네비게이션 버튼 -->
-        <div class="nav-buttons">
-          <a href="images_input.html"><button class="btn-nav">➕ 이미지 업로드</button></a>
-          <a href="images_edit.html"><button class="btn-nav">✏️ 편집하기</button></a>
-        </div>
+
+        <!-- 되돌아가기 -->
+        <a href="account_images_main-1.html" class="btn-back">← 되돌아가기</a>
+
       </div>
     </div>
   </div>
-  
+
   <!-- 이미지 확대 모달 -->
   <div id="imageModal" class="image-modal" onclick="closeModal()">
     <span class="close-modal">&times;</span>
     <img id="modalImage" src="" alt="확대 이미지">
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
-    // Firebase 설정
     const firebaseConfig = {
-        apiKey: "AIzaSyAF7AD1d54k21-stmb0Hpg9OMEECvzFHpQ",
-        authDomain: "terraone-d0318.firebaseapp.com",
-        databaseURL: "https://terraone-d0318-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "terraone-d0318",
-        storageBucket: "terraone-d0318.firebasestorage.app",
-        messagingSenderId: "1082807340877",
-        appId: "1:1082807340877:web:6e2b49c04562d800e87104",
-        measurementId: "G-7HMJEV832S"
+      apiKey: "AIzaSyAF7AD1d54k21-stmb0Hpg9OMEECvzFHpQ",
+      authDomain: "terraone-d0318.firebaseapp.com",
+      databaseURL: "https://terraone-d0318-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "terraone-d0318",
+      storageBucket: "terraone-d0318.firebasestorage.app",
+      messagingSenderId: "1082807340877",
+      appId: "1:1082807340877:web:6e2b49c04562d800e87104"
     };
 
-    // Firebase 초기화
     const app = initializeApp(firebaseConfig);
     const database = getDatabase(app);
 
-    // 전역 변수
-    let selectedMonth = new Date().getMonth() + 1; // 현재 월 (1-12)
+    let selectedMonth = new Date().getMonth() + 1;
     let allImages = [];
 
-    // 월 선택 함수
     window.selectMonth = function(month) {
-      console.log('월 선택:', month);
       selectedMonth = month;
-      
-      // 모든 버튼의 active 클래스 제거
-      document.querySelectorAll('.btn-month').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      
-      // 선택된 버튼에 active 클래스 추가
+      document.querySelectorAll('.btn-month').forEach(b => b.classList.remove('active'));
       document.querySelector(`[data-month="${month}"]`).classList.add('active');
-      
-      // 데이터 필터링 및 표시
       displayImages();
     };
 
-    // 이미지 표시 함수
     function displayImages() {
       const tbody = document.getElementById('imageTableBody');
-      
-      // 선택된 월의 이미지만 필터링
-      const filteredImages = allImages.filter(img => {
-        const imgDate = new Date(img.date);
-        return imgDate.getMonth() + 1 === selectedMonth;
+
+      const filtered = allImages.filter(img => {
+        const d = new Date(img.date);
+        return d.getMonth() + 1 === selectedMonth;
       });
-      
-      if (filteredImages.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="no-data">이미지가 없습니다.</td></tr>';
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="no-data">이미지가 없습니다.</td></tr>`;
         return;
       }
-      
-      // 날짜 기준으로 정렬 (최신순)
-      filteredImages.sort((a, b) => new Date(b.date) - new Date(a.date));
-      
-      // 테이블 생성
-      tbody.innerHTML = filteredImages.map((img, index) => `
+
+      filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      tbody.innerHTML = filtered.map((img, i) => `
         <tr>
-          <td>${index + 1}</td>
+          <td>${i + 1}</td>
           <td>${img.date}</td>
+          <td>${img.time || '-'}</td>
           <td>
-            <img src="${img.imageUrl}" 
-                 class="thumbnail" 
-                 alt="이미지" 
+            <img src="${img.imageUrl}" class="thumbnail"
                  onclick="openModal('${img.imageUrl}')">
           </td>
           <td>
-            <div class="summary-text" title="${img.summary || ''}">${img.summary || '-'}</div>
+            <div class="summary-text">${img.summary || '-'}</div>
           </td>
           <td>
-            <button class="btn-download" onclick="downloadImage('${img.imageUrl}', '${img.date}')">
+            <button class="btn-download"
+              onclick="downloadImage('${img.imageUrl}','${img.date}_${img.time || ''}')">
               ⬇️ 다운로드
             </button>
           </td>
@@ -390,60 +465,38 @@
       `).join('');
     }
 
-    // 이미지 모달 열기
-    window.openModal = function(imageUrl) {
-      const modal = document.getElementById('imageModal');
-      const modalImg = document.getElementById('modalImage');
-      modal.style.display = 'block';
-      modalImg.src = imageUrl;
+    window.openModal = function(url) {
+      document.getElementById('modalImage').src = url;
+      document.getElementById('imageModal').style.display = 'block';
     };
 
-    // 이미지 모달 닫기
     window.closeModal = function() {
       document.getElementById('imageModal').style.display = 'none';
     };
 
-    // 이미지 다운로드
-    window.downloadImage = function(imageUrl, date) {
-      const link = document.createElement('a');
-      link.href = imageUrl;
-      link.download = `image_${date}.jpg`;
-      link.click();
+    window.downloadImage = function(url, name) {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `image_${name}.jpg`;
+      a.click();
     };
 
-    // Firebase에서 이미지 데이터 로드
     function loadImages() {
       const imagesRef = ref(database, 'images_table');
-      
-      onValue(imagesRef, (snapshot) => {
-        const tbody = document.getElementById('imageTableBody');
-        
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          allImages = Object.keys(data).map(key => ({
-            id: key,
-            ...data[key]
-          }));
-          
-          console.log('이미지 로드 완료:', allImages.length, '개');
-          displayImages();
-        } else {
-          tbody.innerHTML = '<tr><td colspan="5" class="no-data">등록된 이미지가 없습니다.</td></tr>';
-        }
-      }, (error) => {
-        console.error('데이터 로드 실패:', error);
-        tbody.innerHTML = '<tr><td colspan="5" class="no-data">데이터를 불러올 수 없습니다.</td></tr>';
+      onValue(imagesRef, snap => {
+        if (!snap.exists()) return;
+        const data = snap.val();
+        allImages = Object.keys(data).map(k => ({ id: k, ...data[k] }));
+        displayImages();
       });
     }
 
-    // 초기화
-    document.addEventListener('DOMContentLoaded', function() {
-      // 현재 월 버튼 활성화
+    document.addEventListener('DOMContentLoaded', () => {
       selectMonth(selectedMonth);
-      
-      // 데이터 로드
       loadImages();
     });
   </script>
+</body>
+
 </body>
 </html>

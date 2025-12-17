@@ -2,145 +2,501 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>이미지 목록 보기</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>이미지보기</title>
+  
+  <!-- 파비콘 -->
+  <link rel="icon" href="./favicons/favicon.png?v=2" />
+  <link rel="icon" type="image/png" sizes="36x36" href="./favicons/android-icon-36x36.png" />
+  <link rel="icon" type="image/png" sizes="48x48" href="./favicons/android-icon-48x48.png" />
+  <link rel="icon" type="image/png" sizes="72x72" href="./favicons/android-icon-72x72.png" />
+  <link rel="apple-touch-icon" sizes="32x32" href="./favicons/apple-icon-32x32.png">
+  <link rel="apple-touch-icon" sizes="57x57" href="./favicons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="./favicons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="./favicons/apple-icon-72x72.png">
 
-    <!-- 파비콘 아이콘들 (상대경로(./) 사용 -->
-    <link rel="icon" href="./favicon.ico?v=2" />
-
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="36x36"
-      href="./favicons/android-icon-36x36.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="48x48"
-      href="./favicons/android-icon-48x48.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="72x72"
-      href="./favicons/android-icon-72x72.png"
-    />
-
-    <link
-      rel="apple-touch-icon"
-      sizes="32x32"
-      href="./favicons/apple-icon-32x32.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="57x57"
-      href="./favicons/apple-icon-57x57.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="60x60"
-      href="./favicons/apple-icon-60x60.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="72x72"
-      href="./favicons/apple-icon-72x72.png"
-    />
-
-    <!-- 웹사이트 매니페스트 (상대경로(./) 사용  -->
-    <link rel="manifest" href="./manifest.json" />
-
-    <!-- Ms브라우저 설정 파일 (상대경로(./) 사용  -->
-    <meta name="msapplication-config" content="./browserconfig.xml" />
-    <meta name="msapplication-TileColor" content="#ffffff" />
-    <meta name="msapplication-TileImage" content="./ms-icon-144x144.png" />
-    <meta name="theme-color" content="#ffffff" />
-
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-
-
-
-
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    img { width: 300px; border:1px solid #888; }
-    .btn-month { padding:5px 10px; margin:3px; border:1px solid #777; cursor:pointer; }
-    .active { background:#007bff; color:white; }
+    :root {
+      --primary-color: #667eea;
+      --secondary-color: #764ba2;
+      --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    body {
+      background: var(--bg-gradient);
+      min-height: 100vh;
+      padding: 20px;
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .card {
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      border: none;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    
+    .card-header {
+      background: var(--bg-gradient);
+      color: white;
+      padding: 25px;
+      text-align: center;
+      border: none;
+    }
+    
+    .card-header h2 {
+      margin: 0;
+      font-weight: 700;
+      font-size: 1.8rem;
+    }
+    
+    .card-body {
+      padding: 30px;
+      background: white;
+    }
+    
+    /* 월 버튼 스타일 */
+    .month-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+    
+    .btn-month {
+      padding: 12px;
+      border-radius: 10px;
+      border: 2px solid #e0e0e0;
+      background: white;
+      color: #333;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 0.95rem;
+    }
+    
+    .btn-month:hover {
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+    
+    .btn-month.active {
+      background: var(--bg-gradient);
+      color: white;
+      border-color: var(--primary-color);
+      transform: scale(1.05);
+    }
+    
+    /* 테이블 스타일 */
+    .table-container {
+      overflow-x: auto;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    
+    thead {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    th {
+      padding: 15px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    
+    td {
+      padding: 12px;
+      text-align: center;
+      border-bottom: 1px solid #f0f0f0;
+      vertical-align: middle;
+    }
+    
+    tbody tr:hover {
+      background-color: #f8f9ff;
+    }
+    
+    .thumbnail {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    
+    .thumbnail:hover {
+      transform: scale(1.1);
+    }
+    
+    .summary-text {
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .btn-download {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      background: var(--bg-gradient);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .btn-download:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    .nav-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    .nav-buttons a {
+      flex: 1;
+      text-decoration: none;
+    }
+    
+    .btn-nav {
+      width: 100%;
+      padding: 15px;
+      border-radius: 12px;
+      border: 2px solid var(--primary-color);
+      background: white;
+      color: var(--primary-color);
+      font-weight: 700;
+      font-size: 1.1rem;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    
+    .btn-nav:hover {
+      background: var(--bg-gradient);
+      color: white;
+      transform: translateY(-2px);
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+      font-size: 1.1rem;
+    }
+    
+    .no-data {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+      font-size: 1rem;
+    }
+    
+    /* 이미지 모달 */
+    .image-modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.9);
+      cursor: pointer;
+    }
+    
+    .image-modal img {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 10px;
+    }
+    
+    .close-modal {
+      position: absolute;
+      top: 20px;
+      right: 40px;
+      color: white;
+      font-size: 40px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+
+    .btn-back {
+      display: block;
+      width: 200px;
+      margin: 30px auto 20px auto;
+      padding: 12px 20px;
+      border-radius: 12px;
+      background: #667eea;
+      color: #fff;
+      font-weight: 700;
+      text-align: center;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-back:hover {
+      background: #556cd6;
+      text-decoration: none;
+      color: #fff;
+    }
+
+ 
+    
+    @media (max-width: 768px) {
+      .container {
+        max-width: 100%;     /* ⬅ 옆으로 확장 */
+        margin-top: 35px;      /* ⬇ 아래로 내리기 */
+        margin-left: 1px;
+        margin-right: 1px;
+        padding-left: 1px;
+        padding-right: 1px;
+      }
+
+
+      .month-buttons {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      
+      .thumbnail {
+        width: 60px;
+        height: 60px;
+      }
+      
+      .summary-text {
+        max-width: 100px;
+      }
+
+      table, thead, tbody, tr, td, th {
+        display: block;
+        width: 100%;
+      }
+
+      thead {
+        display: none; /* 테이블 헤더 숨김 */
+      }
+
+      tbody tr {
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 15px;
+        background: #fff;
+      }
+
+      td {
+        border: none;
+        padding: 8px 0;
+        text-align: left;
+      }
+
+      /* 날짜 */
+      td:nth-child(2) {
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+
+      /* 이미지 */
+      td:nth-child(3) img {
+        width: 100%;
+        height: auto;
+        max-height: 200px;
+        margin-bottom: 8px;
+      }
+
+      /* 🔥 요약 + 다운로드 아래로 */
+      td:nth-child(4),
+      td:nth-child(5) {
+        margin-top: 8px;
+      }
+
+      /* 다운로드 버튼 전체폭 */
+      .btn-download {
+        width: 100%;
+        text-align: center;
+      }
+    }
+
   </style>
 </head>
 
 <body>
-  <h2>이미지 목록</h2>
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <h2>🖼️ 이미지 보기</h2>
+      </div>
+      <div class="card-body">
 
-  <div id="monthButtons"></div>
-  <hr>
+        <!-- 월 선택 버튼 -->
+        <div class="month-buttons">
+          <button class="btn-month" data-month="1" onclick="selectMonth(1)">1월</button>
+          <button class="btn-month" data-month="2" onclick="selectMonth(2)">2월</button>
+          <button class="btn-month" data-month="3" onclick="selectMonth(3)">3월</button>
+          <button class="btn-month" data-month="4" onclick="selectMonth(4)">4월</button>
+          <button class="btn-month" data-month="5" onclick="selectMonth(5)">5월</button>
+          <button class="btn-month" data-month="6" onclick="selectMonth(6)">6월</button>
+          <button class="btn-month" data-month="7" onclick="selectMonth(7)">7월</button>
+          <button class="btn-month" data-month="8" onclick="selectMonth(8)">8월</button>
+          <button class="btn-month" data-month="9" onclick="selectMonth(9)">9월</button>
+          <button class="btn-month" data-month="10" onclick="selectMonth(10)">10월</button>
+          <button class="btn-month" data-month="11" onclick="selectMonth(11)">11월</button>
+          <button class="btn-month" data-month="12" onclick="selectMonth(12)">12월</button>
+        </div>
 
-  <table border="1" width="100%">
-    <thead>
-      <tr>
-        <th>No</th>
-        <th>날짜</th>
-        <th>이미지</th>
-        <th>요약</th>
-        <th>작업</th>
-      </tr>
-    </thead>
-    <tbody id="imageList"></tbody>
-  </table>
+        <!-- 테이블 -->
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:60px;">No</th>
+                <th style="width:120px;">날짜</th>
+                <th style="width:90px;">시간</th>
+                <th style="width:100px;">이미지</th>
+                <th>요약</th>
+                <th style="width:120px;">다운로드</th>
+              </tr>
+            </thead>
+            <tbody id="imageTableBody">
+              <tr>
+                <td colspan="6" class="loading">로딩 중...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 되돌아가기 -->
+        <a href="account_images_main-1.html" class="btn-back">← 되돌아가기</a>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- 이미지 확대 모달 -->
+  <div id="imageModal" class="image-modal" onclick="closeModal()">
+    <span class="close-modal">&times;</span>
+    <img id="modalImage" src="" alt="확대 이미지">
+  </div>
 
   <script type="module">
-    import { db } from "./firebase-config.js";
-    import { ref, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
-    const monthButtons = document.getElementById("monthButtons");
-    const imageList = document.getElementById("imageList");
-    let currentMonth = new Date().getMonth() + 1;
+    const firebaseConfig = {
+      apiKey: "AIzaSyAF7AD1d54k21-stmb0Hpg9OMEECvzFHpQ",
+      authDomain: "terraone-d0318.firebaseapp.com",
+      databaseURL: "https://terraone-d0318-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "terraone-d0318",
+      storageBucket: "terraone-d0318.firebasestorage.app",
+      messagingSenderId: "1082807340877",
+      appId: "1:1082807340877:web:6e2b49c04562d800e87104"
+    };
 
-    // 월 버튼 생성
-    for (let m = 1; m <= 12; m++) {
-      const btn = document.createElement("button");
-      btn.textContent = m + "월";
-      btn.className = "btn-month" + (m === currentMonth ? " active":"");
-      btn.addEventListener("click", () => loadMonth(m));
-      monthButtons.appendChild(btn);
-    }
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
 
-    function loadMonth(month) {
-      currentMonth = month;
-      document.querySelectorAll(".btn-month").forEach((b, i) => {
-        b.classList.toggle("active", (i+1) === month);
+    let selectedMonth = new Date().getMonth() + 1;
+    let allImages = [];
+
+    window.selectMonth = function(month) {
+      selectedMonth = month;
+      document.querySelectorAll('.btn-month').forEach(b => b.classList.remove('active'));
+      document.querySelector(`[data-month="${month}"]`).classList.add('active');
+      displayImages();
+    };
+
+    function displayImages() {
+      const tbody = document.getElementById('imageTableBody');
+
+      const filtered = allImages.filter(img => {
+        const d = new Date(img.date);
+        return d.getMonth() + 1 === selectedMonth;
       });
 
-      const imagesRef = ref(db, "images");
-      onValue(imagesRef, (snapshot) => {
-        const data = snapshot.val();
-        imageList.innerHTML = "";
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="no-data">이미지가 없습니다.</td></tr>`;
+        return;
+      }
 
-        let no = 1;
+      filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-        for (let key in data) {
-          if (data[key].month != month) continue;
+      tbody.innerHTML = filtered.map((img, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${img.date}</td>
+          <td>${img.time || '-'}</td>
+          <td>
+            <img src="${img.imageUrl}" class="thumbnail"
+                 onclick="openModal('${img.imageUrl}')">
+          </td>
+          <td>
+            <div class="summary-text">${img.summary || '-'}</div>
+          </td>
+          <td>
+            <button class="btn-download"
+              onclick="downloadImage('${img.imageUrl}','${img.date}_${img.time || ''}')">
+              ⬇️ 다운로드
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
 
-          const row = `
-            <tr>
-              <td>${no++}</td>
-              <td>${data[key].date}</td>
-              <td><img src="${data[key].imageUrl}"></td>
-              <td>${data[key].summary}</td>
-              <td>
-                <a href="${data[key].imageUrl}" download>다운로드</a> |
-                <a href="images_edit.html?id=${key}">수정/삭제</a>
-              </td>
-            </tr>
-          `;
-          imageList.insertAdjacentHTML("beforeend", row);
-        }
+    window.openModal = function(url) {
+      document.getElementById('modalImage').src = url;
+      document.getElementById('imageModal').style.display = 'block';
+    };
+
+    window.closeModal = function() {
+      document.getElementById('imageModal').style.display = 'none';
+    };
+
+    window.downloadImage = function(url, name) {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `image_${name}.jpg`;
+      a.click();
+    };
+
+    function loadImages() {
+      const imagesRef = ref(database, 'images_table');
+      onValue(imagesRef, snap => {
+        if (!snap.exists()) return;
+        const data = snap.val();
+        allImages = Object.keys(data).map(k => ({ id: k, ...data[k] }));
+        displayImages();
       });
     }
 
-    loadMonth(currentMonth);
+    document.addEventListener('DOMContentLoaded', () => {
+      selectMonth(selectedMonth);
+      loadImages();
+    });
   </script>
+</body>
+
 </body>
 </html>

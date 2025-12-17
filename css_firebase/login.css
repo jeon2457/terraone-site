@@ -7,6 +7,20 @@ body {
   justify-content: center;
 }
 
+.login-icon {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+  .login-icon img {
+      width: 100%;
+      height: auto;
+      display: block;
+}
+
+
 .card {
   border-radius: 1rem;
 }

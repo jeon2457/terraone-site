@@ -29,8 +29,16 @@ form.addEventListener("submit", async (e) => {
 
   // level 값에 따라 페이지 이동
   if (member.level === 10) {
-    // 관리자 페이지
-    window.location.href = "members.html";
+    // 🔥 원래 가려던 페이지가 있으면 그곳으로, 없으면 members.html로
+    const redirectUrl = sessionStorage.getItem("redirectAfterLogin");
+    
+    if (redirectUrl) {
+      sessionStorage.removeItem("redirectAfterLogin"); // 사용 후 삭제
+      window.location.href = redirectUrl;
+    } else {
+      // 직접 login.html에 접근한 경우
+      window.location.href = "members.html";
+    }
   } else {
     // 일반 회원은 접근 불가
     alert("❌ 관리자만 접근할 수 있습니다.");

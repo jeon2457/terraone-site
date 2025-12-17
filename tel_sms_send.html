@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>단체 문자 발송</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body { background: #f5f6fa; }
+
+.scroll-box {
+  border: 1px solid #e6e9ee;
+  border-radius: 10px;
+  padding: 10px;
+  max-height: 700px;
+  overflow-y: auto;
+  background: #fafafa;
+}
+
+.grid-box {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.grid-item {
+  background: white;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  font-size: 0.9rem;
+  line-height: 1.4rem;
+  border: 1px solid #eee;
+}
+
+.controls {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.title {
+  text-align: center;
+  background: #f0f4ff;
+  padding: 16px 0;
+  margin: 20px auto 30px auto;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 25px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #2a3d7c;
+}
+
+.count {
+  text-align: center;
+  font-size: 1rem;
+}
+
+.count .number {
+  color: #1a73e8;
+  font-weight: 700;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container mt-3 mb-5">
+  <div class="title">단체 문자 발송</div>
+
+  <div class="count mb-3">
+    문자메시지 보낼 인원수:
+    <span class="number" id="totalCount">0</span> 명
+  </div>
+
+  <div class="scroll-box">
+    <div class="grid-box" id="memberList"></div>
+  </div>
+
+  <div class="controls">
+    <button type="button" class="btn btn-primary" id="sendBtn">단체문자보내기</button>
+    <button type="button" class="btn btn-secondary" onclick="history.back()">돌아가기</button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+/* Firebase 설정 */
+const firebaseConfig = {
+  apiKey: "AIzaSyAF7AD1d54k21-stmb0Hpg9OMEECvzFHpQ",
+  authDomain: "terraone-d0318.firebaseapp.com",
+  databaseURL: "https://terraone-d0318-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "terraone-d0318",
+  storageBucket: "terraone-d0318.appspot.com",
+  messagingSenderId: "1082807340877",
+  appId: "1:1082807340877:web:6e2b49c04562d800e87104"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+/* URL 파라미터 */
+const params = new URLSearchParams(location.search);
+const fromTel = params.get('from') || '';
+const listParam = params.get('list') || '';
+
+const targetNumbers = listParam
+  .split(',')
+  .map(n => n.trim())
+  .filter(n => n && n !== fromTel);
+
+const listBox = document.getElementById('memberList');
+const totalCountEl = document.getElementById('totalCount');
+const sendBtn = document.getElementById('sendBtn');
+
+let members = [];
+let smsNumbers = [];
+
+const telRef = ref(db, 'terraone/tel');
+
+onValue(telRef, (snapshot) => {
+  members = [];
+  smsNumbers = [];
+  listBox.innerHTML = '';
+
+  snapshot.forEach(child => {
+    const m = child.val();
+    if (!m.tel) return;
+    if (!targetNumbers.includes(m.tel)) return;
+
+    members.push({
+      name: m.name || '',
+      tel: m.tel,
+      remark: m.remark || ''
+    });
+  });
+
+  /* ✅ 이름 기준 가나다순 정렬 */
+  members.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+
+  members.forEach((m, idx) => {
+    smsNumbers.push(m.tel);
+
+    const div = document.createElement('div');
+    div.className = 'grid-item';
+    div.innerHTML = `
+      <strong>${idx + 1}. ${m.name}</strong><br>
+      (${m.remark})<br>
+      📞 ${m.tel}
+    `;
+    listBox.appendChild(div);
+  });
+
+  totalCountEl.textContent = smsNumbers.length;
+});
+
+/* 문자 발송 */
+sendBtn.addEventListener('click', () => {
+  if (smsNumbers.length === 0) {
+    alert('발송할 전화번호가 없습니다.');
+    return;
+  }
+
+  if (!confirm(`${smsNumbers.length}명에게 단체문자를 보내시겠습니까?`)) return;
+  location.href = 'sms:' + smsNumbers.join(',');
+});
+</script>
+
+</body>
+</html>
+
+
+
+<!-- 
+
+// 👉 sms_2를 아예 없애고 “실시간 계산” 방식으로 바꾸는 구조가 더 간결할수도 있다.
+
+// 🔥 아주 중요한 팁 (강력 추천)
+
+// 장기적으로는 더 안전한 구조:
+
+// ❌ sms_2에 전화번호를 저장
+
+// ✅ tel_sms_send.html에서 그때그때 전체 회원 조회
+
+// edit-member.js 코드도 수정요구!
+
+ -->

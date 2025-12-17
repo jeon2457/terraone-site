@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>회원등록 - 코드 실행 순서 애니메이션 (교육용)</title>
+<style>
+  :root{
+    --bg:#0f1724;
+    --card:#0b1220;
+    --accent:#0ea5ff;
+    --muted:#9aa8b2;
+    --white:#e6f0f6;
+  }
+  body{
+    margin:0;
+    font-family: "Apple SD Gothic Neo", "Noto Sans KR", Arial, sans-serif;
+    background: linear-gradient(180deg,#071127 0%, #021018 100%);
+    color:var(--white);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+
+  .wrap{
+    max-width:1100px;
+    margin:28px auto;
+    padding:28px;
+  }
+
+  header{
+    display:flex;
+    gap:16px;
+    align-items:center;
+    margin-bottom:18px;
+  }
+  header h1{
+    margin:0;
+    font-size:20px;
+    color:var(--accent);
+  }
+  header p{ margin:0; color:var(--muted); font-size:13px; }
+
+  .stage {
+    display:grid;
+    grid-template-columns: 280px 1fr 280px;
+    gap:20px;
+    align-items:start;
+  }
+
+  /* left column: 설명 */
+  .panel {
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:10px;
+    padding:16px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+    border:1px solid rgba(255,255,255,0.03);
+  }
+  .panel h2{ margin:0 0 8px 0; font-size:16px; color:var(--accent); }
+  .panel p{ margin:0; color:var(--muted); font-size:13px; line-height:1.5; }
+
+  /* center: animation canvas */
+  .canvas{
+    background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+    border-radius:10px;
+    height:560px;
+    position:relative;
+    overflow:hidden;
+    padding:18px;
+    border:1px solid rgba(255,255,255,0.03);
+  }
+
+  /* right: details & code (escaped) */
+  .codebox{
+    background:#071428;
+    border-radius:10px;
+    padding:14px;
+    font-family: Menlo, Consolas, monospace;
+    font-size:13px;
+    color:#d6eefc;
+    border:1px solid rgba(255,255,255,0.03);
+    height:560px;
+    overflow:auto;
+  }
+
+  /* diagram nodes */
+  .node{
+    position:absolute;
+    width:220px;
+    padding:14px;
+    border-radius:12px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.5);
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border:1px solid rgba(255,255,255,0.04);
+    transition:transform 500ms ease, box-shadow 300ms ease, opacity 300ms ease;
+    opacity:0.6;
+  }
+  .node h3{ margin:0; font-size:15px; color:var(--accent); }
+  .node p{ margin:6px 0 0 0; font-size:13px; color:var(--white); line-height:1.3; }
+
+  /* positions */
+  .node.browser { left:18px; top:24px; }
+  .node.form { left:18px; top:220px; }
+  .node.server { left:420px; top:120px; width:260px; }
+  .node.auth { left:420px; top:300px; width:260px; }
+  .node.db { right:18px; top:120px; }
+  .node.insert { right:18px; top:300px; }
+
+  /* active highlight */
+  .node.active{
+    transform:translateY(-8px) scale(1.02);
+    opacity:1;
+    box-shadow:0 16px 40px rgba(0,160,255,0.15);
+    border:1px solid rgba(14,165,255,0.7);
+  }
+
+  /* arrows */
+  .arrow{
+    position:absolute;
+    width:60%;
+    height:2px;
+    background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(14,165,255,0.8));
+    transform-origin:left center;
+    opacity:0.4;
+  }
+  .arrow.dot{ background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.02)); opacity:0.15; }
+
+  .controls{
+    margin-top:12px;
+    display:flex;
+    gap:8px;
+    align-items:center;
+  }
+  .btn{
+    background:rgba(14,165,255,0.12);
+    color:var(--accent);
+    border:none;
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:13px;
+  }
+  .btn.secondary{
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.03);
+    color:var(--muted);
+  }
+
+  .timeline{
+    height:8px;
+    background:rgba(255,255,255,0.03);
+    border-radius:8px;
+    overflow:hidden;
+    margin-top:12px;
+  }
+  .timeline .bar{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,var(--accent), #60a5fa);
+    transition:width 500ms linear;
+  }
+
+  /* small notes */
+  .note{
+    font-size:12px;
+    color:var(--muted);
+    margin-top:10px;
+  }
+
+  /* responsive */
+  @media (max-width:1080px){
+    .stage{ grid-template-columns: 1fr; }
+    .canvas{ height:760px; }
+    .codebox, .panel{ height:auto; }
+    .node{ left:50%; transform:translateX(-50%); width:86%; }
+    .node.server{ left:50%; top:240px; width:86%; }
+    .node.db{ left:50%; top:420px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>회원등록 코드 실행 순서 (애니메이션)</h1>
+      <p>버튼 ▶ 재생으로 단계별로 흐름을 확인하세요 — 교육용, 실제 서버 코드 실행 없음</p>
+    </div>
+  </header>
+
+  <div class="stage">
+    <!-- LEFT: 간단 설명 -->
+    <div class="panel">
+      <h2>간단 요약</h2>
+      <p>브라우저에서 폼을 제출하면 → 서버(PHP)가 입력을 받고 → 인증 확인 → DB에 저장 → 결과 페이지로 이동합니다. 아래 애니메이션은 이 순서를 시각적으로 보여줍니다.</p>
+
+      <div class="controls" style="margin-top:12px;">
+        <button id="playBtn" class="btn">▶ 재생</button>
+        <button id="pauseBtn" class="btn secondary">|| 중지</button>
+        <button id="resetBtn" class="btn secondary">↺ 리셋</button>
+      </div>
+
+      <div class="timeline" aria-hidden="true">
+        <div class="bar" id="progressBar"></div>
+      </div>
+
+      <div class="note">
+        <strong>팁:</strong> 각 단계 클릭하면 해당 단계 설명을 코드영역에서 확인할 수 있습니다.
+      </div>
+    </div>
+
+    <!-- CENTER: animation canvas -->
+    <div class="canvas" id="canvas">
+
+      <!-- Browser node -->
+      <div class="node browser" id="node-browser" title="브라우저">
+        <h3>사용자(브라우저)</h3>
+        <p>회원가입 화면에서 폼을 작성하고 <strong>전송</strong>을 클릭합니다.</p>
+      </div>
+
+      <!-- Form node (client-side) -->
+      <div class="node form" id="node-form" title="폼">
+        <h3>HTML Form</h3>
+        <p>method="POST" 로 브라우저가 데이터를 서버로 보냅니다 (주소창에 노출되지 않음).</p>
+      </div>
+
+      <!-- Arrow: browser -> server -->
+      <div id="arrow-b2s" class="arrow" style="left:260px; top:90px; transform: rotate(4deg) scaleX(1.8)"></div>
+
+      <!-- Server main -->
+      <div class="node server" id="node-server" title="서버">
+        <h3>서버 (PHP)</h3>
+        <p>서버는 요청을 받아 아래 여러 단계를 차례로 처리합니다.</p>
+        <ol style="margin:8px 0 0 18px; color:var(--muted); font-size:13px;">
+          <li>auth_check (인증 확인)</li>
+          <li>db-connect (DB 연결)</li>
+          <li>입력값 검증 및 비밀번호 해싱</li>
+          <li>트랜잭션 → INSERT</li>
+        </ol>
+      </div>
+
+      <!-- Auth node -->
+      <div class="node auth" id="node-auth" title="인증">
+        <h3>auth_check.php</h3>
+        <p>로그인 여부 확인. 로그인 안 됐으면 로그인/목록 페이지로 리다이렉트.</p>
+      </div>
+
+      <!-- Arrow server -> auth -->
+      <div id="arrow-s2a" class="arrow dot" style="left:520px; top:210px; transform: rotate(90deg) scaleX(1.1)"></div>
+
+      <!-- DB node -->
+      <div class="node db" id="node-db" title="데이터베이스">
+        <h3>MySQL (tel 테이블)</h3>
+        <p>회원정보가 저장되는 곳. INSERT, SELECT 등 SQL 실행이 이뤄집니다.</p>
+      </div>
+
+      <!-- Insert node -->
+      <div class="node insert" id="node-insert" title="INSERT">
+        <h3>INSERT 트랜잭션</h3>
+        <p>트랜잭션 시작 → INSERT 실행 → updateLeadersSms2 호출 → COMMIT</p>
+      </div>
+
+      <!-- Arrow server -> db -->
+      <div id="arrow-s2db" class="arrow" style="left:620px; top:160px; transform: rotate(-12deg) scaleX(1.2)"></div>
+
+      <!-- small status -->
+      <div id="status" style="position:absolute; left:18px; bottom:18px; font-size:13px; color:var(--muted);">
+        상태: <span id="statusText">대기중</span>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: code & detailed step text -->
+    <div class="codebox" id="codebox">
+      <h3 style="margin-top:0;color:var(--accent);">선택된 단계 설명</h3>
+      <div id="detailText" style="white-space:pre-wrap; color:#dff6ff; font-size:13px;">
+(▶ 재생을 눌러 애니메이션을 시작하세요)
+      </div>
+
+      <hr style="border:none; border-top:1px solid rgba(255,255,255,0.03); margin:12px 0;">
+      <div style="color:var(--muted); font-size:12px;">
+        <strong>참고</strong><br>
+        - 이 HTML은 PHP 코드를 그대로 실행하지 않도록 설계되었습니다.<br>
+        - 실제 PHP 코드 예시는 아래처럼 보이지만 &lt;?php ... ?&gt; 태그는 그대로 실행되지 않습니다.
+      </div>
+
+      <pre style="background:rgba(0,0,0,0.12); padding:10px; border-radius:8px; margin-top:10px; color:#cbeeff;">
+&lt;?php
+// auth_check.php는 로그인 여부를 보고 리다이렉트할 수 있음
+require './php/auth_check.php';
+
+// DB 연결
+require './php/db-connect-pdo.php';
+
+// POST 수신 확인
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  // 값 읽기
+  $id = $_POST['id'] ?? '';
+  // 비밀번호 해싱
+  $hashed = password_hash($password, PASSWORD_DEFAULT);
+  // 트랜잭션 시작
+  $pdo->beginTransaction();
+  // INSERT 실행
+  $stmt = $pdo->prepare("INSERT INTO tel (...) VALUES (...)");
+  $stmt->execute([...]);
+  $pdo->commit();
+  // 리다이렉트
+  header('Location: tel_select.php');
+  exit;
+}
+?&gt;
+      </pre>
+    </div>
+  </div>
+</div>
+
+<script>
+/*
+  실행 순서 애니메이션 제어 스크립트
+  - 단계 목록 (steps) 에서 각 단계에 맞는 node를 활성화(하이라이트) 시킴
+  - progress bar 업데이트
+  - 재생 / 중지 / 리셋 동작 제공
+*/
+
+// 단계 정의 (순서대로)
+const steps = [
+  { id:'browser', title:'1. 브라우저(사용자)', text:
+`사용자가 회원가입 화면에서 값을 입력하고 "전송"을 클릭합니다.
+- form method="POST" 로 서버로 데이터 전송
+- 개인정보가 URL에 노출되지 않음 (POST 방식)` },
+  { id:'form', title:'2. HTML Form', text:
+`HTML 폼이 데이터를 묶어 서버로 보냅니다.
+- 브라우저는 입력값을 POST 바디로 전송
+- 클라이언트측 간단 검증 가능 (JS)` },
+  { id:'server', title:'3. 서버(PHP) 요청 수신', text:
+`서버에서 $_SERVER['REQUEST_METHOD'] 를 확인하여 POST 처리 시작.
+- 먼저 보안/세션 체크를 수행할 준비를 함.` },
+  { id:'auth', title:'4. auth_check (인증)', text:
+`require './php/auth_check.php'를 호출하여 로그인 여부를 확인합니다.
+- 로그인 안 되어 있으면 목록/로그인 페이지로 리다이렉트될 수 있음.` },
+  { id:'server2', title:'5. DB 연결 & 입력 처리', text:
+`db-connect-pdo.php 로 PDO 연결을 생성합니다.
+- 입력값을 필터/검증
+- password_hash() 로 비밀번호를 해시` },
+  { id:'insert', title:'6. 트랜잭션 & INSERT', text:
+`$pdo->beginTransaction();
+$stmt = $pdo->prepare('INSERT INTO tel ...');
+$stmt->execute([...]);
+updateLeadersSms2($pdo);  // 회장/총무 SMS_2 업데이트
+$pdo->commit();` },
+  { id:'db', title:'7. DB에 저장 완료', text:
+`데이터가 tel 테이블에 안전하게 저장됩니다.
+- COMMIT 이 완료되면 변경이 확정됨` },
+  { id:'redirect', title:'8. 결과 리다이렉트', text:
+`저장 후 사용자에게 성공 메시지를 띄우고 tel_select.php 또는 목록 페이지로 이동합니다.
+- header('Location: ...') 또는 JS로 location.href 를 사용` }
+];
+
+// DOM 노드 참조
+const nodes = {
+  browser: document.getElementById('node-browser'),
+  form: document.getElementById('node-form'),
+  server: document.getElementById('node-server'),
+  auth: document.getElementById('node-auth'),
+  db: document.getElementById('node-db'),
+  insert: document.getElementById('node-insert'),
+};
+const statusText = document.getElementById('statusText');
+const detailText = document.getElementById('detailText');
+const progressBar = document.getElementById('progressBar');
+
+let current = -1;
+let timer = null;
+let playing = false;
+const stepDuration = 1400; // 각 단계 표시 시간 (ms)
+
+// helper: activate node by id (visual)
+function activateStep(index){
+  // reset all
+  Object.values(nodes).forEach(n=>{
+    n.classList.remove('active');
+  });
+  current = index;
+  // map step index to node key
+  const step = steps[index];
+  detailText.textContent = `${step.title}\n\n${step.text}`;
+  statusText.textContent = `${step.title}`;
+  // highlight appropriate visual node
+  // mapping:
+  if(step.id === 'browser') nodes.browser.classList.add('active');
+  if(step.id === 'form') nodes.form.classList.add('active');
+  if(step.id === 'server' || step.id === 'server2') nodes.server.classList.add('active');
+  if(step.id === 'auth') nodes.auth.classList.add('active');
+  if(step.id === 'insert') nodes.insert.classList.add('active');
+  if(step.id === 'db') nodes.db.classList.add('active');
+
+  // progress
+  const pct = Math.round(((index+1)/steps.length)*100);
+  progressBar.style.width = pct + '%';
+}
+
+// play sequence
+function play(){
+  if(playing) return;
+  playing = true;
+  document.getElementById('playBtn').textContent = "▶ 재생중";
+  let idx = current + 1;
+  if(idx >= steps.length) idx = 0;
+  activateStep(idx);
+  timer = setInterval(()=>{
+    idx++;
+    if(idx >= steps.length){
+      // 끝났을 때
+      clearInterval(timer);
+      playing = false;
+      document.getElementById('playBtn').textContent = "▶ 재생";
+      statusText.textContent = "완료";
+      return;
+    }
+    activateStep(idx);
+  }, stepDuration);
+}
+
+// pause
+function pause(){
+  if(timer) clearInterval(timer);
+  playing = false;
+  document.getElementById('playBtn').textContent = "▶ 재생";
+  statusText.textContent = "일시중지";
+}
+
+// reset
+function resetAll(){
+  if(timer) clearInterval(timer);
+  playing = false;
+  current = -1;
+  progressBar.style.width = '0%';
+  detailText.textContent = "(▶ 재생을 눌러 애니메이션을 시작하세요)";
+  statusText.textContent = "대기중";
+  Object.values(nodes).forEach(n=> n.classList.remove('active'));
+  document.getElementById('playBtn').textContent = "▶ 재생";
+}
+
+// buttons
+document.getElementById('playBtn').addEventListener('click', play);
+document.getElementById('pauseBtn').addEventListener('click', pause);
+document.getElementById('resetBtn').addEventListener('click', resetAll);
+
+// click node to jump to step
+document.querySelectorAll('.node').forEach(el=>{
+  el.style.cursor = 'pointer';
+  el.addEventListener('click', () => {
+    // find which step maps to this node
+    let idx = 0;
+    if(el.id === 'node-browser') idx = 0;
+    else if(el.id === 'node-form') idx = 1;
+    else if(el.id === 'node-server') idx = 2;
+    else if(el.id === 'node-auth') idx = 3;
+    else if(el.id === 'node-insert') idx = 5;
+    else if(el.id === 'node-db') idx = 6;
+    if(timer) clearInterval(timer);
+    playing = false;
+    activateStep(idx);
+  });
+});
+
+// initialize
+resetAll();
+
+</script>
+</body>
+</html>

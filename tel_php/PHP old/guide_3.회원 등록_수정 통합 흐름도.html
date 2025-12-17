@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>회원 관리 흐름도</title>
+<style>
+body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 20px; }
+.container { max-width: 1000px; margin: auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+h1 { text-align: center; color: #007bff; }
+h2 { color: #333; margin-top: 30px; }
+.flowchart { display: flex; flex-direction: column; align-items: center; gap: 20px; margin-top: 30px; }
+.node { background: #e9f3ff; padding: 15px 20px; border: 1px solid #c9e3ff; border-radius: 8px; text-align: center; width: 300px; }
+.arrow { width: 2px; height: 30px; background: #007bff; margin: 0 auto; position: relative; }
+.arrow::after { content: ""; position: absolute; bottom: -10px; left: -4px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 10px solid #007bff; }
+.code-snippet { background: #f0f0f0; padding: 10px; font-family: monospace; font-size: 0.9rem; border-radius: 5px; overflow-x: auto; margin-top: 10px; }
+.note { font-size: 0.9rem; color: #555; margin-top: 5px; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>회원 등록/수정 통합 흐름도</h1>
+
+<h2>1️⃣ 회원등록 (tel_input.php)</h2>
+<div class="flowchart">
+    <div class="node">
+        사용자 입력<br>
+        <strong>아이디, 이름, 전화번호, 거주지, 비고, SMS, SMS_2, 레벨</strong>
+    </div>
+    <div class="arrow"></div>
+    <div class="node">
+        서버에서 <strong>비고(remark)</strong> 확인<br>
+        회장/총무면 SMS_2 실시간 생성
+        <div class="note">자기 전화번호 제외, 전체 회원 번호 콤마 연결</div>
+    </div>
+    <div class="arrow"></div>
+    <div class="node">
+        DB 저장<br>
+        <strong>tel 테이블 INSERT</strong>
+        <div class="code-snippet">
+INSERT INTO tel (id, password, name, tel, addr, remark, sms, sms_2, user_level)
+VALUES (...)
+        </div>
+    </div>
+    <div class="arrow"></div>
+    <div class="node">
+        기존 회장/총무 SMS_2 업데이트<br>
+        신규 회원 포함 모든 번호 반영
+    </div>
+    <div class="arrow"></div>
+    <div class="node">
+        완료 알림<br>
+        <strong>alert + tel_select.php 이동</strong>
+    </div>
+</div>
+
+<h2>2️⃣ 회원수정 (tel_update.php)</h2>
+<div class="flowchart">
+    <div class="node">
+        수정할 회원 선택<br>
+        POST: idx
+    </div>
+    <div class="arrow"></div>
+    <div class="node">
+        DB 조회<br>
+        <strong>SELECT * FROM tel WHERE idx=?</strong>
+    </div>
+    <div class="arrow"></div>
+    <div class="node">
+        화면에 입력값 표시<br>
+        <strong>아이디, 이름, 전화번호, 주소, 비고, SMS, SMS_2, 레벨</strong>
+    </div>
+    <div class="arrow"></div>
+    <div class="node">
+        비고(remark) 변경 시 서버 호출<br>
+        <strong>get_all_phones.php?exclude_idx=현재회원</strong>
+        <div class="note">회장/총무라면 SMS_2 자동 생성</div>
+    </div>
+    <div class="arrow"></div>
+    <div class="node">
+        DB 업데이트<br>
+        <strong>UPDATE tel SET ... WHERE idx=?</strong>
+        <div class="note">기존 회장/총무 SMS_2도 갱신 가능</div>
+    </div>
+    <div class="arrow"></div>
+    <div class="node">
+        완료 알림<br>
+        <strong>tel_edit.php 이동</strong>
+    </div>
+</div>
+
+<h2>3️⃣ 핵심 통합 원리</h2>
+<ul>
+<li>회장/총무는 입력/수정 시 SMS_2 자동 생성</li>
+<li>기존 회원의 SMS_2도 새로운 번호 포함 갱신</li>
+<li>get_all_phones.php 로 실시간 전화번호 가져오기</li>
+<li>DB에는 항상 최신 상태 저장</li>
+<li>디자인이나 입력 UI는 기존 그대로 유지</li>
+</ul>
+
+</div>
+</body>
+</html>

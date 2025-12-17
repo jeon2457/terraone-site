@@ -1,0 +1,22 @@
+body {
+  background: linear-gradient(135deg, #6f42c1, #6610f2);
+  min-height: 100vh;
+  font-family: 'Noto Sans KR', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card {
+  border-radius: 1rem;
+}
+
+h2.card-title {
+  font-weight: bold;
+  color: #fff;
+}
+
+#message {
+  font-weight: bold;
+  color: #ffc107;
+}

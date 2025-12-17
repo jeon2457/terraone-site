@@ -1,0 +1,193 @@
+[중요] 접근허용_접근차단 페이지 지정되어있다.  
+
+📋 페이지 분류
+
+✅ 접근 차단 필요 (관리자만)
+
+admin_member.php
+account_edit.php
+account_input.php
+images_edit.php
+images_upload.php
+
+🌐 공개 (누구나 접근)
+
+login.php (아무나 접근가능)
+signup.php  ===> 여기서 관리자로 등록(level=10)
+account_view.php
+images_view.php
+
+
+## 📊 전체 파일 구조
+```
+C:\xampp\htdocs\New_PHP\
+│
+├─ php/
+│  ├─ auth_check.php         ✅ 권한 체크 공통 파일
+│  └─ db-connect.php
+│
+├─ login.php                 🌐 공개 (누구나 접근)
+├─ signup.php                🌐 공개
+│
+├─ account_view.php          🌐 공개 (조회만)
+├─ account_input.php         🔒 관리자만 ← require 'php/auth_check.php';
+├─ account_edit.php          🔒 관리자만 ← require 'php/auth_check.php';
+│
+├─ images_view.php           🌐 공개 (조회만)
+├─ images_upload.php         🔒 관리자만 ← require 'php/auth_check.php';
+├─ images_edit.php           🔒 관리자만 ← require 'php/auth_check.php';
+├─ images_replace.php        🔒 관리자만 ← require 'php/auth_check.php';
+│
+└─ admin_member.php          🔒 관리자만 ← require 'php/auth_check.php';
+```
+
+
+
+<?php
+
+// auth_check.php - 관리자 인증 체크 공통 파일
+
+// 세션 시작 (이미 시작되었는지 확인)
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// 로그인 여부 확인
+if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
+    // 로그인하지 않은 경우
+    $_SESSION['redirect_url'] = $_SERVER['REQUEST_URI']; // 현재 페이지 URL 저장
+    
+    echo "<script>
+        alert('로그인이 필요합니다.');
+        location.href='./login.php';
+    </script>";
+    exit;
+}
+
+// 관리자 권한 확인 (level 10 이상)
+if (!isset($_SESSION['user_level']) || $_SESSION['user_level'] < 10) {
+    echo "<script>
+        alert('접근 권한이 없습니다. 관리자만 이용 가능합니다.');
+        history.back();
+    </script>";
+    exit;
+}
+
+// 디버깅용 (테스트 후 삭제 가능)
+// echo "<!-- 인증 통과: " . $_SESSION['user_name'] . " (Level: " . $_SESSION['user_level'] . ") -->";
+?>
+```
+
+---
+
+---
+
+## 🎯 작동 시나리오
+
+### **시나리오 1: 비로그인 사용자**
+```
+1. account_input.php 직접 접근
+   ↓
+2. auth_check.php 실행
+   ↓
+3. 세션 확인 → 없음
+   ↓
+4. "로그인이 필요합니다" 알림
+   ↓
+5. login.php로 리다이렉트
+   ↓
+6. 로그인 성공
+   ↓
+7. 원래 가려던 account_input.php로 복귀 ✅
+```
+
+### **시나리오 2: 일반 회원 (level < 10)**
+```
+1. 로그인 성공 (level = 2)
+   ↓
+2. account_input.php 접근 시도
+   ↓
+3. auth_check.php 실행
+   ↓
+4. 권한 확인 → level 2 (부족)
+   ↓
+5. "관리자만 이용 가능" 알림
+   ↓
+6. 이전 페이지로 복귀 (history.back)
+```
+
+### **시나리오 3: 관리자 (level = 10)**
+```
+1. 로그인 성공 (level = 10)
+   ↓
+2. account_input.php 접근
+   ↓
+3. auth_check.php 실행
+   ↓
+4. 권한 확인 → level 10 ✅
+   ↓
+5. 페이지 정상 표시
+```
+
+### **시나리오 4: 공개 페이지**
+```
+1. account_view.php 접근
+   ↓
+2. auth_check.php 없음
+   ↓
+3. 누구나 접근 가능 ✅
+
+===================================================
+===================================================
+
+
+▶▶▶  무조건 php코드안의 제일 상단위에 삽입해야합니다.
+
+<?php
+require 'php/auth_check.php'; // ← 추가
+require 'php/db-connect.php';
+date_default_timezone_set('Asia/Seoul');
+
+// ... 나머지 코드
+
+
+===================================================
+
+
+▶▶▶ [중요]  시작페이지인 login.php 로그인 페이지와
+signup.php 회원가입 페이지는 아래코드만 들어가면된다.
+
+session_start();  // ← 로그인 페이지는 직접 세션 시작!
+require_once './php/db-connect.php'; // DB 연결
+
+===================================================
+
+📋 전체 요약
+파일				session_start()		auth_check.php		db-connect.php	
+login.php			✅ 직접 작성		❌ 사용 안 함		✅ 필요
+signup.php			✅ 직접 작성		❌ 사용 안 함		✅ 필요
+account_view.php	❌ 불필요			❌ 사용 안 함		✅ 필요
+images_view.php		❌ 불필요			❌ 사용 안 함		✅ 필요
+account_input.php	❌ 불필요			✅ 필수!			✅ 필요
+account_edit.php		❌ 불필요			✅ 필수!			✅ 필요
+images_upload.php	❌ 불필요			✅ 필수!			✅ 필요
+images_edit.php		❌ 불필요			✅ 필수!			✅ 필요
+admin_member.php	❌ 불필요			✅ 필수!			✅ 필요
+
+결론: login.php, signup.php는 session_start()와 db-connect.php만 있으면 됩니다! ✅ 😊
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

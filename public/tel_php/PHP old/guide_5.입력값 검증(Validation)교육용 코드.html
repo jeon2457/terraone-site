@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>입력값 검증 교육용 예제</title>
+<style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .form-box { width: 360px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; }
+    label { font-weight: bold; margin-top: 15px; display: block; }
+    input { width: 100%; padding: 8px; margin-top: 5px; }
+    .error { color: red; font-size: 13px; height: 16px; }
+    .success { color: green; font-weight: bold; margin-top: 20px; }
+    button { width: 100%; margin-top: 20px; padding: 10px; }
+</style>
+</head>
+
+<body>
+<h2>입력값 검증(Validation) 예제</h2>
+
+<div class="form-box">
+    <form id="myForm">
+
+        <!-- 이름 -->
+        <label>이름</label>
+        <input type="text" id="name">
+        <div id="nameError" class="error"></div>
+
+        <!-- 전화번호 -->
+        <label>전화번호</label>
+        <input type="text" id="tel" placeholder="010-1234-5678">
+        <div id="telError" class="error"></div>
+
+        <!-- 이메일 -->
+        <label>이메일</label>
+        <input type="text" id="email">
+        <div id="emailError" class="error"></div>
+
+        <!-- 주소 -->
+        <label>주소</label>
+        <input type="text" id="addr">
+        <div id="addrError" class="error"></div>
+
+        <button type="button" onclick="validateForm()">제출하기</button>
+    </form>
+
+    <div id="result" class="success"></div>
+</div>
+
+<script>
+function validateForm() {
+    let isValid = true;
+    document.getElementById('result').innerHTML = "";
+
+    // 초기화
+    document.querySelectorAll('.error').forEach(el => el.innerHTML = "");
+
+    // 이름 검증 (한글/영문만)
+    const name = document.getElementById('name').value.trim();
+    if (!/^[가-힣a-zA-Z]+$/.test(name)) {
+        document.getElementById('nameError').innerHTML = "이름은 한글 또는 영문만 가능합니다.";
+        isValid = false;
+    }
+
+    // 전화번호 검증 (010-0000-0000 형식)
+    const tel = document.getElementById('tel').value.trim();
+    if (!/^010-\d{4}-\d{4}$/.test(tel)) {
+        document.getElementById('telError').innerHTML = "전화번호 형식이 올바르지 않습니다.";
+        isValid = false;
+    }
+
+    // 이메일 검증 (기본 형식)
+    const email = document.getElementById('email').value.trim();
+    if (!/^[\w.-]+@[\w.-]+\.\w+$/.test(email)) {
+        document.getElementById('emailError').innerHTML = "이메일 형식이 올바르지 않습니다.";
+        isValid = false;
+    }
+
+    // 주소 검증 (2글자 이상)
+    const addr = document.getElementById('addr').value.trim();
+    if (addr.length < 2) {
+        document.getElementById('addrError').innerHTML = "주소는 최소 2글자 이상 입력해야 합니다.";
+        isValid = false;
+    }
+
+    // 전체 통과
+    if (isValid) {
+        document.getElementById('result').innerHTML = "🎉 모든 입력값이 정상입니다!";
+    }
+}
+</script>
+
+</body>
+</html>

@@ -1,167 +1,175 @@
-<!-- 데이타수정후 확인해보려면 도스프롬프트에서 firebase emulators:start 실행 -->
-<!-- 브라우저에서 ex)  http://127.0.0.1:5000/login.html -->
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>로그인</title>
+  <title>관리자로그인</title>
 
+  <!-- 파비콘 -->
+  <link rel="icon" href="./favicons/favicon.png?v=2" />
+  <link rel="icon" type="image/png" sizes="36x36" href="./favicons/android-icon-36x36.png" />
+  <link rel="icon" type="image/png" sizes="48x48" href="./favicons/android-icon-48x48.png" />
+  <link rel="icon" type="image/png" sizes="72x72" href="./favicons/android-icon-72x72.png" />
+  <link rel="apple-touch-icon" sizes="32x32" href="./favicons/apple-icon-32x32.png">
+  <link rel="apple-touch-icon" sizes="57x57" href="./favicons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="./favicons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="./favicons/apple-icon-72x72.png">
 
-    <!-- 파비콘 아이콘들 (상대경로(./) 사용 -->
-    <link rel="icon" href="./favicon.ico?v=2" />
-
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="36x36"
-      href="./favicons/android-icon-36x36.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="48x48"
-      href="./favicons/android-icon-48x48.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="72x72"
-      href="./favicons/android-icon-72x72.png"
-    />
-
-    <link
-      rel="apple-touch-icon"
-      sizes="32x32"
-      href="./favicons/apple-icon-32x32.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="57x57"
-      href="./favicons/apple-icon-57x57.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="60x60"
-      href="./favicons/apple-icon-60x60.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="72x72"
-      href="./favicons/apple-icon-72x72.png"
-    />
-
-    <!-- 웹사이트 매니페스트 (상대경로(./) 사용  -->
-    <link rel="manifest" href="./manifest.json" />
-
-    <!-- Ms브라우저 설정 파일 (상대경로(./) 사용  -->
-    <meta name="msapplication-config" content="./browserconfig.xml" />
-    <meta name="msapplication-TileColor" content="#ffffff" />
-    <meta name="msapplication-TileImage" content="./ms-icon-144x144.png" />
-    <meta name="theme-color" content="#ffffff" />
 
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
   
   <!-- 사용자 정의 CSS -->
   <link rel="stylesheet" href="./css_firebase/login.css">
-
-  <script type="module" src="./js/login.js"></script>
 </head>
 <body>
-  <div class="container mt-5">
+  <div class="container mt-3">
     <div class="row justify-content-center">
       <div class="col-md-6 col-lg-5">
+        <!-- 상단 안내 메시지 -->
+        <div class="text-left mb-3 py-4" 
+             style="color: #fff; background-color: #333; border-radius: 12px; padding-left: 20px; padding-right: 20px;">
+          <strong>🔒 관리자 전용 로그인</strong><br>
+          <small>admin : te****** / 7****</small>
+        </div>
         <div class="card shadow-lg p-4">
+          <div class="login-icon">
+            <img src="./image/clova.jpg" alt="로그인 아이콘">
+          </div>
           <h2 class="card-title text-center mb-4">로그인</h2>
+          
           <form id="loginForm" class="needs-validation" novalidate>
             <div class="mb-3">
-              <label for="id" class="form-label">아이디</label>
-              <input type="text" class="form-control" id="id" required>
+              <label for="inputId" class="form-label">아이디</label>
+              <!-- id="inputId"로 변경 -->
+              <input type="text" class="form-control" id="inputId" required autofocus>
             </div>
 
             <div class="mb-3">
-              <label for="password" class="form-label">비밀번호</label>
-              <input type="password" class="form-control" id="password" required>
+              <label for="inputPassword" class="form-label">비밀번호</label>
+              <!-- id="inputPassword"로 변경 -->
+              <input type="password" class="form-control" id="inputPassword" required>
             </div>
 
-            <p style="font-size: 12px;">
-            <span style="color: red;">[알림] </span>
-            이 코드들은 FTP로 관리하지않고 C:\GitHub\terraone-site\public에서 코드 업로드를 할경우에는 도스프롬프트에서 해당폴더로 이동해서 명령어:" cd C:\GitHub\terraone-site " 로 경로이동을 하고 " firebase login " 으로 로그인(jeon2457@gamil.com) 확인하고, 명령어: " firebase deploy " 로 전체코드를 업데이트한다.  DB 데이타는 코드속에 포함되어 전송하는 방식이다.
-            <span style="background-color: black; color: orange;">구글 firebase / Realtime Database</span>로 서버가 돌아감.
-            </p>
+            <p style="font-size: 15px; color: #666;">
+              <span class="badge bg-secondary"  style="color: red;">알림</span> 
+              <span style="font-size: 14px; margin: 0; text-align: left;">
+              구글의 firebase/Realtime Database에서 웹서버를 가동하고있다. 이 코드들은 업로드 방식이 다른데 FTP로 관리하지않고 도스 프롬프트에서 업로드 시킨다. HTML코드이지만 PHP코드처럼 동적페이지를 무난하게 수행한다.  C:\GitHub\terraone-site\public에 원본코드가 있고 서버로 업데이트 할경우에는 도스프롬프트에서 해당폴더로 이동해서 명령어: " cd C:\GitHub\terraone-site " 로 경로이동을 하고 " firebase login " 으로 로그인(jeon2457@gamil.com) 확인되면 명령어: " firebase deploy " 로 전체코드를 업데이트한다. DB 데이타는 코드속에 포함되어 전송하는 방식이다. 서버주소: https://console.firebase.google.com/ <br> 계정: jeon2457@gmail.com<br> 비밀번호: jeonsj8....@<br>프로젝트명: terraone <br>전화번호 연락망은 좌측메뉴 빌드-Realtime Database-데이터에 들어가면 모든정보가 DB에 저장되어있다, 거래명세서 정보(expense_table, income_table),영수증사진 정보(images_table), 회원연락망 정보(terraone)의 테이블로 이루어져있고, 이미지사진(영수증)은 실제로 Storage=> images/에 저장되어있다.
+            </span>
 
-            <button type="submit" class="btn btn-primary w-100">관리자 로그인</button>
+
+            
+
+            <button type="submit" class="btn btn-primary w-100 mt-5">관리자 로그인</button>
           </form>
-          <div id="message" class="mt-3 text-center"></div>
+
+          <!-- 에러 메시지 표시 -->
+          <div id="errorMsg" class="mt-3 text-center fw-bold text-danger"></div>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- 🔥 DB 기반 로그인 스크립트 -->
+  <script type="module">
+    import { getDatabase, ref, query, orderByChild, equalTo, get } 
+      from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+    import { app } from "./js/firebase-config.js";
+    import { requireGuest } from "./js/auth.js"; 
+
+    // 1. 이미 로그인했으면 메인으로 이동
+    requireGuest();
+
+    const db = getDatabase(app);
+    const loginForm = document.getElementById("loginForm");
+    const errorMsg = document.getElementById("errorMsg");
+
+    // 2. 로그인 버튼 클릭 시 실행
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      errorMsg.style.color = "blue";
+      errorMsg.textContent = "🔍 DB 조회 중...";
+
+      const idVal = document.getElementById("inputId").value.trim();
+      const pwVal = document.getElementById("inputPassword").value.trim();
+
+      if (!idVal || !pwVal) {
+        errorMsg.style.color = "red";
+        errorMsg.textContent = "아이디와 비밀번호를 입력해주세요.";
+        return;
+      }
+
+      try {
+        // 🔥 [핵심] DB에서 아이디로 검색 (SELECT * FROM tel WHERE id = 'terraone')
+        const usersRef = ref(db, 'terraone/tel');
+        const q = query(usersRef, orderByChild('id'), equalTo(idVal));
+        
+        const snapshot = await get(q);
+
+        if (snapshot.exists()) {
+          // 아이디가 존재함! 이제 비밀번호 비교
+          let userFound = null;
+          
+          // 검색된 결과 (보통 1개지만 forEach로 꺼냄)
+          snapshot.forEach((childSnapshot) => {
+            const userData = childSnapshot.val();
+            
+            // 비밀번호 비교 (일치하면 로그인 성공)
+            if (String(userData.password) === String(pwVal)) {
+              userFound = userData;
+              userFound.key = childSnapshot.key; // 키값도 저장
+            }
+          });
+
+          if (userFound) {
+            // ✅ 로그인 성공!
+            console.log("로그인 성공:", userFound);
+            
+            // 레벨 체크 (관리자만 허용한다면)
+            if (parseInt(userFound.level) < 10) {
+               errorMsg.style.color = "red";
+               errorMsg.textContent = "관리자 권한이 없습니다. (Level < 10)";
+               return;
+            }
+
+            errorMsg.style.color = "green";
+            errorMsg.textContent = "✅ 로그인 성공! 이동합니다...";
+
+            // 브라우저 세션(임시 저장소)에 로그인 정보 저장
+            sessionStorage.setItem("currentUser", JSON.stringify(userFound));
+
+            // 페이지 이동
+            setTimeout(() => {
+              window.location.href = "members.html";
+            }, 500);
+
+          } else {
+            // 비밀번호 틀림
+            errorMsg.style.color = "red";
+            errorMsg.textContent = "❌ 비밀번호가 틀렸습니다.";
+          }
+
+        } else {
+          // 아이디 없음
+          errorMsg.style.color = "red";
+          errorMsg.textContent = "❌ 존재하지 않는 아이디입니다.";
+        }
+
+      } catch (error) {
+        console.error("로그인 오류:", error);
+        errorMsg.style.color = "red";
+        errorMsg.textContent = "시스템 오류: " + error.message;
+        
+        // 만약 인덱스 오류가 난다면 안내
+        if (error.message.includes("Index not defined")) {
+           alert("Firebase Console > Database > Rules에서 .indexOn 설정을 확인해주세요.");
+        }
+      }
+    });
+  </script>
+
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-
-
-
-
-<!--  ☆★☆  terraone-site 폴더구조  ☆★☆
-
-
-C:\GitHub\terraone-site
-│
-├─ .firebase/
-├─ .git/
-├─ .github/
-├─  css/
-├─ image/
-│
-├─ public/
-│   ├─ css/
-│   ├─ css_firebase/
-│   ├─ favicons/
-│   │    
-│   ├─ image/
-│   │    └─ sms-4.png
-│   ├─ images/
-│   ├─ images/
-│   │ 
-│   ├─ js/
-│   │    ├─ auth.js
-│   │    ├─ edit-member.js
-│   │    ├─ firebase-config.js
-│   │    ├─ firebase-db.js
-│   │    ├─ index-firebase.js
-│   │    ├─ login.js
-│   │    ├─ members.js 
-│   │    └─ signup.js
-│   │
-│   ├─ edit-member.html  
-│   ├─ favicon.ico
-│   ├─ firebase.json
-│   ├─ index.html
-│   ├─ login.html
-│   ├─ manifest.json
-│   ├─ members.html
-│   └─ signup.html
-│
-├─ .firebaserc
-├─ .gitattributes
-├─ .gitgnore
-├─ database.rules.json
-├─ favicon.ico
-├─ manifest.json
-├─ package.json
-│
-└─ (기타 파일들)
-
-
- -->
-
-
-      

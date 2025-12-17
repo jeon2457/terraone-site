@@ -1,159 +1,121 @@
-// members.js
-import { getAllMembers, deleteMember } from "./firebase-db.js";
-import { requireAdmin, getCurrentUser, logout } from "./auth.js";
+// js/members.js
+// 버전 통일: 10.9.0
+import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+import { app } from "./firebase-config.js";
+import { requireAdmin } from "./auth.js";
 
-// 🔥 관리자 권한 체크 (페이지 진입 시)
-if (!requireAdmin()) {
-  // requireAdmin()에서 이미 리다이렉트 처리됨
-}
+console.log("🚀 [Debug] members.js 시작 (버전 10.9.0)");
+
+// 1. 관리자 권한 체크
+requireAdmin();
+
+const db = getDatabase(app);
+const membersRef = ref(db, "terraone/tel");
 
 const tbody = document.querySelector("#membersTable tbody");
-const selectAllCheckbox = document.querySelector("#selectAll");
-const signupBtn = document.querySelector("#signupSelected");
-const viewBtn = document.querySelector("#viewSelected");
-const editBtn = document.querySelector("#editSelected");
-const deleteBtn = document.querySelector("#deleteSelected");
-const messageDiv = document.querySelector("#message");
+const selectAllCheckbox = document.getElementById("selectAll");
+const messageDiv = document.getElementById("message");
 
-// 🔹 요소 존재 확인
-if (!tbody) {
-  console.error("❌ tbody 요소를 찾을 수 없습니다!");
-  alert("페이지 구조에 문제가 있습니다. HTML을 확인하세요.");
-}
+// ============================================================
+// 🔥 데이터 불러오기
+// ============================================================
+onValue(membersRef, (snapshot) => {
+  tbody.innerHTML = "";
+  selectAllCheckbox.checked = false;
 
-// 🔹 회원 목록 렌더링
-async function renderMembers() {
-  console.log("🔍 renderMembers 함수 시작");
-  
-  if (!tbody) {
-    console.error("❌ tbody가 null입니다!");
-    return;
-  }
-  
-  tbody.innerHTML = "<tr><td colspan='10' class='text-center'>데이터 로딩 중...</td></tr>";
-  
-  try {
-    const membersData = await getAllMembers();
-    console.log("📦 불러온 데이터:", membersData);
-    console.log("📊 데이터 개수:", Object.keys(membersData).length);
+  if (snapshot.exists()) {
+    const data = snapshot.val();
+    console.log("📦 [Debug] 데이터 수신 성공:", Object.keys(data).length + "명");
 
-    if (!membersData || Object.keys(membersData).length === 0) {
-      tbody.innerHTML = `<tr><td colspan="10" class="text-center">등록된 회원이 없습니다.</td></tr>`;
-      return;
-    }
+    let membersList = [];
+    Object.keys(data).forEach((key) => {
+      membersList.push({
+        key: key,
+        ...data[key]
+      });
+    });
 
-    // 레벨 숫자를 문자열로 매핑
-    const levelText = { 1: "임시회원", 2: "회원+", 10: "관리자" };
+    // 가나다순 정렬
+    membersList.sort((a, b) => {
+      const nameA = a.name ? String(a.name) : "";
+      const nameB = b.name ? String(b.name) : "";
+      return nameA.localeCompare(nameB, "ko-KR");
+    });
 
-    tbody.innerHTML = ""; // 기존 내용 지우기
-    let idx = 1;
-    
-    for (const key in membersData) {
-      const m = membersData[key];
-      console.log(`👤 회원 ${idx}:`, key, m);
-      
+    // 화면 출력
+    membersList.forEach((member, index) => {
       const tr = document.createElement("tr");
+      const sms2Value = member.sms_2 ? member.sms_2 : "-";
+      
       tr.innerHTML = `
-        <td><input type="checkbox" class="selectMember" data-key="${key}"></td>
-        <td>${idx}</td>
-        <td>${m.id || ""}</td>
-        <td>${m.name || ""}</td>
-        <td>${m.tel || ""}</td>
-        <td>${m.addr || ""}</td>
-        <td>${m.remark || ""}</td>
-        <td>${m.sms || ""}</td>
-        <td>${Array.isArray(m.sms_2) ? m.sms_2.join(", ") : m.sms_2 || ""}</td>
-        <td>${levelText[m.level] || "회원"}</td>
+        <td><input type="checkbox" class="member-check" value="${member.key}"></td>
+        <td>${index + 1}</td>
+        <td>${member.id || "-"}</td>
+        <td class="fw-bold">${member.name || "-"}</td>
+        <td>${member.tel || "-"}</td>
+        <td>${member.addr || "-"}</td>
+        <td>${member.remark || "-"}</td>
+        <td>${member.sms || "-"}</td>
+        <td style="font-size: 0.85rem; color: #666; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${sms2Value}">
+            ${sms2Value}
+        </td>
+        <td>
+          <span class="badge ${getBadgeClass(member.level)}">
+            ${member.level || "1"}
+          </span>
+        </td>
       `;
       tbody.appendChild(tr);
-      idx++;
-    }
-    
-    console.log("✅ 렌더링 완료!");
-  } catch (error) {
-    console.error("❌ 에러 발생:", error);
-    tbody.innerHTML = `<tr><td colspan="10" class="text-center text-danger">데이터 로드 실패: ${error.message}</td></tr>`;
+    });
+
+  } else {
+    tbody.innerHTML = `<tr><td colspan="10" class="text-center py-4">등록된 회원이 없습니다.</td></tr>`;
   }
+}, (error) => {
+  console.error("❌ 데이터 읽기 오류:", error);
+  messageDiv.innerHTML = `<div class="alert alert-danger">데이터 로드 실패: ${error.message}</div>`;
+});
+
+function getBadgeClass(level) {
+  if (level == 10) return "text-bg-danger";
+  if (level == 2) return "text-bg-success";
+  return "text-bg-secondary";
 }
 
-// 🔹 전체 선택 체크박스
-if (selectAllCheckbox) {
-  selectAllCheckbox.addEventListener("change", () => {
-    const checkboxes = document.querySelectorAll(".selectMember");
-    checkboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
-  });
-}
+// ============================================================
+// ✅ 버튼 기능
+// ============================================================
+selectAllCheckbox.addEventListener("change", (e) => {
+  document.querySelectorAll(".member-check").forEach((cb) => (cb.checked = e.target.checked));
+});
 
-// 🔹 선택 회원 수정
-if (editBtn) {
-  editBtn.addEventListener("click", () => {
-    const selectedKeys = Array.from(document.querySelectorAll(".selectMember:checked"))
-      .map(cb => cb.dataset.key);
+// 2. 회원가입 버튼
+document.getElementById("signupSelected").addEventListener("click", () => window.location.href = "signup.html");
 
-    if (selectedKeys.length === 0) {
-      alert("수정할 회원을 선택해주세요.");
-      return;
-    }
-    if (selectedKeys.length > 1) {
-      alert("한 번에 한 명만 수정 가능합니다.");
-      return;
-    }
+// 3. [수정됨] 회원열람 버튼 (체크박스 상관없이 index.html로 이동)
+document.getElementById("viewSelected").addEventListener("click", () => {
+  window.location.href = "index.html";
+});
 
-    const key = selectedKeys[0];
-    window.location.href = `edit-member.html?key=${key}`;
-  });
-}
+// 4. 선택회원 수정 버튼
+document.getElementById("editSelected").addEventListener("click", () => {
+  const checked = document.querySelectorAll(".member-check:checked");
+  if (checked.length !== 1) { alert("한 명만 선택해주세요."); return; }
+  window.location.href = `edit-member.html?key=${checked[0].value}`;
+});
 
-// 🔹 선택 회원 삭제
-if (deleteBtn) {
-  deleteBtn.addEventListener("click", async () => {
-    const selectedKeys = Array.from(document.querySelectorAll(".selectMember:checked"))
-      .map(cb => cb.dataset.key);
+// 5. 선택회원 삭제 버튼
+document.getElementById("deleteSelected").addEventListener("click", async () => {
+  const checked = document.querySelectorAll(".member-check:checked");
+  if (checked.length === 0) { alert("삭제할 회원을 선택하세요."); return; }
+  if (!confirm(`${checked.length}명을 삭제하시겠습니까?`)) return;
 
-    if (selectedKeys.length === 0) {
-      alert("삭제할 회원을 선택해주세요.");
-      return;
-    }
-
-    if (!confirm("선택한 회원을 삭제하시겠습니까?")) return;
-
-    for (const key of selectedKeys) {
-      await deleteMember(key);
-    }
-
-    if (messageDiv) {
-      messageDiv.textContent = "✅ 선택 회원 삭제 완료!";
-    }
-    renderMembers();
-  });
-}
-
-// 🔹 페이지 로드 시 회원 목록 표시
-console.log("📄 페이지 로드됨");
-window.addEventListener("DOMContentLoaded", () => {
-  console.log("🚀 DOMContentLoaded 이벤트 발생");
-  
-  // 🔥 로그인 사용자 정보 표시
-  const user = getCurrentUser();
-  if (user) {
-    console.log(`👋 ${user.name}님 환영합니다! (Level: ${user.level})`);
+  try {
+    const promises = [];
+    checked.forEach((cb) => promises.push(remove(ref(db, `terraone/tel/${cb.value}`))));
+    await Promise.all(promises);
+    alert("✅ 삭제 완료!");
+  } catch (err) {
+    alert("오류: " + err.message);
   }
-  
-  renderMembers();
 });
-
-
-
-// 멤버전체목록 페이지(members.html) 회원가입 클릭시 이동
-signupBtn.addEventListener("click", () => {
-  window.location.href = "./signup.html";
-});
-
-
-// 멤버전체목록 페이지(members.html) 회원열람 클릭시 이동
-viewBtn.addEventListener("click", () => {
-  window.location.href = "./index.html";
-});
-
-
-

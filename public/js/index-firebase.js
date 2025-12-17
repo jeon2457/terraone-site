@@ -1,69 +1,84 @@
 // 📁 public/js/index-firebase.js
-// index.html에서 Firebase 데이터를 불러와 members.html과 동일한 형식으로 테이블 생성
+// index.html용 Firebase 데이터 연동 (버전 10.9.0)
 // 번호, 이름, 전화번호, 주소, 비고, SMS 데이터만 표시
 
-import { getAllMembers } from "./firebase-db.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+import { app } from "./firebase-config.js";
 
+const db = getDatabase(app);
+const membersRef = ref(db, "terraone/tel");
 const tbody = document.getElementById("memberTableBody");
 
-// 🔹 SMS 전송 함수 (기존 방식 유지)
+console.log("🚀 [Debug] index-firebase.js 시작 (버전 10.9.0)");
+
+// 🔹 SMS 전송 함수 (iOS/Android 호환)
 window.sendSMS = function(event, phoneNumbers) {
-  event.preventDefault();
+  event.preventDefault(); // 기본 링크 이동 막기
   
-  // iOS와 Android에서 모두 작동하도록 처리
+  if (!phoneNumbers || String(phoneNumbers).trim() === "") {
+    alert("전송할 전화번호가 없습니다.");
+    return;
+  }
+
+  // iOS와 Android 구분 처리
   const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
   const smsUrl = isIOS ? `sms:${phoneNumbers}&body=` : `sms:${phoneNumbers}?body=`;
   
   window.location.href = smsUrl;
 };
 
-// 🔹 회원 목록 렌더링
-async function renderMembers() {
-  console.log("🔍 Firebase에서 회원 데이터 로딩 시작...");
-  
-  try {
-    const membersData = await getAllMembers();
-    console.log("📦 불러온 데이터:", membersData);
+// 🔹 데이터 불러오기 (실시간 감지)
+onValue(membersRef, (snapshot) => {
+  tbody.innerHTML = ""; // 기존 목록 초기화
 
-    if (!membersData || Object.keys(membersData).length === 0) {
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="6" class="text-center">등록된 회원이 없습니다.</td>
-        </tr>
-      `;
-      return;
-    }
+  if (snapshot.exists()) {
+    const data = snapshot.val();
+    const totalCount = Object.keys(data).length;
+    console.log(`📦 [Debug] 데이터 수신 성공: 총 ${totalCount}명`);
 
-    // 🔥 회원 데이터를 배열로 변환
-    const membersArray = Object.entries(membersData).map(([key, member]) => ({
-      key,
-      ...member
-    }));
-
-    // 이름순 정렬
-    membersArray.sort((a, b) => {
-      if (a.name < b.name) return -1;
-      if (a.name > b.name) return 1;
-      return 0;
+    // 1. 객체를 배열로 변환
+    let membersList = [];
+    Object.keys(data).forEach((key) => {
+      membersList.push({
+        key: key,
+        ...data[key]
+      });
     });
 
-    // 🔥 전체 전화번호 목록 생성 (회장/총무 SMS 발송용)
-    const allPhoneNumbers = membersArray
-      .filter(m => m.tel)
-      .map(m => m.tel)
-      .join(',');
+    // 2. 이름 기준 가나다순 정렬
+    membersList.sort((a, b) => {
+      const nameA = a.name ? String(a.name) : "";
+      const nameB = b.name ? String(b.name) : "";
+      return nameA.localeCompare(nameB, "ko-KR");
+    });
 
-    tbody.innerHTML = ""; // 기존 내용 지우기
-
-    // 🔥 회원 목록 생성 (members.html과 동일한 형식)
-    membersArray.forEach((member, index) => {
+    // 3. 화면에 출력
+    membersList.forEach((member, index) => {
       const tr = document.createElement("tr");
       
-      // 회장이나 총무인 경우 특별 처리
-      const isPresident = member.remark === "회장";
-      const isTreasurer = member.remark === "총무";
+      // ✅ [수정 핵심] sms_2 데이터를 안전하게 문자열로 변환
+      // DB에 숫자로 저장되어 있어도 에러가 나지 않게 String()으로 감쌈
+      const sms2Raw = member.sms_2 ? String(member.sms_2) : "";
+      const sms2Value = sms2Raw.trim(); 
+
+      // 회장/총무 여부
+      const isPresidentOrTreasurer = (member.remark === "회장" || member.remark === "총무");
       
-      // 기존 index.html의 클래스명 그대로 사용
+      // 단체 문자 대상 번호 결정 (sms_2가 있으면 그것, 없으면 본인 번호)
+      const bulkSmsTarget = (sms2Value !== "") ? sms2Value : member.tel;
+
+      // 주소/비고란 링크 처리
+      const addressContent = isPresidentOrTreasurer 
+        ? `<a href="#" onclick="sendSMS(event, '${bulkSmsTarget}')" style="color: inherit; text-decoration: none;">${member.addr || ""}</a>`
+        : `<span>${member.addr || ""}</span>`;
+
+      const remarkContent = isPresidentOrTreasurer
+        ? `<a href="#" onclick="sendSMS(event, '${bulkSmsTarget}')" style="color: inherit; text-decoration: none;">${member.remark || "&nbsp;"}</a>`
+        : `<span>${member.remark || "&nbsp;"}</span>`;
+
+      // SMS 아이콘 타겟
+      const smsTarget = (sms2Value !== "") ? sms2Value : member.tel;
+
       tr.innerHTML = `
         <td class="no_1">${index + 1}</td>
         <td class="name_1">
@@ -73,24 +88,14 @@ async function renderMembers() {
           <a href="tel:${member.tel || ''}"><span>${member.tel || ""}</span></a>
         </td>
         <td class="address_1">
-          ${(isPresident || isTreasurer) 
-            ? `<a href="sms:${allPhoneNumbers}" onclick="sendSMS(event,'${allPhoneNumbers}')">
-                 <span>${member.addr || ""}</span>
-               </a>`
-            : `<span>${member.addr || ""}</span>`
-          }
+          ${addressContent}
         </td>
         <td class="remark_1">
-          ${(isPresident || isTreasurer) 
-            ? `<a href="sms:${allPhoneNumbers}" onclick="sendSMS(event,'${allPhoneNumbers}')">
-                 <span>${member.remark || "&nbsp;"}</span>
-               </a>`
-            : `<span>${member.remark || "&nbsp;"}</span>`
-          }
+          ${remarkContent}
         </td>
         <td class="sms_1">
-          <a href="sms:${member.tel || ''}" onclick="sendSMS(event,'${member.tel || ''}')">
-            <span><img class="max-small" src="image/sms-4.png" /></span>
+          <a href="#" onclick="sendSMS(event, '${smsTarget}')">
+            <span><img class="max-small" src="image/sms-4.png" alt="문자" /></span>
           </a>
         </td>
       `;
@@ -98,25 +103,17 @@ async function renderMembers() {
       tbody.appendChild(tr);
     });
 
-    console.log("✅ 회원 목록 렌더링 완료! 총 " + membersArray.length + "명");
-  } catch (error) {
-    console.error("❌ 데이터 로드 실패:", error);
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="6" class="text-center" style="color: red;">
-          데이터 로드 실패: ${error.message}
-        </td>
-      </tr>
-    `;
-  }
-}
+    console.log("✅ 모든 회원 렌더링 완료");
 
-// 🔹 페이지 로드 시 회원 목록 표시
-console.log("📄 index.html 페이지 로드됨");
-window.addEventListener("DOMContentLoaded", () => {
-  console.log("🚀 DOMContentLoaded 이벤트 발생");
-  renderMembers();
+  } else {
+    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4">등록된 회원이 없습니다.</td></tr>`;
+  }
+}, (error) => {
+  console.error("❌ 데이터 읽기 오류:", error);
+  tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">데이터 로드 실패: ${error.message}</td></tr>`;
 });
+
+
 
 // 🔥 실시간 업데이트 옵션 (선택사항)
 // members.html에서 수정/삭제 시 자동으로 index.html 업데이트

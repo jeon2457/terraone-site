@@ -1,52 +1,54 @@
-// 📁 public/js/auth.js
-// 권한 체크 공통 모듈
+// js/auth.js
+// 📂 DB 기반 로그인 전용 권한 관리 모듈
 
-// ✅ 로그인 여부 확인
-export function isLoggedIn() {
-  const user = sessionStorage.getItem("loggedInUser");
-  return user !== null;
+// ✅ [1] 관리자 권한 체크
+export function requireAdmin() {
+  // 브라우저에 저장된 로그인 정보 가져오기
+  const userJson = sessionStorage.getItem("currentUser");
+  
+  if (!userJson) {
+    alert("❌ 로그인이 필요한 페이지입니다.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  const user = JSON.parse(userJson);
+
+  // 레벨 확인 (관리자는 10)
+  if (parseInt(user.level) < 10) {
+    alert("❌ 관리자만 접근할 수 있습니다.");
+    window.location.href = "login.html"; // 또는 일반 회원 페이지
+    return;
+  }
+
+  console.log(`✅ 인증 확인됨: ${user.name}(${user.id})`);
+  
+  // 상단 헤더에 정보 표시
+  const userInfo = document.getElementById("userInfo");
+  if (userInfo) {
+    userInfo.textContent = `👋 ${user.name}님 (관리자)`;
+  }
 }
 
-// ✅ 현재 로그인한 사용자 정보 가져오기
-export function getCurrentUser() {
-  const user = sessionStorage.getItem("loggedInUser");
-  return user ? JSON.parse(user) : null;
+// ✅ [2] 로그인 페이지 접근 체크 (이미 로그인했으면 메인으로)
+export function requireGuest() {
+  const userJson = sessionStorage.getItem("currentUser");
+  if (userJson) {
+    // 이미 로그인 된 상태
+    window.location.href = "members.html"; 
+  }
 }
 
-// ✅ 관리자 권한 확인 (level 10)
-export function isAdmin() {
-  const user = getCurrentUser();
-  return user && user.level === 10;
-}
-
-// ✅ 로그아웃
+// ✅ [3] 로그아웃
 export function logout() {
-  sessionStorage.removeItem("loggedInUser");
+  // 저장된 정보 삭제
+  sessionStorage.removeItem("currentUser");
+  alert("로그아웃 되었습니다.");
   window.location.href = "login.html";
 }
 
-// ✅ 관리자 페이지 접근 체크 (관리자가 아니면 로그인 페이지로 이동)
-export function requireAdmin() {
-  if (!isLoggedIn()) {
-    alert("❌ 로그인이 필요합니다.");
-    window.location.href = "login.html";
-    return false;
-  }
-  
-  if (!isAdmin()) {
-    alert("❌ 관리자만 접근할 수 있습니다.");
-    window.location.href = "login.html";
-    return false;
-  }
-  
-  return true;
-}
-
-// ✅ 로그인 페이지 접근 체크 (이미 로그인했으면 members.html로 이동)
-export function requireGuest() {
-  if (isLoggedIn() && isAdmin()) {
-    window.location.href = "members.html";
-    return false;
-  }
-  return true;
+// ✅ [4] 현재 사용자 정보 가져오기
+export function getCurrentUser() {
+  const userJson = sessionStorage.getItem("currentUser");
+  return userJson ? JSON.parse(userJson) : null;
 }

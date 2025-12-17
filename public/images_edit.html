@@ -3,7 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>이미지 편집</title>
+  <title>이미지편집</title>
+  
+  <!-- 파비콘 -->
+  <link rel="icon" href="./favicons/favicon.png?v=2" />
+  <link rel="icon" type="image/png" sizes="36x36" href="./favicons/android-icon-36x36.png" />
+  <link rel="icon" type="image/png" sizes="48x48" href="./favicons/android-icon-48x48.png" />
+  <link rel="icon" type="image/png" sizes="72x72" href="./favicons/android-icon-72x72.png" />
+  <link rel="apple-touch-icon" sizes="32x32" href="./favicons/apple-icon-32x32.png">
+  <link rel="apple-touch-icon" sizes="57x57" href="./favicons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="./favicons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="./favicons/apple-icon-72x72.png">
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     :root {
@@ -21,16 +32,23 @@
     }
     
     .container {
-      max-width: 1200px;
-      margin: 0 auto;
+      max-width: 1400px;     /* ⬅ 옆으로 확장 */
+      margin-top: 80px;      /* ⬇ 아래로 내리기 */
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 15px;
+      padding-right: 15px;
     }
-    
+
     .card {
       border-radius: 20px;
       box-shadow: 0 10px 40px rgba(0,0,0,0.2);
       border: none;
       overflow: hidden;
       margin-bottom: 20px;
+      padding: 10px;
+      margin: 0;
+    }
     }
     
     .card-header {
@@ -48,7 +66,7 @@
     }
     
     .card-body {
-      padding: 30px;
+      padding: 18px;
       background: white;
     }
     
@@ -223,8 +241,41 @@
     .edit-mode {
       background-color: #fff8dc !important;
     }
+
+
+    .btn-back {
+      display: block;
+      width: 200px;
+      margin: 30px auto 20px auto;
+      padding: 12px 20px;
+      border-radius: 12px;
+      background: #667eea;
+      color: #fff;
+      font-weight: 700;
+      text-align: center;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-back:hover {
+      background: #556cd6;
+      text-decoration: none;
+      color: #fff;
+    }
+
+ 
     
     @media (max-width: 768px) {
+      .container {
+        max-width: 100%;     /* ⬅ 옆으로 확장 */
+        margin-top: 44px;      /* ⬇ 아래로 내리기 */
+        margin-left: 1px;
+        margin-right: 1px;
+        padding-left: 1px;
+        padding-right: 1px;
+      }
+
+
       .month-buttons {
         grid-template-columns: repeat(3, 1fr);
       }
@@ -238,15 +289,67 @@
         padding: 6px 12px;
         font-size: 0.85rem;
       }
+
+      .card-body {
+      padding: 15px;
     }
+
+    table thead {
+      display: none; /* 헤더 숨김 */
+    }
+
+    table, tbody, tr, td {
+      display: block;
+      width: 100%;
+    }
+
+    tbody tr {
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      padding: 10px;
+    }
+
+    td {
+      text-align: left;
+      border: none;
+      padding: 8px 6px;
+    }
+
+    /* 날짜/시간 */
+    td:nth-child(2) {
+      font-weight: 600;
+    }
+
+    /* 이미지 */
+    td:nth-child(3) {
+      text-align: center;
+    }
+
+    /* 요약 */
+    td:nth-child(4) {
+      margin-top: 8px;
+    }
+
+    /* 작업 버튼 ↓ 아래로 */
+    td:nth-child(5) {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+    }
+
+  }
+
   </style>
 </head>
+
 <body>
   <div class="container">
     <div class="card">
       <div class="card-header">
         <h2>✏️ 이미지 편집</h2>
       </div>
+
       <div class="card-body">
         <!-- 월 선택 버튼 -->
         <div class="month-buttons">
@@ -263,17 +366,17 @@
           <button class="btn-month" data-month="11" onclick="selectMonth(11)">11월</button>
           <button class="btn-month" data-month="12" onclick="selectMonth(12)">12월</button>
         </div>
-        
+
         <!-- 테이블 -->
         <div class="table-container">
           <table>
             <thead>
               <tr>
-                <th style="width: 60px;">No</th>
-                <th style="width: 120px;">날짜</th>
-                <th style="width: 100px;">이미지</th>
+                <th style="width:60px;">No</th>
+                <th style="width:160px;">날짜 / 시간</th>
+                <th style="width:100px;">이미지</th>
                 <th>요약</th>
-                <th style="width: 200px;">작업</th>
+                <th style="width:200px;">작업</th>
               </tr>
             </thead>
             <tbody id="imageTableBody">
@@ -283,110 +386,98 @@
             </tbody>
           </table>
         </div>
-        
-        <!-- 네비게이션 버튼 -->
+
+        <!-- 네비게이션 -->
         <div class="nav-buttons">
           <a href="images_input.html"><button class="btn-nav">➕ 이미지 업로드</button></a>
           <a href="images_view.html"><button class="btn-nav">📊 목록보기</button></a>
         </div>
+
+        <a href="account_images_main-1.html" class="btn-back">← 되돌아가기</a>
       </div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  
+
   <script type="module">
     import { requireAdmin } from "./js/auth.js";
-    // 관리자 권한 체크
-    if (!requireAdmin()) {
-      // auth.js에서 자동으로 login.html로 리다이렉트
-    }
-    
+    if (!requireAdmin()) {}
+
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getDatabase, ref, onValue, update, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
     import { getStorage, ref as storageRef, deleteObject } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
-    // Firebase 설정
     const firebaseConfig = {
-        apiKey: "AIzaSyAF7AD1d54k21-stmb0Hpg9OMEECvzFHpQ",
-        authDomain: "terraone-d0318.firebaseapp.com",
-        databaseURL: "https://terraone-d0318-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "terraone-d0318",
-        storageBucket: "terraone-d0318.firebasestorage.app",
-        messagingSenderId: "1082807340877",
-        appId: "1:1082807340877:web:6e2b49c04562d800e87104",
-        measurementId: "G-7HMJEV832S"
+      apiKey: "AIzaSyAF7AD1d54k21-stmb0Hpg9OMEECvzFHpQ",
+      authDomain: "terraone-d0318.firebaseapp.com",
+      databaseURL: "https://terraone-d0318-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "terraone-d0318",
+      storageBucket: "terraone-d0318.firebasestorage.app",
+      messagingSenderId: "1082807340877",
+      appId: "1:1082807340877:web:6e2b49c04562d800e87104"
     };
 
-    // Firebase 초기화
     const app = initializeApp(firebaseConfig);
     const database = getDatabase(app);
     const storage = getStorage(app);
 
-    // 전역 변수
     let selectedMonth = new Date().getMonth() + 1;
     let allImages = [];
     let editingId = null;
 
-    // 월 선택 함수
     window.selectMonth = function(month) {
-      console.log('월 선택:', month);
       selectedMonth = month;
-      
-      document.querySelectorAll('.btn-month').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      
+      document.querySelectorAll('.btn-month').forEach(b => b.classList.remove('active'));
       document.querySelector(`[data-month="${month}"]`).classList.add('active');
       displayImages();
     };
 
-    // 이미지 표시 함수
     function displayImages() {
       const tbody = document.getElementById('imageTableBody');
-      
-      const filteredImages = allImages.filter(img => {
-        const imgDate = new Date(img.date);
-        return imgDate.getMonth() + 1 === selectedMonth;
+
+      const filtered = allImages.filter(img => {
+        const d = new Date(img.date);
+        return d.getMonth() + 1 === selectedMonth;
       });
-      
-      if (filteredImages.length === 0) {
+
+      if (!filtered.length) {
         tbody.innerHTML = '<tr><td colspan="5" class="no-data">이미지가 없습니다.</td></tr>';
         return;
       }
-      
-      filteredImages.sort((a, b) => new Date(b.date) - new Date(a.date));
-      
-      tbody.innerHTML = filteredImages.map((img, index) => {
-        const isEditing = editingId === img.id;
-        
+
+      filtered.sort((a,b)=>new Date(b.date)-new Date(a.date));
+
+      tbody.innerHTML = filtered.map((img, i) => {
+        const edit = editingId === img.id;
         return `
-          <tr ${isEditing ? 'class="edit-mode"' : ''} id="row-${img.id}">
-            <td>${index + 1}</td>
+          <tr class="${edit ? 'edit-mode':''}">
+            <td>${i+1}</td>
             <td>
-              ${isEditing 
-                ? `<input type="date" class="edit-input" id="edit-date-${img.id}" value="${img.date}">`
-                : img.date
+              ${edit
+                ? `
+                  <input type="date" class="edit-input" id="edit-date-${img.id}" value="${img.date}">
+                  <input type="time" class="edit-input mt-1" id="edit-time-${img.id}" value="${img.time || '00:00'}">
+                `
+                : `${img.date} ${img.time || ''}`
+              }
+            </td>
+            <td><img src="${img.imageUrl}" class="thumbnail"></td>
+            <td>
+              ${edit
+                ? `<textarea class="edit-input" id="edit-summary-${img.id}">${img.summary||''}</textarea>`
+                : (img.summary||'-')
               }
             </td>
             <td>
-              <img src="${img.imageUrl}" class="thumbnail" alt="이미지">
-            </td>
-            <td>
-              ${isEditing
-                ? `<textarea class="edit-input" id="edit-summary-${img.id}" rows="2">${img.summary || ''}</textarea>`
-                : `<div title="${img.summary || ''}">${img.summary || '-'}</div>`
-              }
-            </td>
-            <td>
-              ${isEditing
+              ${edit
                 ? `
                   <button class="btn-action btn-save" onclick="saveEdit('${img.id}')">💾 저장</button>
                   <button class="btn-action btn-cancel" onclick="cancelEdit()">❌ 취소</button>
                 `
                 : `
                   <button class="btn-action btn-edit" onclick="startEdit('${img.id}')">✏️ 수정</button>
-                  <button class="btn-action btn-delete" onclick="deleteImage('${img.id}', '${img.imageUrl}')">🗑️ 삭제</button>
+                  <button class="btn-action btn-delete" onclick="deleteImage('${img.id}','${img.imageUrl}')">🗑️ 삭제</button>
                 `
               }
             </td>
@@ -395,112 +486,42 @@
       }).join('');
     }
 
-    // 수정 시작
-    window.startEdit = function(id) {
-      console.log('수정 시작:', id);
-      editingId = id;
-      displayImages();
-    };
+    window.startEdit = id => { editingId=id; displayImages(); };
+    window.cancelEdit = ()=>{ editingId=null; displayImages(); };
 
-    // 수정 취소
-    window.cancelEdit = function() {
-      console.log('수정 취소');
-      editingId = null;
-      displayImages();
-    };
-
-    // 수정 저장
     window.saveEdit = async function(id) {
-      console.log('저장:', id);
-      
-      const newDate = document.getElementById(`edit-date-${id}`).value;
-      const newSummary = document.getElementById(`edit-summary-${id}`).value;
-      
-      if (!newDate) {
-        alert('날짜를 입력해주세요.');
-        return;
-      }
-      
-      try {
-        const imageRef = ref(database, `images_table/${id}`);
-        await update(imageRef, {
-          date: newDate,
-          summary: newSummary
-        });
-        
-        console.log('수정 완료!');
-        alert('✅ 수정되었습니다!');
-        editingId = null;
-        loadImages();
-        
-      } catch (error) {
-        console.error('수정 실패:', error);
-        alert('❌ 수정 중 오류가 발생했습니다.');
-      }
+      const date = document.getElementById(`edit-date-${id}`).value;
+      const time = document.getElementById(`edit-time-${id}`).value;
+      const summary = document.getElementById(`edit-summary-${id}`).value;
+
+      await update(ref(database, `images_table/${id}`), {
+        date, time, summary
+      });
+
+      editingId=null;
+      loadImages();
     };
 
-    // 이미지 삭제
-    window.deleteImage = async function(id, imageUrl) {
-      if (!confirm('정말로 삭제하시겠습니까?')) {
-        return;
-      }
-      
-      console.log('삭제:', id);
-      
-      try {
-        // Storage에서 이미지 삭제
-        try {
-          const imgRef = storageRef(storage, imageUrl);
-          await deleteObject(imgRef);
-          console.log('Storage 이미지 삭제 완료');
-        } catch (storageError) {
-          console.warn('Storage 삭제 실패 (계속 진행):', storageError);
-        }
-        
-        // Database에서 데이터 삭제
-        const imageRef = ref(database, `images_table/${id}`);
-        await remove(imageRef);
-        
-        console.log('데이터베이스 삭제 완료!');
-        alert('✅ 삭제되었습니다!');
-        loadImages();
-        
-      } catch (error) {
-        console.error('삭제 실패:', error);
-        alert('❌ 삭제 중 오류가 발생했습니다.');
-      }
+    window.deleteImage = async function(id,url){
+      if(!confirm('삭제하시겠습니까?')) return;
+      try{ await deleteObject(storageRef(storage,url)); }catch(e){}
+      await remove(ref(database,`images_table/${id}`));
+      loadImages();
     };
 
-    // Firebase에서 이미지 데이터 로드
-    function loadImages() {
-      const imagesRef = ref(database, 'images_table');
-      
-      onValue(imagesRef, (snapshot) => {
-        const tbody = document.getElementById('imageTableBody');
-        
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          allImages = Object.keys(data).map(key => ({
-            id: key,
-            ...data[key]
-          }));
-          
-          console.log('이미지 로드 완료:', allImages.length, '개');
-          displayImages();
-        } else {
-          tbody.innerHTML = '<tr><td colspan="5" class="no-data">등록된 이미지가 없습니다.</td></tr>';
-        }
-      }, (error) => {
-        console.error('데이터 로드 실패:', error);
-        tbody.innerHTML = '<tr><td colspan="5" class="no-data">데이터를 불러올 수 없습니다.</td></tr>';
+    function loadImages(){
+      onValue(ref(database,'images_table'), snap=>{
+        if(!snap.exists()) return;
+        allImages = Object.entries(snap.val()).map(([id,v])=>({id,...v}));
+        displayImages();
       });
     }
 
-    // 초기화
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded',()=>{
       selectMonth(selectedMonth);
       loadImages();
     });
   </script>
 </body>
+
 </html>

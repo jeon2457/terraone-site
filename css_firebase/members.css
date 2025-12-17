@@ -38,3 +38,49 @@ h2 {
   font-weight: bold;
   color: #ffc107;
 }
+
+
+
+/* =========================
+   📱 모바일 반응형 테이블 컬럼 숨김
+   ========================= */
+@media (max-width: 768px) {
+  .btn-area-responsive {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* 버튼 간 간격 */
+  }
+
+
+
+  /* 아이디 */
+  #membersTable th:nth-child(3),
+  #membersTable td:nth-child(3) {
+    display: none;
+  }
+
+  /* 비고 */
+  #membersTable th:nth-child(7),
+  #membersTable td:nth-child(7) {
+    display: none;
+  }
+
+  /* SMS */
+  #membersTable th:nth-child(8),
+  #membersTable td:nth-child(8) {
+    display: none;
+  }
+
+  /* SMS 추가 */
+  #membersTable th:nth-child(9),
+  #membersTable td:nth-child(9) {
+    display: none;
+  }
+
+  /* 레벨 */
+  #membersTable th:nth-child(10),
+  #membersTable td:nth-child(10) {
+    display: none;
+  }  
+    
+}
