@@ -1,0 +1,53 @@
+
+;;;;;  먼저 앱키를 받으려면 카카오에 접속해서 가입하고 절차를 밟아야한다.
+
+   [[  kakao developers 가입하기  ]]
+  - https://developers.kakao.com/
+id:  jeon2457@kakao.com
+pw: jeonsj8..5#
+
+가입절차는 같은폴더내에 이미지를 보면 알수있다.
+==>> 가입절차방법 폴더내 이미지(kakao developers 카카오앱키-1.png ~ 17.png)
+
+(★★★주의할점★★★)  :  주의하실점은 위 코드를 실행하는 파일 및 링크주소는 
+  카카오앱 생성시 등록한 도메인 안에서만 되어야 정상작동 합니다.
+  https://developers.kakao.com/console/app/176496/product/login에서 카카오 로그인
+  메뉴로 들어가면 Redirect URI 에서 연동할 사이트주소를 입력해야한다.
+
+가입안내사이트:  https://www.whatwant.com/entry/Python%EC%9C%BC%EB%A1%9C-%EC%B9%B4%EC%B9%B4%EC%98%A4%ED%86%A1-%EB%A9%94%EC%8B%9C%EC%A7%80-%EB%B3%B4%EB%82%B4%EA%B8%B0-1
+
+사이트만드는데 도움받으려면 유튜브 "카카오톡API" 검색으로 강좌 찾아볼것!
+- https://youtu.be/Re2R2rid1K4  카카오계정으로 로그인하기 (카카오톡 로그인 API 사용하기)  - 개발자의품격
+
+	  ▶▶▶▶▶  [[ 앱 키 ]]  ◀◀◀◀◀
+
+네이티브 앱 키	689355b8fac02d9b143c1988c90b6b93
+REST API 키	12c12f89f690b64f39d907b91d31392e
+JavaScript 키	7b84f7eb4bb72edbddad81937369478d
+Admin 키	              dae6a4dff0905fa4995e1fd8412110ab
+엑세스 토큰           nh3vx5SVF7ccEw4IwS9lOB5kXhVlhDpKlIwgUGaWCj1zmwAAAYOcmPjq
+
+1. https://developers.kakao.com/   ==>> 로그인===> Redirect URI 추가삽입 ( https://localhost.com )
+
+2. 인증 code 받기 ==>> 에러로인해 인증코드 못받음! ㅠㅠ
+https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${REST API앱키 여기에 입력}&redirect_uri=${REDIRECT_URI}
+https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${12c12f89f690b64f39d907b91d31392e}&redirect_uri=${https://localhost.com}
+
+https://kauth.kakao.com/oauth/authorize?client_id={12c12f89f690b64f39d907b91d31392e}&redirect_uri=https://localhost:3000&response_type=code&scope=talk_message
+https://kauth.kakao.com/oauth/authorize?client_id={REST_API 앱키를 입력하세요}&response_type=code&redirect_uri=https://localhost.com:3000
+
+
+rkHarDxn6AoWPbX3nKGamcUrv4oLGRVK
+https://kauth.kakao.com/oauth/authorize?client_id={eba80f7370cc96acd20887c11783e1c4}&redirect_uri=https://localhost.com&response_type=code&scope=talk_message
+https://kauth.kakao.com/oauth/authorize?client_id={eba80f7370cc96acd20887c11783e1c4}&redirect_uri=https://localhost.com&response_type=code&scope=talk_message
+
+https://kauth.kakao.com/oauth/authorize?client_id={09ae3c16e0adbeb9f86a199adc576d04}&redirect_uri=https://localhost.com&response_type=code&scope=talk_message
+
+
+http://jikji35.woobi.co.kr
+http://m.jikji35.woobi.co.kr
+http://jikji35.dothome.co.kr
+https://jikji35.netlify.app
+https://jeon2457.github.io
+http://terraone.modoo.at
+http://jikji35.ivyro.net

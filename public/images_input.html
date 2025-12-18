@@ -212,6 +212,29 @@
       color: #fff;
     }
 
+    .kakao-buttons {
+        display: flex;
+        gap: 10px;
+        padding: 20px;
+        justify-content: center;
+    }
+    /* 카카오 고유 색상 및 아이콘 스타일링 */
+    .btn-kakao-chat {
+        background-color: #FEE500;
+        color: #3C1E1E;
+        font-weight: bold;
+        border: none;
+        display: flex;
+        align-items: center;
+    }
+    .btn-kakao-chat:hover {
+        background-color: #f7d200;
+    }
+    .kakao-icon {
+        margin-right: 5px;
+        font-size: 1.2em; /* 아이콘 크기 조정 */
+    }
+
  
     
     @media (max-width: 576px) {
@@ -287,6 +310,16 @@
           <a href="images_view.html"><button class="btn-nav">📊 목록보기</button></a>
           <a href="images_edit.html"><button class="btn-nav">✏️ 편집하기</button></a>
         </div>
+
+        <div class="d-flex justify-content-center mt-4 gap-3">
+            <a 
+                href="https://open.kakao.com/o/gWWWIK5h" 
+                target="_blank" 
+                class="btn btn-kakao-chat btn-sm">
+                <span class="kakao-icon">🔗</span> 카카오톡 공유방
+            </a>
+        </div>
+
         <!-- 되돌아가기 Firebase 페이지 -->
           <a href="account_images_main-1.html" class="btn-back">← 되돌아가기</a>
       </div>

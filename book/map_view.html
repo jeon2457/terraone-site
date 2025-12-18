@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<!-- 모바일 화면 꽉 차게 설정 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>찾아오는 길안내</title>
+
+<!-- ✅ 카카오맵 API 키 확인 필수 -->
+<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=3409644aa1cb50eb41430562f5df97d2&libraries=services"></script>
+
+<style>
+/* CSS 초기화 */
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: 'Noto Sans KR', sans-serif;
+  overflow: hidden;
+}
+
+.map-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+}
+
+/* 내비게이션 버튼 박스 */
+.navi-buttons {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 400px;
+  display: none; /* 초기에는 숨김 */
+  gap: 10px;
+  z-index: 9999;
+}
+
+/* 공통 버튼 스타일 */
+.btn-navi {
+  flex: 1;
+  padding: 12px; /* 패딩 약간 조절 */
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 16px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  transition: transform 0.2s;
+  
+  /* 🔥 [수정됨] 이미지와 텍스트 가로 정렬 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* 이미지와 글자 사이 간격 */
+  cursor: pointer;
+}
+
+.btn-navi:active {
+  transform: scale(0.96);
+}
+
+/* 🔥 [추가됨] 버튼 내부 아이콘 이미지 스타일 */
+.btn-icon {
+  width: 24px;  /* 아이콘 크기 */
+  height: 24px;
+  object-fit: contain; /* 비율 유지 */
+  border-radius: 4px; /* 모서리 살짝 둥글게 */
+}
+
+/* 카카오맵 (노랑) */
+.btn-kakao {
+  background-color: #FEE500;
+  color: #3C1E1E;
+  border: 1px solid #eecbf0;
+}
+
+/* TMAP (흰색/검정) */
+.btn-tmap {
+  background-color: #FFFFFF;
+  color: #000000;
+  border: 1px solid #ccc;
+}
+
+/* 모달창 스타일 (기존 유지) */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  justify-content: center;
+  align-items: center;
+}
+.modal-box {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  width: 85%;
+  max-width: 320px;
+  text-align: center;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+}
+.modal-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; color: #333; }
+.modal-desc { font-size: 14px; color: #666; margin-bottom: 20px; line-height: 1.5; }
+.modal-btns { display: flex; gap: 10px; }
+.modal-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
+.btn-cancel { background: #f1f1f1; color: #555; }
+.btn-install { background: #ff4d4d; color: white; }
+</style>
+</head>
+
+<body>
+<div class="map-wrapper">
+  <div id="map"></div>
+
+  <!-- 내비게이션 버튼 -->
+  <div class="navi-buttons" id="naviBox">
+    <!-- ✅ 카카오맵 버튼 (이미지 교체) -->
+    <a href="#" id="kakaoLink" class="btn-navi btn-kakao" target="_blank">
+      <img src="image/kakao_map.png" alt="kakao" class="btn-icon">
+      카카오맵
+    </a>
+    
+    <!-- ✅ TMAP 버튼 (이미지 교체) -->
+    <div id="tmapLink" class="btn-navi btn-tmap" onclick="tryRunTmap()">
+      <img src="image/t_map.jpg" alt="tmap" class="btn-icon">
+      TMAP 실행
+    </div>
+  </div>
+</div>
+
+<!-- 안내 모달창 -->
+<div id="tmapModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-title">📢 안내</div>
+    <div class="modal-desc">
+      TMAP 앱이 열리지 않으면 설치되어 있지 않습니다.<br>
+      설치 페이지로 이동하시겠습니까?
+    </div>
+    <div class="modal-btns">
+      <button class="modal-btn btn-cancel" onclick="closeModal()">취소</button>
+      <button class="modal-btn btn-install" onclick="goToStore()">설치하러 가기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// 1. 주소 가져오기
+const address = localStorage.getItem('weddingAddress');
+
+if (!address) {
+  alert('입력된 주소가 없습니다.');
+}
+
+const mapContainer = document.getElementById('map');
+const mapOption = {
+  center: new kakao.maps.LatLng(37.5665, 126.9780),
+  level: 3
+};
+
+const map = new kakao.maps.Map(mapContainer, mapOption);
+const geocoder = new kakao.maps.services.Geocoder();
+const marker = new kakao.maps.Marker({ map });
+
+// TMAP 링크 변수
+let tmapUrlScheme = "";
+
+// 2. 좌표 검색 및 링크 생성
+if (address) {
+  geocoder.addressSearch(address, function(result, status) {
+    if (status === kakao.maps.services.Status.OK) {
+      const lat = result[0].y;
+      const lng = result[0].x;
+      const coords = new kakao.maps.LatLng(lat, lng);
+
+      map.setCenter(coords);
+      marker.setPosition(coords);
+
+      new kakao.maps.InfoWindow({
+        content: `<div style="width:150px;text-align:center;padding:6px 0;font-size:14px;">${address}</div>`
+      }).open(map, marker);
+
+      // --- 링크 설정 ---
+      const naviBox = document.getElementById('naviBox');
+      const kakaoBtn = document.getElementById('kakaoLink');
+
+      // 카카오맵
+      kakaoBtn.href = `https://map.kakao.com/link/to/${address},${lat},${lng}`;
+
+      // TMAP
+      tmapUrlScheme = `tmap://route?goalname=${encodeURIComponent(address)}&goalx=${lng}&goaly=${lat}`;
+
+      // 버튼 표시
+      naviBox.style.display = 'flex'; 
+
+    } else {
+      alert("주소 위치를 찾을 수 없습니다.");
+    }
+  });
+}
+
+// 3. TMAP 실행 로직
+function tryRunTmap() {
+  if (!tmapUrlScheme) return;
+
+  const startTime = new Date().getTime();
+  window.location.href = tmapUrlScheme;
+
+  setTimeout(function() {
+    const endTime = new Date().getTime();
+    if (endTime - startTime < 2500) {
+      showModal();
+    }
+  }, 1500);
+}
+
+function showModal() { document.getElementById('tmapModal').style.display = 'flex'; }
+function closeModal() { document.getElementById('tmapModal').style.display = 'none'; }
+
+function goToStore() {
+  const userAgent = navigator.userAgent.toLowerCase();
+  if (userAgent.indexOf("android") > -1) {
+    window.location.href = "market://details?id=com.skt.tmap.ku"; 
+  } else if (userAgent.indexOf("iphone") > -1 || userAgent.indexOf("ipad") > -1) {
+    window.location.href = "https://apps.apple.com/kr/app/tmap-%EB%8C%80%EC%A4%91%EA%B5%90%ED%86%B5-%EB%8C%80%EB%A6%AC%EC%9A%B4%EC%A0%84/id431589174";
+  } else {
+    alert("모바일 기기에서만 설치가 가능합니다.");
+  }
+  closeModal();
+}
+</script>
+</body>
+</html>

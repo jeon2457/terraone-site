@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>우리의 결혼식</title>
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --gold: #c9a24d;
+  --dark: #2e2e2e;
+  --soft: #f8f6f2;
+}
+
+body {
+  margin: 0;
+  font-family: 'Noto Serif KR', serif;
+  background: var(--soft);
+  color: var(--dark);
+}
+
+.container {
+  max-width: 480px;
+  margin: auto;
+  background: #fff;
+  box-shadow: 0 10px 40px rgba(0,0,0,.08);
+}
+
+/* ===== HERO ===== */
+.hero {
+  text-align: center;
+  padding: 80px 20px;
+  background: linear-gradient(135deg, #fff, #f5f0e8);
+}
+
+.hero h1 {
+  font-size: 2.2rem;
+  letter-spacing: 2px;
+}
+
+.hero p {
+  margin-top: 12px;
+  font-size: 1rem;
+  opacity: .7;
+}
+
+/* ===== SECTION ===== */
+.section {
+  padding: 50px 20px;
+  text-align: center;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  color: var(--gold);
+}
+
+/* ===== ACCOUNT ===== */
+.account-box {
+  background: #fafafa;
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 25px;
+}
+
+.account-box h3 {
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+}
+
+.account-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 10px;
+  border: 1px solid #eee;
+}
+
+.account-row span {
+  font-size: .95rem;
+}
+
+.copy-btn {
+  background: var(--gold);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: .85rem;
+  cursor: pointer;
+}
+
+/* ===== BANK BUTTON ===== */
+.bank-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.bank-btn {
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  font-size: .95rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.kb { background:#ffcc00; }
+.shinhan { background:#0052a4; color:#fff; }
+.kakao { background:#fee500; }
+.woori { background:#1a4fa3; color:#fff; }
+
+/* ===== FOOTER ===== */
+.footer {
+  padding: 40px 20px;
+  text-align: center;
+  font-size: .85rem;
+  opacity: .6;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+  <!-- HERO -->
+  <section class="hero">
+    <h1>홍길동 · 김영희</h1>
+    <p>2025년 10월 12일 토요일 오후 2시</p>
+  </section>
+
+  <!-- ACCOUNT -->
+  <section class="section">
+    <div class="section-title">마음 전하실 곳</div>
+
+    <!-- 신랑 -->
+    <div class="account-box">
+      <h3>🤵 신랑 홍길동</h3>
+
+      <div class="account-row">
+        <span>국민은행 123456-78-901234</span>
+        <button class="copy-btn" onclick="copyText('국민은행 123456-78-901234')">복사</button>
+      </div>
+
+      <div class="bank-buttons">
+        <button class="bank-btn kb" onclick="openBank('kb')">국민은행</button>
+        <button class="bank-btn kakao" onclick="openBank('kakao')">카카오뱅크</button>
+      </div>
+    </div>
+
+    <!-- 신부 -->
+    <div class="account-box">
+      <h3>👰 신부 김영희</h3>
+
+      <div class="account-row">
+        <span>신한은행 987654-32-109876</span>
+        <button class="copy-btn" onclick="copyText('신한은행 987654-32-109876')">복사</button>
+      </div>
+
+      <div class="bank-buttons">
+        <button class="bank-btn shinhan" onclick="openBank('shinhan')">신한은행</button>
+        <button class="bank-btn woori" onclick="openBank('woori')">우리은행</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    소중한 축복에 감사드립니다 💍
+  </div>
+
+</div>
+
+<script>
+function copyText(text) {
+  navigator.clipboard.writeText(text);
+  alert("계좌번호가 복사되었습니다.");
+}
+
+function openBank(bank) {
+  const links = {
+    kb: "intent://#Intent;scheme=kbbank;package=com.kbstar.kbbank;end",
+    shinhan: "intent://#Intent;scheme=shinhan-sr-ansimclick;package=com.shinhan.sr.bank;end",
+    kakao: "intent://#Intent;scheme=kakaobank;package=com.kakaobank.channel;end",
+    woori: "intent://#Intent;scheme=wooribank;package=com.wooribank.smart;end"
+  };
+  location.href = links[bank];
+}
+</script>
+
+</body>
+</html>

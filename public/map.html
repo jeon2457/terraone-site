@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<!-- 모바일 화면 대응 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>장소검색 및 입력</title>
+
+<!-- ✅ JavaScript 키 -->
+<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=3409644aa1cb50eb41430562f5df97d2&libraries=services"></script>
+
+<style>
+/* 초기화 */
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Noto Sans KR', sans-serif;
+  background: #f0f2f5;
+  color: #333;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 15px;
+  color: #2c3e50;
+  font-size: 1.5rem;
+}
+
+/* 검색 폼 디자인 수정 (버튼 포함) */
+.search-form {
+  display: flex; /* 가로 정렬 */
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+input[type="text"] {
+  flex: 1; /* 남은 공간 다 차지 */
+  padding: 15px;
+  font-size: 16px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  outline: none;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+input[type="text"]:focus {
+  border-color: #4a90e2;
+}
+
+/* 🔍 검색 버튼 스타일 */
+.btn-search {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  width: 55px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: background 0.2s;
+}
+
+.btn-search:active {
+  background-color: #357abd;
+}
+
+/* 검색 결과 리스트 */
+#placesList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  max-height: 200px;
+  overflow-y: auto;
+  display: none;
+}
+
+#placesList li {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+#placesList li:last-child { border-bottom: none; }
+#placesList li:hover { background-color: #f9f9f9; }
+
+#placesList .place-name {
+  font-weight: bold;
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+#placesList .place-addr {
+  font-size: 13px;
+  color: #777;
+}
+
+#placesList li.on {
+  background-color: #e3f2fd;
+  border-left: 5px solid #4a90e2;
+}
+
+/* 지도 박스 */
+.map-box {
+  background: white;
+  padding: 5px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  flex: 1;
+  min-height: 250px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+}
+
+/* 하단 버튼 */
+.btn-link {
+  display: block;
+  width: 100%;
+  background-color: #4a90e2;
+  color: white;
+  text-align: center;
+  padding: 16px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 12px;
+  text-decoration: none;
+  box-shadow: 0 4px 6px rgba(74, 144, 226, 0.3);
+  transition: background-color 0.2s;
+}
+
+.btn-link:active {
+  background-color: #357abd;
+  transform: translateY(2px);
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+  
+  <h2>📍 장소/주소 검색</h2>
+
+  <!-- 폼 제출 이벤트 리스너 변경 (JS에서 처리) -->
+  <form class="search-form" id="searchForm">
+    <input type="text" id="keyword" placeholder="건물명, 지명 입력 (예: 서울역)" autocomplete="off">
+    <button type="submit" class="btn-search">🔍</button>
+  </form>
+
+  <!-- 검색 결과 목록 -->
+  <ul id="placesList"></ul>
+
+  <!-- 지도 미리보기 -->
+  <div class="map-box">
+    <div id="map"></div>
+  </div>
+
+  <!-- 하단 버튼 -->
+  <a href="#" onclick="goToMapView()" class="btn-link">🗺️ 이 위치로 지도보기</a>
+
+</div>
+
+<script>
+// 1. 지도 생성
+const mapContainer = document.getElementById('map');
+const mapOption = {
+  center: new kakao.maps.LatLng(37.5665, 126.9780),
+  level: 3
+};
+
+const map = new kakao.maps.Map(mapContainer, mapOption);
+const marker = new kakao.maps.Marker({ map: map });
+
+const ps = new kakao.maps.services.Places();
+let selectedAddress = "";
+
+// 🚀 [핵심 수정] 폼 제출 이벤트 리스너
+document.getElementById('searchForm').addEventListener('submit', function(e) {
+  e.preventDefault(); // 페이지 새로고침 방지
+  searchPlaces();     // 검색 실행
+  
+  // 🔥 [중요] 모바일 키보드 강제로 내리기
+  // 키보드가 내려가야 가려져 있던 검색 목록이 보입니다.
+  document.getElementById('keyword').blur(); 
+});
+
+// 3. 키워드 검색 함수
+function searchPlaces() {
+  const keyword = document.getElementById('keyword').value.trim();
+
+  if (!keyword) {
+    alert('검색어를 입력해주세요!');
+    return false;
+  }
+
+  // 장소검색 객체를 통해 키워드로 장소검색을 요청합니다
+  ps.keywordSearch(keyword, placesSearchCB);
+}
+
+// 4. 장소검색 콜백함수
+function placesSearchCB(data, status, pagination) {
+  if (status === kakao.maps.services.Status.OK) {
+    displayPlaces(data);
+  } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
+    alert('검색 결과가 존재하지 않습니다.');
+    return;
+  } else if (status === kakao.maps.services.Status.ERROR) {
+    alert('검색 결과 중 오류가 발생했습니다.');
+    return;
+  }
+}
+
+// 5. 검색 결과 목록 표출
+function displayPlaces(places) {
+  const listEl = document.getElementById('placesList');
+  listEl.innerHTML = "";
+  listEl.style.display = 'block';
+
+  for (let i = 0; i < places.length; i++) {
+    const itemEl = document.createElement('li');
+    
+    // 도로명 주소 우선 사용
+    const addressName = places[i].road_address_name ? places[i].road_address_name : places[i].address_name;
+
+    itemEl.innerHTML = `
+      <div class="place-name">${places[i].place_name}</div>
+      <div class="place-addr">${addressName}</div>
+    `;
+
+    itemEl.onclick = function() {
+      // 지도 이동
+      const coords = new kakao.maps.LatLng(places[i].y, places[i].x);
+      map.setCenter(coords);
+      marker.setPosition(coords);
+
+      // 선택 스타일
+      const children = listEl.children;
+      for(let j=0; j<children.length; j++) children[j].classList.remove('on');
+      this.classList.add('on');
+
+      // 저장용 주소 설정
+      selectedAddress = addressName;
+      
+      // 입력창 업데이트 (선택한 장소명으로)
+      document.getElementById('keyword').value = places[i].place_name;
+    };
+
+    listEl.appendChild(itemEl);
+  }
+}
+
+// 7. 지도보기 버튼
+function goToMapView() {
+  if (!selectedAddress) {
+    alert("목록에서 장소를 선택해주세요!");
+    return;
+  }
+
+  localStorage.setItem('weddingAddress', selectedAddress);
+  location.href = "map_view.html";
+}
+</script>
+</body>
+</html>

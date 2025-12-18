@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>계좌 송금 안내</title>
+
+<style>
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: #f5f6fa;
+  padding: 20px;
+}
+
+.transfer-box {
+  max-width: 420px;
+  margin: auto;
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.transfer-box h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.bank-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.2s;
+}
+
+.bank-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* 은행별 색상 */
+.kb { background: #ffcc00; color:#000; }
+.shinhan { background: #0046ff; }
+.woori { background: #0082c9; }
+.nh { background: #2fa84f; }
+.kakao { background: #ffe812; color:#000; }
+.toss { background: #0064ff; }
+
+.bank-name {
+  font-size: 1rem;
+}
+
+.account {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+</style>
+</head>
+
+<body>
+
+<div class="transfer-box">
+  <h2>💌 마음 전하실 곳</h2>
+
+  <a href="#" class="bank-btn kb">
+    <span class="bank-name">국민은행</span>
+    <span class="account">123456-01-123456</span>
+  </a>
+
+  <a href="#" class="bank-btn shinhan">
+    <span class="bank-name">신한은행</span>
+    <span class="account">110-123-456789</span>
+  </a>
+
+  <a href="#" class="bank-btn woori">
+    <span class="bank-name">우리은행</span>
+    <span class="account">1002-345-678901</span>
+  </a>
+
+  <a href="#" class="bank-btn nh">
+    <span class="bank-name">농협</span>
+    <span class="account">301-1234-5678</span>
+  </a>
+
+  <a href="#" class="bank-btn kakao">
+    <span class="bank-name">카카오뱅크</span>
+    <span class="account">3333-01-1234567</span>
+  </a>
+
+  <a href="#" class="bank-btn toss">
+    <span class="bank-name">토스뱅크</span>
+    <span class="account">1000-1234-5678</span>
+  </a>
+</div>
+
+</body>
+</html>

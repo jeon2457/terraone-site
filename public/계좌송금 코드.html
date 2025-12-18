@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>마음 전하실 곳</title>
+<style>
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: #f7f7f7;
+  padding: 20px;
+}
+.card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  max-width: 400px;
+  margin: auto;
+}
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.bank {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+.account {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+.btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  font-size: 1rem;
+  margin-top: 8px;
+  cursor: pointer;
+}
+.copy { background: #eee; }
+.kakao { background: #fee500; }
+.toss { background: #0064ff; color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h2>입금계좌 안내</h2>
+
+  <div class="bank">🏦 기업은행</div>
+  <div class="account" id="account">💳 123-456-789012</div>
+  <div>예금주: 전상준</div>
+
+  <button class="btn copy" onclick="copyAccount()">📋 계좌번호 복사</button>
+
+  <!-- 카카오페이 송금 -->
+  <a href="https://pay.kakao.com" target="_blank">
+    <button class="btn kakao">카카오페이로 송금</button>
+  </a>
+
+  <!-- 토스 송금 -->
+  <a href="https://toss.im" target="_blank">
+    <button class="btn toss">토스로 송금</button>
+  </a>
+</div>
+
+<script>
+function copyAccount() {
+  const text = document.getElementById('account').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    alert('계좌번호가 복사되었습니다.');
+  });
+}
+</script>
+
+</body>
+</html>
